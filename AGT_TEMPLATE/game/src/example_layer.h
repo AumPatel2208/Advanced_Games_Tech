@@ -1,5 +1,6 @@
 #pragma once
 #include <engine.h>
+#include "player.h"
 
 class example_layer : public engine::layer
 {
@@ -20,8 +21,9 @@ private:
 	engine::ref<engine::game_object>	mTree{};
 	engine::ref<engine::game_object>	mBall{};
 	engine::ref<engine::game_object>	mMannequin{};
-
 	engine::ref<engine::material>		mMaterial{};
+	Player								mPlayer{};
+
 
 	engine::DirectionalLight            mDirectionalLight;
 

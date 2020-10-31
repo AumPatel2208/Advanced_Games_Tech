@@ -3,7 +3,6 @@
 #define GLM_FORCE_CTOR_INIT
 #include "glm/glm.hpp"
 
-
 namespace engine
 {
     //================= CAMERA INTERFACE =================
@@ -121,6 +120,12 @@ namespace engine
 
         void on_update(const timestep& timestep) override;
 
+        // To update from player to provide authentic 3rd person camera
+        void on3rdPersonUpdate(const timestep& timestep,glm::vec3 position, glm::vec3 look_at);
+
+        // update from https://www.youtube.com/watch?v=PoxDDZmctnU
+        void onUpdateTP(const timestep& timestep);
+
         glm::vec3 position() const override { return m_position; }
         void position(const glm::vec3& pos) override { m_position = pos; update_view_matrix(); }
 
@@ -139,6 +144,14 @@ namespace engine
         const glm::mat4& view_projection_matrix() const override;
 
 		void set_view_matrix(glm::vec3 position, glm::vec3 look_at);
+
+
+        float& getYaw()  { return m_yaw; }
+        float& getPitch()  { return m_pitch; }
+        float& getFOV()  { return m_fov; }
+        static float getSensitivity() { return s_mouse_sensitivity; }
+        float& getAngleAroundPlayer() { return mAngleAroundPlayer; }
+ 
 
     private: 
         void process_mouse(float mouse_delta_x, float mouse_delta_y, bool constrain_pitch = true);
@@ -173,6 +186,9 @@ namespace engine
         float m_near_plane = 0.1f; 
         /// \brief ar clipping plane. 
         float m_far_plane = 100.f; 
+
+        float mAngleAroundPlayer = 0.f;
+
 
         /// \brief in units per seconds. 
         inline static float s_movement_speed = SPEED; 

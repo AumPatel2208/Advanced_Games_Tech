@@ -73,7 +73,7 @@ engine::perspective_camera::perspective_camera(
     m_front_vector = glm::vec3(0.0f, 0.0f, -1.0f);
     m_up_vector = glm::vec3(0.0f, 1.0f,  0.0f);
     m_view_mat = glm::lookAt(m_position, m_position + m_front_vector, m_up_vector);
-
+    
     glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     //m_front_vector = glm::normalize(m_position - cameraTarget);
 
@@ -108,6 +108,18 @@ void engine::perspective_camera::on_update(const timestep& timestep)
     //float delta = input::mouse_scroll();
     //process_mouse_scroll(delta);
 }
+
+void engine::perspective_camera::on3rdPersonUpdate(const timestep& timestep ,glm::vec3 position, glm::vec3 look_at ) {
+    auto [mouse_delta_x, mouse_delta_y] = input::mouse_position();
+    process_mouse(mouse_delta_x, mouse_delta_y);
+
+    
+    update_camera_vectors();
+
+    set_view_matrix(position, look_at);
+
+}
+
 
 const glm::mat4& engine::perspective_camera::projection_matrix() const 
 { 

@@ -94,7 +94,9 @@ example_layer::example_layer()
     mannequinProps.position = glm::vec3(3.0f, 0.5f, -5.0f);
     mannequinProps.type = 0;
     mannequinProps.bounding_shape = mSkinnedMesh->size() / 2.f * mannequinProps.scale.x;
+
     mMannequin = engine::game_object::create(mannequinProps);
+    mPlayer.initialise(mMannequin);
 
     // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
     const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
@@ -157,19 +159,21 @@ example_layer::example_layer()
 example_layer::~example_layer() {}
 
 void example_layer::on_update(const engine::timestep& timeStep) {
-    m3DCamera.on_update(timeStep);
-
+    // m3DCamera.on_update(timeStep);
+    
     mPhysicsManager->dynamics_world_update(mGameObjects, double(timeStep));
 
-    mMannequin->animated_mesh()->on_update(timeStep);
-
+    // mMannequin->animated_mesh()->on_update(timeStep);
+    mPlayer.onUpdate(timeStep);
+    // mPlayer.updateCameraOld(m3DCamera, timeStep);
+    mPlayer.updateCamera(m3DCamera);
     checkBounce();
 }
 
 void example_layer::on_render() {
     engine::render_command::clear_color({0.2f, 0.3f, 0.3f, 1.0f});
     engine::render_command::clear();
-
+ 
     //const auto textured_shader = engine::renderer::shaders_library()->get("mesh_static");
     //engine::renderer::begin_scene(m_3d_camera, textured_shader);
 
@@ -222,7 +226,8 @@ void example_layer::on_render() {
 
     glm::mat4 aniTransform = glm::mat4(1.0f);
 
-    engine::renderer::submit(animatedMeshShader, mMannequin);
+    engine::renderer::submit(animatedMeshShader, mPlayer.object());
+    // engine::renderer::submit(animatedMeshShader, mMannequin);
 
     engine::renderer::end_scene();
 
