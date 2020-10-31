@@ -6,238 +6,243 @@
 #include "engine/events/key_event.h"
 #include "engine/utils/track.h"
 
-example_layer::example_layer() 
-    :m_2d_camera(-1.6f, 1.6f, -0.9f, 0.9f), 
-    m_3d_camera((float)engine::application::window().width(), (float)engine::application::window().height())
-
-
-{
-
+example_layer::example_layer()
+    : m2DCamera(-1.6f, 1.6f, -0.9f, 0.9f),
+      m3DCamera((float)engine::application::window().width(), (float)engine::application::window().height()) {
     // Hide the mouse and lock it inside the window
     //engine::input::anchor_mouse(true);
     engine::application::window().hide_mouse_cursor();
 
-	// Initialise audio and play background music
-	m_audio_manager = engine::audio_manager::instance();
-	m_audio_manager->init();
-	m_audio_manager->load_sound("assets/audio/bounce.wav", engine::sound_type::event, "bounce"); // Royalty free sound from freesound.org
-	m_audio_manager->load_sound("assets/audio/DST-impuretechnology.mp3", engine::sound_type::track, "music");  // Royalty free music from http://www.nosoapradio.us/
-	//m_audio_manager->play("music");
+    // Initialise audio and play background music
+    mAudioManager = engine::audio_manager::instance();
+    mAudioManager->init();
+    mAudioManager->load_sound("assets/audio/bounce.wav", engine::sound_type::event, "bounce");
+    // Royalty free sound from freesound.org
+    mAudioManager->load_sound("assets/audio/DST-impuretechnology.mp3", engine::sound_type::track, "music");
+    // Royalty free music from http://www.nosoapradio.us/
+    //m_audio_manager->play("music");
 
 
-	// Initialise the shaders, materials and lights
-	auto mesh__material_shader = engine::renderer::shaders_library()->get("mesh_material");
-	auto mesh_lighting_shader = engine::renderer::shaders_library()->get("mesh_lighting");
-	auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-	auto animated_mesh_shader = engine::renderer::shaders_library()->get("animated_mesh");
+    // Initialise the shaders, materials and lights
+    auto meshMaterialShader = engine::renderer::shaders_library()->get("mesh_material");
+    auto meshLightingShader = engine::renderer::shaders_library()->get("mesh_lighting");
+    auto textShader = engine::renderer::shaders_library()->get("text_2D");
+    auto animatedMeshShader = engine::renderer::shaders_library()->get("animated_mesh");
 
-	m_directionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
-	m_directionalLight.AmbientIntensity = 0.25f;
-	m_directionalLight.DiffuseIntensity = 0.6f;
-	m_directionalLight.Direction = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
+    mDirectionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
+    mDirectionalLight.AmbientIntensity = 0.25f;
+    mDirectionalLight.DiffuseIntensity = 0.6f;
+    mDirectionalLight.Direction = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
 
-	// set color texture unit
-	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->bind();
-	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gColorMap", 0);
-	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("lighting_on", true);
-	m_directionalLight.submit(animated_mesh_shader);
-	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gMatSpecularIntensity", 0.5f);
-	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gSpecularPower", 5.f);
-	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("transparency", 1.0f);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->bind();
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->set_uniform("lighting_on", true);
-	m_directionalLight.submit(mesh__material_shader);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->set_uniform("gMatSpecularIntensity", 1.f);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->set_uniform("gSpecularPower", 10.f);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->bind();
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->set_uniform("gColorMap", 0);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->set_uniform("lighting_on", true);
-	m_directionalLight.submit(mesh_lighting_shader);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->set_uniform("gMatSpecularIntensity", 0.5f);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->set_uniform("gSpecularPower", 5.f);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->set_uniform("transparency", 1.0f);
-	std::dynamic_pointer_cast<engine::gl_shader>(text_shader)->bind();
-	std::dynamic_pointer_cast<engine::gl_shader>(text_shader)->set_uniform("projection",
-		glm::ortho(0.f, (float)engine::application::window().width(), 0.f,
-		(float)engine::application::window().height()));
-	m_material = engine::material::create(1.0f, glm::vec3(1.0f, 0.1f, 0.07f),
-		glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
+    // set color texture unit
+    std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->bind();
+    std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->set_uniform("gColorMap", 0);
+    std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->set_uniform("lighting_on", true);
+    mDirectionalLight.submit(animatedMeshShader);
+    std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->set_uniform("gMatSpecularIntensity", 0.5f);
+    std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->set_uniform("gSpecularPower", 5.f);
+    std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->set_uniform("transparency", 1.0f);
+    std::dynamic_pointer_cast<engine::gl_shader>(meshMaterialShader)->bind();
+    std::dynamic_pointer_cast<engine::gl_shader>(meshMaterialShader)->set_uniform("lighting_on", true);
+    mDirectionalLight.submit(meshMaterialShader);
+    std::dynamic_pointer_cast<engine::gl_shader>(meshMaterialShader)->set_uniform("gMatSpecularIntensity", 1.f);
+    std::dynamic_pointer_cast<engine::gl_shader>(meshMaterialShader)->set_uniform("gSpecularPower", 10.f);
+    std::dynamic_pointer_cast<engine::gl_shader>(meshLightingShader)->bind();
+    std::dynamic_pointer_cast<engine::gl_shader>(meshLightingShader)->set_uniform("gColorMap", 0);
+    std::dynamic_pointer_cast<engine::gl_shader>(meshLightingShader)->set_uniform("lighting_on", true);
+    mDirectionalLight.submit(meshLightingShader);
+    std::dynamic_pointer_cast<engine::gl_shader>(meshLightingShader)->set_uniform("gMatSpecularIntensity", 0.5f);
+    std::dynamic_pointer_cast<engine::gl_shader>(meshLightingShader)->set_uniform("gSpecularPower", 5.f);
+    std::dynamic_pointer_cast<engine::gl_shader>(meshLightingShader)->set_uniform("transparency", 1.0f);
+    std::dynamic_pointer_cast<engine::gl_shader>(textShader)->bind();
+    std::dynamic_pointer_cast<engine::gl_shader>(textShader)->set_uniform("projection",
+                                                                          glm::ortho(
+                                                                              0.f, (float)engine::application::window()
+                                                                              .width(), 0.f,
+                                                                              (float)engine::application::window().
+                                                                              height()));
+    mMaterial = engine::material::create(1.0f, glm::vec3(1.0f, 0.1f, 0.07f),
+                                          glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
 
 
-	// Skybox texture from http://www.vwall.it/wp-content/plugins/canvasio3dpro/inc/resource/cubeMaps/
-	m_skybox = engine::skybox::create(50.f,
-		{ engine::texture_2d::create("assets/textures/skybox/SkyboxFront.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxRight.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxBack.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxLeft.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxTop.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxBottom.bmp", true)
-		});
+    // Skybox texture from http://www.vwall.it/wp-content/plugins/canvasio3dpro/inc/resource/cubeMaps/
+    mSkybox = engine::skybox::create(50.f,
+                                      {
+                                          engine::texture_2d::create("assets/textures/skybox/mountain1/front.jpg",
+                                                                     true),
+                                          engine::texture_2d::create("assets/textures/skybox/mountain1/right.jpg",
+                                                                     true),
+                                          engine::texture_2d::create("assets/textures/skybox/mountain1/back.jpg", true),
+                                          engine::texture_2d::create("assets/textures/skybox/mountain1/left.jpg", true),
+                                          engine::texture_2d::create("assets/textures/skybox/mountain1/top.jpg", true),
+                                          engine::texture_2d::create("assets/textures/skybox/mountain1/bottom.jpg",
+                                                                     true)
+                                      });
 
-	engine::ref<engine::skinned_mesh> m_skinned_mesh = engine::skinned_mesh::create("assets/models/animated/mannequin/free3Dmodel.dae");
-	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/walking.dae");
-	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
-	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/jump.dae");
-	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/standard_run.dae");
-	m_skinned_mesh->switch_root_movement(false);
+    engine::ref<engine::skinned_mesh> mSkinnedMesh = engine::skinned_mesh::create(
+        "assets/models/animated/mannequin/free3Dmodel.dae");
+    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/walking.dae");
+    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
+    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/jump.dae");
+    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/standard_run.dae");
+    mSkinnedMesh->switch_root_movement(false);
 
-	engine::game_object_properties mannequin_props;
-	mannequin_props.animated_mesh = m_skinned_mesh;
-	mannequin_props.scale = glm::vec3(1.f/ glm::max(m_skinned_mesh->size().x, glm::max(m_skinned_mesh->size().y, m_skinned_mesh->size().z)));
-	mannequin_props.position = glm::vec3(3.0f, 0.5f, -5.0f);
-	mannequin_props.type = 0;
-	mannequin_props.bounding_shape = m_skinned_mesh->size() / 2.f * mannequin_props.scale.x;
-	m_mannequin = engine::game_object::create(mannequin_props);
+    engine::game_object_properties mannequinProps;
+    mannequinProps.animated_mesh = mSkinnedMesh;
+    mannequinProps.scale = glm::vec3(1.f / glm::max(mSkinnedMesh->size().x,
+                                                    glm::max(mSkinnedMesh->size().y, mSkinnedMesh->size().z)));
+    mannequinProps.position = glm::vec3(3.0f, 0.5f, -5.0f);
+    mannequinProps.type = 0;
+    mannequinProps.bounding_shape = mSkinnedMesh->size() / 2.f * mannequinProps.scale.x;
+    mMannequin = engine::game_object::create(mannequinProps);
 
-	// Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
-	std::vector<engine::ref<engine::texture_2d>> terrain_textures = { engine::texture_2d::create("assets/textures/terrain.bmp", false) };
-	engine::ref<engine::terrain> terrain_shape = engine::terrain::create(100.f, 0.5f, 100.f);
-	engine::game_object_properties terrain_props;
-	terrain_props.meshes = { terrain_shape->mesh() };
-	terrain_props.textures = terrain_textures;
-	terrain_props.is_static = true;
-	terrain_props.type = 0;
-	terrain_props.bounding_shape = glm::vec3(100.f, 0.5f, 100.f);
-	terrain_props.restitution = 0.92f;
-	m_terrain = engine::game_object::create(terrain_props);
+    // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
+    const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
+        engine::texture_2d::create("assets/textures/terrain.bmp", false)
+    };
+    const engine::ref<engine::terrain> terrainShape = engine::terrain::create(100.f, 0.5f, 100.f);
+    engine::game_object_properties terrainProps;
+    terrainProps.meshes = {terrainShape->mesh()};
+    terrainProps.textures = terrainTextures;
+    terrainProps.is_static = true;
+    terrainProps.type = 0;
+    terrainProps.bounding_shape = glm::vec3(100.f, 0.5f, 100.f);
+    terrainProps.restitution = 0.92f;
+    mTerrain = engine::game_object::create(terrainProps);
 
-	// Load the cow model. Create a cow object. Set its properties
-	engine::ref <engine::model> cow_model = engine::model::create("assets/models/static/cow4.3ds");
-	engine::game_object_properties cow_props;
-	cow_props.meshes = cow_model->meshes();
-	cow_props.textures = cow_model->textures();
-	float cow_scale = 1.f / glm::max(cow_model->size().x, glm::max(cow_model->size().y, cow_model->size().z));
-	cow_props.position = { -4.f,0.5f, -5.f };
-	cow_props.scale = glm::vec3(cow_scale);
-	cow_props.bounding_shape = cow_model->size() / 2.f * cow_scale;
-	m_cow = engine::game_object::create(cow_props);
+    // Load the cow model. Create a cow object. Set its properties
+    engine::ref<engine::model> cowModel = engine::model::create("assets/models/static/cow4.3ds");
+    engine::game_object_properties cow_props;
+    cow_props.meshes = cowModel->meshes();
+    cow_props.textures = cowModel->textures();
+    float cowScale = 1.f / glm::max(cowModel->size().x, glm::max(cowModel->size().y, cowModel->size().z));
+    cow_props.position = {-4.f, 0.5f, -5.f};
+    cow_props.scale = glm::vec3(cowScale);
+    cow_props.bounding_shape = cowModel->size() / 2.f * cowScale;
+    mCow = engine::game_object::create(cow_props);
 
-	// Load the tree model. Create a tree object. Set its properties
-	engine::ref <engine::model> tree_model = engine::model::create("assets/models/static/elm.3ds");
-	engine::game_object_properties tree_props;
-	tree_props.meshes = tree_model->meshes();
-	tree_props.textures = tree_model->textures();
-	float tree_scale = 3.f / glm::max(tree_model->size().x, glm::max(tree_model->size().y, tree_model->size().z));
-	tree_props.position = { 4.f, 0.5f, -5.f };
-	tree_props.bounding_shape = tree_model->size() / 2.f * tree_scale;
-	tree_props.scale = glm::vec3(tree_scale);
-	m_tree = engine::game_object::create(tree_props);
+    // Load the tree model. Create a tree object. Set its properties
+    engine::ref<engine::model> treeModel = engine::model::create("assets/models/static/elm.3ds");
+    engine::game_object_properties tree_props;
+    tree_props.meshes = treeModel->meshes();
+    tree_props.textures = treeModel->textures();
+    const auto treeScale = 3.f / glm::max(treeModel->size().x, glm::max(treeModel->size().y, treeModel->size().z));
+    tree_props.position = {4.f, 0.5f, -5.f};
+    tree_props.bounding_shape = treeModel->size() / 2.f * treeScale;
+    tree_props.scale = glm::vec3(treeScale);
+    mTree = engine::game_object::create(tree_props);
 
-	engine::ref<engine::sphere> sphere_shape = engine::sphere::create(10, 20, 0.5f);
-	engine::game_object_properties sphere_props;
-	sphere_props.position = { 0.f, 5.f, -5.f };
-	sphere_props.meshes = { sphere_shape->mesh() };
-	sphere_props.type = 1;
-	sphere_props.bounding_shape = glm::vec3(0.5f);
-	sphere_props.restitution = 0.92f;
-	sphere_props.mass = 0.000001f;
-	m_ball = engine::game_object::create(sphere_props);
+    const engine::ref<engine::sphere> sphereShape = engine::sphere::create(10, 20, 0.5f);
+    engine::game_object_properties sphere_props;
+    sphere_props.position = {0.f, 5.f, -5.f};
+    sphere_props.meshes = {sphereShape->mesh()};
+    sphere_props.type = 1;
+    sphere_props.bounding_shape = glm::vec3(0.5f);
+    sphere_props.restitution = 0.92f;
+    sphere_props.mass = 0.000001f;
+    mBall = engine::game_object::create(sphere_props);
 
-	m_game_objects.push_back(m_terrain);
-	m_game_objects.push_back(m_ball);
-	//m_game_objects.push_back(m_cow);
-	//m_game_objects.push_back(m_tree);
-	//m_game_objects.push_back(m_pickup);
-	m_physics_manager = engine::bullet_manager::create(m_game_objects);
+    mGameObjects.push_back(mTerrain);
+    mGameObjects.push_back(mBall);
+    //m_game_objects.push_back(m_cow);
+    //m_game_objects.push_back(m_tree);
+    //m_game_objects.push_back(m_pickup);
+    mPhysicsManager = engine::bullet_manager::create(mGameObjects);
 
-	m_text_manager = engine::text_manager::create();
+    mTextManager = engine::text_manager::create();
 
-	m_skinned_mesh->switch_animation(1);
+    mSkinnedMesh->switch_animation(1);
 }
 
 example_layer::~example_layer() {}
 
-void example_layer::on_update(const engine::timestep& time_step) 
-{
-    m_3d_camera.on_update(time_step);
+void example_layer::on_update(const engine::timestep& timeStep) {
+    m3DCamera.on_update(timeStep);
 
-	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
+    mPhysicsManager->dynamics_world_update(mGameObjects, double(timeStep));
 
-	m_mannequin->animated_mesh()->on_update(time_step);
+    mMannequin->animated_mesh()->on_update(timeStep);
 
-	check_bounce();
-} 
+    checkBounce();
+}
 
-void example_layer::on_render() 
-{
-    engine::render_command::clear_color({0.2f, 0.3f, 0.3f, 1.0f}); 
+void example_layer::on_render() {
+    engine::render_command::clear_color({0.2f, 0.3f, 0.3f, 1.0f});
     engine::render_command::clear();
 
     //const auto textured_shader = engine::renderer::shaders_library()->get("mesh_static");
     //engine::renderer::begin_scene(m_3d_camera, textured_shader);
 
-	const auto textured_lighting_shader = engine::renderer::shaders_library()->get("mesh_lighting");
-	engine::renderer::begin_scene(m_3d_camera, textured_lighting_shader);
+    const auto textured_lighting_shader = engine::renderer::shaders_library()->get("mesh_lighting");
+    engine::renderer::begin_scene(m3DCamera, textured_lighting_shader);
 
-	// Set up some of the scene's parameters in the shader
-	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
+    // Set up some of the scene's parameters in the shader
+    std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform(
+        "gEyeWorldPos", m3DCamera.position());
 
-	// Position the skybox centred on the player and render it
-	glm::mat4 skybox_tranform(1.0f);
-	skybox_tranform = glm::translate(skybox_tranform, m_3d_camera.position());
-	for (const auto& texture : m_skybox->textures())
-	{
-		texture->bind();
-	}
-	engine::renderer::submit(textured_lighting_shader, m_skybox, skybox_tranform);
+    // Position the skybox centred on the player and render it
+    glm::mat4 skyboxTransform(1.0f);
+    skyboxTransform = glm::translate(skyboxTransform, m3DCamera.position());
+    for (const auto& texture : mSkybox->textures()) {
+        texture->bind();
+    }
+    engine::renderer::submit(textured_lighting_shader, mSkybox, skyboxTransform);
 
-	engine::renderer::submit(textured_lighting_shader, m_terrain);
+    engine::renderer::submit(textured_lighting_shader, mTerrain);
 
-	glm::mat4 tree_transform(1.0f);
-	tree_transform = glm::translate(tree_transform, glm::vec3(4.f, 0.5, -5.0f));
-	tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
-	tree_transform = glm::scale(tree_transform, m_tree->scale());
-	engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
-	
-	glm::mat4 cow_transform(1.0f);
-	cow_transform = glm::translate(cow_transform, m_cow->position());
-	cow_transform = glm::rotate(cow_transform, m_cow->rotation_amount(), m_cow->rotation_axis());
-	cow_transform = glm::scale(cow_transform, m_cow->scale());
-	engine::renderer::submit(textured_lighting_shader, cow_transform, m_cow);
+    glm::mat4 treeTransform(1.0f);
+    treeTransform = glm::translate(treeTransform, glm::vec3(4.f, 0.5, -5.0f));
+    treeTransform = glm::rotate(treeTransform, mTree->rotation_amount(), mTree->rotation_axis());
+    treeTransform = glm::scale(treeTransform, mTree->scale());
+    engine::renderer::submit(textured_lighting_shader, treeTransform, mTree);
+
+    glm::mat4 cowTransform(1.0f);
+    cowTransform = glm::translate(cowTransform, mCow->position());
+    cowTransform = glm::rotate(cowTransform, mCow->rotation_amount(), mCow->rotation_axis());
+    cowTransform = glm::scale(cowTransform, mCow->scale());
+    engine::renderer::submit(textured_lighting_shader, cowTransform, mCow);
 
     engine::renderer::end_scene();
 
-	// Set up material shader. (does not render textures, renders materials instead)
-	const auto material_shader = engine::renderer::shaders_library()->get("mesh_material");
-	engine::renderer::begin_scene(m_3d_camera, material_shader);
+    // Set up material shader. (does not render textures, renders materials instead)
+    const auto materialShader = engine::renderer::shaders_library()->get("mesh_material");
+    engine::renderer::begin_scene(m3DCamera, materialShader);
 
-	m_material->submit(material_shader);
-	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
+    mMaterial->submit(materialShader);
+    std::dynamic_pointer_cast<engine::gl_shader>(materialShader)->set_uniform("gEyeWorldPos", m3DCamera.position());
 
-	engine::renderer::submit(material_shader, m_ball);
+    engine::renderer::submit(materialShader, mBall);
 
-	engine::renderer::end_scene();
+    engine::renderer::end_scene();
 
-	const auto animated_mesh_shader = engine::renderer::shaders_library()->get("animated_mesh");
-	engine::renderer::begin_scene(m_3d_camera, animated_mesh_shader);
-	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
+    const auto animatedMeshShader = engine::renderer::shaders_library()->get("animated_mesh");
+    engine::renderer::begin_scene(m3DCamera, animatedMeshShader);
+    std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->set_uniform(
+        "gEyeWorldPos", m3DCamera.position());
 
-	glm::mat4 aniTransform = glm::mat4(1.0f);
+    glm::mat4 aniTransform = glm::mat4(1.0f);
 
-	engine::renderer::submit(animated_mesh_shader, m_mannequin);
+    engine::renderer::submit(animatedMeshShader, mMannequin);
 
-	engine::renderer::end_scene();
+    engine::renderer::end_scene();
 
-	// Render text
-	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-	m_text_manager->render_text(text_shader, "Orange Text", 10.f, (float)engine::application::window().height()-25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-} 
-
-void example_layer::on_event(engine::event& event) 
-{ 
-    if(event.event_type() == engine::event_type_e::key_pressed) 
-    { 
-        auto& e = dynamic_cast<engine::key_pressed_event&>(event); 
-        if(e.key_code() == engine::key_codes::KEY_TAB) 
-        { 
-            engine::render_command::toggle_wireframe();
-        }
-    } 
+    // Render text
+    const auto textShader = engine::renderer::shaders_library()->get("text_2D");
+    mTextManager->render_text(textShader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f,
+                                0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
 }
 
-void example_layer::check_bounce()
-{
-	//if (m_prev_sphere_y_vel < 0.f && m_game_objects.at(1)->velocity().y > 0.f)
-		//m_audio_manager->play("bounce");
-	m_prev_sphere_y_vel = m_game_objects.at(1)->velocity().y;
+void example_layer::on_event(engine::event& event) {
+    if (event.event_type() == engine::event_type_e::key_pressed) {
+        auto& e = dynamic_cast<engine::key_pressed_event&>(event);
+        if (e.key_code() == engine::key_codes::KEY_TAB) {
+            engine::render_command::toggle_wireframe();
+        }
+    }
+}
+
+void example_layer::checkBounce() {
+    //if (m_prev_sphere_y_vel < 0.f && m_game_objects.at(1)->velocity().y > 0.f)
+    //m_audio_manager->play("bounce");
+    mPrevSphereYVel = mGameObjects.at(1)->velocity().y;
 }
