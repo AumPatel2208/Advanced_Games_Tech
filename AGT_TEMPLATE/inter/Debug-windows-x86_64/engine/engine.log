@@ -1,4 +1,11 @@
-﻿  grid.cpp
+﻿  pch.cpp
+  application.cpp
+  layer.cpp
+  layers_stack.cpp
+  logger.cpp
+  character.cpp
+  game_object.cpp
+  grid.cpp
 C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\src\engine\entities\grid.cpp(5,95): warning C4244: 'initializing': conversion from 'uint32_t' to 'float', possible loss of data
 C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\src\engine\entities\grid.cpp(5,78): warning C4244: 'initializing': conversion from 'uint32_t' to 'float', possible loss of data
 C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\src\engine\entities\grid.cpp(5,110): warning C4244: 'initializing': conversion from 'uint32_t' to 'float', possible loss of data
@@ -9,11 +16,42 @@ C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\src\engine\enti
   cuboid.cpp
   heightmap.cpp
   sphere.cpp
-  Tetrahedron.cpp
   skybox.cpp
+  terrain.cpp
+  buffer.cpp
+  camera.cpp
+  light.cpp
+  material.cpp
+  mesh.cpp
+  model.cpp
+  render_command.cpp
+  renderer.cpp
+  Generating Code...
+  Compiling...
+  shader.cpp
+  skinned_mesh.cpp
+  text_manager.cpp
+  texture.cpp
+  vertex_array.cpp
   audio_manager.cpp
+  bullet_manager.cpp
+C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\src\engine\utils\bullet_manager.cpp(238,2): warning C4267: 'initializing': conversion from 'size_t' to 'int32_t', possible loss of data
   event_sound.cpp
+  timer.cpp
   track.cpp
+  context.cpp
+  gl_buffer.cpp
+  gl_context.cpp
+  gl_mesh.cpp
+  gl_renderer_api.cpp
+  gl_shader.cpp
+  gl_texture.cpp
+  gl_vertex_array.cpp
+  win_core.cpp
+  win_input.cpp
+  Generating Code...
+  Compiling...
+  win_window.cpp
   Generating Code...
 fmod_vc.lib(fmod.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in opengl32.lib(OPENGL32.dll); second definition ignored
   engine.vcxproj -> C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\..\bin\Debug-windows-x86_64\engine\engine.lib

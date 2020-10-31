@@ -1,6 +1,19 @@
 # Advanced Games Tech
 
+## Checklist
 
+- [ ] intro screen
+  - [ ] top down camera view pan into the gameplay view
+  - [ ] interactible buttons?
+- [ ] Primitive based object
+  - [ ] with multiple transformations
+  - [ ] could have a power up move around the map, stay there for a bit and move around more afterwards
+- [ ] Skybox and terrain textures
+- [ ] Camera motion technique
+- [ ] Mesh-based object
+- [ ] Report
+- [ ] Source Code Design, organization and coding style
+- [ ] Plagiarism Check
 
 ## Souls-Like Game
 
@@ -53,3 +66,5 @@
 
 #### Procedurally generated trees
 - https://weigert.vsos.ethz.ch/2020/10/19/transport-oriented-growth-and-procedural-trees/
+
+ 

@@ -1,8 +1,6 @@
 #pragma once
 #include <engine.h>
 
-class pickup;
-
 class example_layer : public engine::layer
 {
 public:
@@ -14,28 +12,26 @@ public:
     void on_event(engine::event& event) override;
 
 private:
-	void checkBounce();
+	void check_bounce();
 
-	engine::ref<engine::skybox>			mSkybox{};
-	engine::ref<engine::game_object>	mTerrain{};
-	engine::ref<engine::game_object>	mCow{};
-	engine::ref<engine::game_object>	mTree{};
-	engine::ref<engine::game_object>	mBall{};
-	engine::ref<engine::game_object>    mTetrahedron{};
-	engine::ref<engine::game_object>	mMannequin{};
-	engine::ref<engine::material>		mMaterial{};
-	engine::ref<engine::material>		mTetrahedronMaterial{};
-	engine::ref<pickup>					mPickup{};
+	engine::ref<engine::skybox>			m_skybox{};
+	engine::ref<engine::game_object>	m_terrain{};
+	engine::ref<engine::game_object>	m_cow{};
+	engine::ref<engine::game_object>	m_tree{};
+	engine::ref<engine::game_object>	m_ball{};
+	engine::ref<engine::game_object>	m_mannequin{};
 
-	engine::DirectionalLight            mDirectionalLight;
+	engine::ref<engine::material>		m_material{};
 
-	std::vector<engine::ref<engine::game_object>>     mGameObjects{};
+	engine::DirectionalLight            m_directionalLight;
 
-	engine::ref<engine::bullet_manager> mPhysicsManager{};
-	engine::ref<engine::audio_manager>  mAudioManager{};
-	float								mPrevSphereYVel = 0.f;
-	engine::ref<engine::text_manager>	mTextManager{};
+	std::vector<engine::ref<engine::game_object>>     m_game_objects{};
 
-    engine::orthographic_camera       m2DCamera; 
-    engine::perspective_camera        m3DCamera;
+	engine::ref<engine::bullet_manager> m_physics_manager{};
+	engine::ref<engine::audio_manager>  m_audio_manager{};
+	float								m_prev_sphere_y_vel = 0.f;
+	engine::ref<engine::text_manager>	m_text_manager{};
+
+    engine::orthographic_camera       m_2d_camera; 
+    engine::perspective_camera        m_3d_camera;
 };

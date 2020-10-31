@@ -1,6 +1,5 @@
 #pragma once
 
-
 // For use by engine applications
 
 #include "engine/core/application.h"
@@ -33,7 +32,6 @@
 #include "engine/entities/shapes/sphere.h"
 #include "engine/entities/terrain.h"
 #include "engine/entities/skybox.h"
-#include "engine/entities/shapes/Tetrahedron.h"
 
 // ---utils---------------------------
 #include "engine/utils/bullet_manager.h"
