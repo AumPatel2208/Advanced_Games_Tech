@@ -12,13 +12,16 @@ public:
     engine::ref<engine::game_object> object() const { return mObject; }
     void turn(float angle);
     void updateCameraOld(engine::perspective_camera& camera, const engine::timestep& timeStep);
+    void update1stPersonCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
     void updateCamera(engine::perspective_camera& camera);
     void jump();
     
 
 private:
     float mSpeed{0.f};
-    float mTimer;
+    float mJumpTimer;
     float cameraRadius = 5.f;
     engine::ref<engine::game_object> mObject;
+    float height = 1.f;
+    std::pair<float, float> prevMousePosition;
 };

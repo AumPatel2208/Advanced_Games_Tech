@@ -9,11 +9,18 @@ public:
 	~example_layer();
 
     void on_update(const engine::timestep& timeStep) override;
-    void on_render() override; 
+    void on_render() override;
+    void RenderMenu();
     void on_event(engine::event& event) override;
 
 private:
 	void checkBounce();
+
+	// to check if game has started
+	bool hasStarted = false;
+
+
+    std::string							menuText;
 
 	engine::ref<engine::skybox>			mSkybox{};
 	engine::ref<engine::game_object>	mTerrain{};

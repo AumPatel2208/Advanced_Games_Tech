@@ -4,7 +4,6 @@
 #include "engine/core/input.h"
 #include "engine/key_codes.h"
 
-
 //================== Orthographic Camera [2D] =================================
 
 engine::orthographic_camera::orthographic_camera(float left, float right, float bottom, float top)
@@ -95,18 +94,29 @@ void engine::perspective_camera::on_update(const timestep& timestep)
 
 	update_camera_vectors();
 
-    if(input::key_pressed(engine::key_codes::KEY_A)) // left
+    if(input::key_pressed(engine::key_codes::KEY_H)) // left
         move(e_direction::left, timestep);
-    else if(input::key_pressed(engine::key_codes::KEY_D)) // right
+    else if(input::key_pressed(engine::key_codes::KEY_K)) // right
         move(e_direction::right, timestep);
 
-    if(input::key_pressed(engine::key_codes::KEY_S)) // down
+    if(input::key_pressed(engine::key_codes::KEY_J)) // down
         move(e_direction::backward, timestep);
-    else if(engine::input::key_pressed(engine::key_codes::KEY_W)) // up
+    else if(engine::input::key_pressed(engine::key_codes::KEY_U)) // up
         move(e_direction::forward, timestep);
 
     //float delta = input::mouse_scroll();
     //process_mouse_scroll(delta);
+}
+
+void engine::perspective_camera::onUpdate1stPerson(const timestep& timestep, glm::vec3 playerPosition) {
+    auto [mouse_delta_x, mouse_delta_y] = input::mouse_position();
+    process_mouse(mouse_delta_x, mouse_delta_y);
+
+    update_camera_vectors();
+
+    m_position = playerPosition;
+    
+
 }
 
 void engine::perspective_camera::on3rdPersonUpdate(const timestep& timestep ,glm::vec3 position, glm::vec3 look_at ) {
@@ -228,6 +238,15 @@ void engine::perspective_camera::set_view_matrix(glm::vec3 position, glm::vec3 l
 	m_view_projection_mat = m_projection_mat * m_view_mat;
 }
 
+void engine::perspective_camera::set_view_matrix_custom(glm::vec3 position, glm::vec3 look_at)
+{
+    m_position = position;
+    m_front_vector = glm::normalize(look_at - position);
+    m_view_mat = glm::lookAt(m_position, m_position + m_front_vector, m_up_vector);
+    m_view_projection_mat = m_projection_mat * m_view_mat;
+    update_camera_vectors();
+}
+
 void engine::perspective_camera::update_camera_vectors()
 {
     // Calculate the new Front vector
@@ -239,6 +258,8 @@ void engine::perspective_camera::update_camera_vectors()
     front.z = sin(yaw_radians) * cos(pitch_radians);
 
     m_front_vector = glm::normalize(front);
+    
+
     // Also re-calculate the Right and Up vector
     // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     m_right_vector = glm::normalize(glm::cross(m_front_vector, m_world_up_vector));  

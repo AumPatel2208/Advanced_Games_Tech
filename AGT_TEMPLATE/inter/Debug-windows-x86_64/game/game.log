@@ -1,4 +1,4 @@
 ﻿  player.cpp
-C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\game\src\player.cpp(54,58): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\game\src\player.cpp(137,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\game\src\player.cpp(89,62): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\game\src\player.cpp(193,37): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
   game.vcxproj -> C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\game\..\bin\Debug-windows-x86_64\game\game.exe

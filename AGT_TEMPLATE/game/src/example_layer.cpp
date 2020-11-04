@@ -5,6 +5,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "engine/events/key_event.h"
 #include "engine/utils/track.h"
+#include <fstream>
+
 
 example_layer::example_layer()
     : m2DCamera(-1.6f, 1.6f, -0.9f, 0.9f),
@@ -12,6 +14,29 @@ example_layer::example_layer()
     // Hide the mouse and lock it inside the window
     //engine::input::anchor_mouse(true);
     engine::application::window().hide_mouse_cursor();
+
+    // Load File
+    std::ifstream inFile;
+    // inFile.open("C:\\Users\\Aum\\Documents\\Games Tech\\Coursework\\AGT_TEMPLATE\\game\\assets\\text\\menu.txt");
+    inFile.open(".\\assets\\text\\menu.txt");
+
+
+    if (!inFile) {
+        std::cerr << "Unable to open file datafile.txt";
+        exit(1); // call system to stop
+    }
+    char x;
+    while (inFile >> x) {
+        menuText = menuText + x;
+    }
+    std::cout << menuText;
+    inFile.close();
+
+
+    // Place the camera birds eye
+    // m3DCamera.position(glm::vec3(0.f, 5.f, 0.f));
+    // m3DCamera.set_view_matrix_custom(m3DCamera.position(), glm::vec3(0, -2.f, 0));
+    
 
     // Initialise audio and play background music
     mAudioManager = engine::audio_manager::instance();
@@ -62,22 +87,22 @@ example_layer::example_layer()
                                                                               (float)engine::application::window().
                                                                               height()));
     mMaterial = engine::material::create(1.0f, glm::vec3(1.0f, 0.1f, 0.07f),
-                                          glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
+                                         glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
 
 
     // Skybox texture from http://www.vwall.it/wp-content/plugins/canvasio3dpro/inc/resource/cubeMaps/
     mSkybox = engine::skybox::create(50.f,
-                                      {
-                                          engine::texture_2d::create("assets/textures/skybox/mountain1/front.jpg",
-                                                                     true),
-                                          engine::texture_2d::create("assets/textures/skybox/mountain1/right.jpg",
-                                                                     true),
-                                          engine::texture_2d::create("assets/textures/skybox/mountain1/back.jpg", true),
-                                          engine::texture_2d::create("assets/textures/skybox/mountain1/left.jpg", true),
-                                          engine::texture_2d::create("assets/textures/skybox/mountain1/top.jpg", true),
-                                          engine::texture_2d::create("assets/textures/skybox/mountain1/bottom.jpg",
-                                                                     true)
-                                      });
+                                     {
+                                         engine::texture_2d::create("assets/textures/skybox/mountain1/front.jpg",
+                                                                    true),
+                                         engine::texture_2d::create("assets/textures/skybox/mountain1/right.jpg",
+                                                                    true),
+                                         engine::texture_2d::create("assets/textures/skybox/mountain1/back.jpg", true),
+                                         engine::texture_2d::create("assets/textures/skybox/mountain1/left.jpg", true),
+                                         engine::texture_2d::create("assets/textures/skybox/mountain1/top.jpg", true),
+                                         engine::texture_2d::create("assets/textures/skybox/mountain1/bottom.jpg",
+                                                                    true)
+                                     });
 
     engine::ref<engine::skinned_mesh> mSkinnedMesh = engine::skinned_mesh::create(
         "assets/models/animated/mannequin/free3Dmodel.dae");
@@ -160,20 +185,25 @@ example_layer::~example_layer() {}
 
 void example_layer::on_update(const engine::timestep& timeStep) {
     // m3DCamera.on_update(timeStep);
-    
+
     mPhysicsManager->dynamics_world_update(mGameObjects, double(timeStep));
 
     // mMannequin->animated_mesh()->on_update(timeStep);
     mPlayer.onUpdate(timeStep);
-    // mPlayer.updateCameraOld(m3DCamera, timeStep);
-    mPlayer.updateCamera(m3DCamera);
+    mPlayer.updateCameraOld(m3DCamera, timeStep);
+    // mPlayer.updateCamera(m3DCamera);
+    
+
+
+    // mPlayer.update1stPersonCamera(m3DCamera, timeStep);
+
     checkBounce();
 }
 
 void example_layer::on_render() {
     engine::render_command::clear_color({0.2f, 0.3f, 0.3f, 1.0f});
     engine::render_command::clear();
- 
+
     //const auto textured_shader = engine::renderer::shaders_library()->get("mesh_static");
     //engine::renderer::begin_scene(m_3d_camera, textured_shader);
 
@@ -231,10 +261,35 @@ void example_layer::on_render() {
 
     engine::renderer::end_scene();
 
+    //render menu
+    RenderMenu();
+}
+
+void example_layer::RenderMenu() {
     // Render text
     const auto textShader = engine::renderer::shaders_library()->get("text_2D");
-    mTextManager->render_text(textShader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f,
-                                0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+    // mTextManager->render_text(textShader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f,
+    //     0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+    //
+    //
+    // mTextManager->render_text(textShader, "sark douls v1",
+    //                           (float)engine::application::window().width() / 2 - (float)engine::application::window().width() / 12,
+    //                           (float)engine::application::window().height() / 2 - 10.f,
+    //                           2.f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+    // mTextManager->render_text(textShader, "Options:",
+    //                           (float)engine::application::window().width() / 4,
+    //                           (float)engine::application::window().height() / 2 - 10.f,
+    //                           0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+    // mTextManager->render_text(textShader, "    1) Play Game",
+    //                           (float)engine::application::window().width() / 4,
+    //                           (float)engine::application::window().height() / 2 - 10.f,
+    //                           0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+    // mTextManager->render_text(textShader, "    2) Help",
+    //                           (float)engine::application::window().width() / 4,
+    //                           (float)engine::application::window().height() / 2 - 10.f,
+    //                           0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+
+
 }
 
 void example_layer::on_event(engine::event& event) {

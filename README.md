@@ -9,7 +9,10 @@
   - [ ] with multiple transformations
   - [ ] could have a power up move around the map, stay there for a bit and move around more afterwards
 - [ ] Skybox and terrain textures
+  - [x] skybox
 - [ ] Camera motion technique
+  - [ ] like ratchet and clank
+    - [ ] strafe and free move
 - [ ] Mesh-based object
 - [ ] Report
 - [ ] Source Code Design, organization and coding style
@@ -68,3 +71,19 @@
 - https://weigert.vsos.ethz.ch/2020/10/19/transport-oriented-growth-and-procedural-trees/
 
  
+
+
+
+Skybox          
+
+negy = bottom
+
+posy = top
+
+negx = left
+
+posx = right
+
+negz = back
+
+posz = front
