@@ -190,7 +190,8 @@ void example_layer::on_update(const engine::timestep& timeStep) {
 
     // mMannequin->animated_mesh()->on_update(timeStep);
     mPlayer.onUpdate(timeStep);
-    mPlayer.updateCameraOld(m3DCamera, timeStep);
+
+    mPlayer.updateCamera3rdPerson(m3DCamera, timeStep);
     // mPlayer.updateCamera(m3DCamera);
     
 

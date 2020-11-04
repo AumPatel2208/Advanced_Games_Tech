@@ -11,7 +11,7 @@ public:
     void onUpdate(const engine::timestep& timeStep);
     engine::ref<engine::game_object> object() const { return mObject; }
     void turn(float angle);
-    void updateCameraOld(engine::perspective_camera& camera, const engine::timestep& timeStep);
+    void updateCameraTutorial(engine::perspective_camera& camera, const engine::timestep& timeStep);
     void update1stPersonCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
     void updateCamera(engine::perspective_camera& camera);
     void jump();

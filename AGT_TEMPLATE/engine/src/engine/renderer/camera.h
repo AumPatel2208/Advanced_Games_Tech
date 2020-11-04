@@ -146,7 +146,7 @@ namespace engine
         const glm::mat4& view_projection_matrix() const override;
 
 		void set_view_matrix(glm::vec3 position, glm::vec3 look_at);
-        void set_view_matrix_custom(glm::vec3 position, glm::vec3 look_at);
+        void set_view_matrix_custom(glm::vec3 position, glm::vec3 look_at, glm::vec3 objectPosition, const timestep& timestep);
 
 
         float& getYaw()  { return m_yaw; }
@@ -191,6 +191,8 @@ namespace engine
         float m_far_plane = 100.f; 
 
         float mAngleAroundPlayer = 0.f;
+        std::pair<float, float> prevMousePosition;
+
 
 
         /// \brief in units per seconds. 

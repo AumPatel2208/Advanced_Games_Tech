@@ -1,3 +1,5 @@
 ﻿  camera.cpp
+C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\src\engine\renderer\camera.cpp(242,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\src\engine\renderer\camera.cpp(243,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 fmod_vc.lib(fmod.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in opengl32.lib(OPENGL32.dll); second definition ignored
   engine.vcxproj -> C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\engine\..\bin\Debug-windows-x86_64\engine\engine.lib
