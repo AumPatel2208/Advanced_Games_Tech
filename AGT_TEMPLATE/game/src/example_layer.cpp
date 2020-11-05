@@ -18,7 +18,7 @@ example_layer::example_layer()
     // Load File
     std::ifstream inFile;
     // inFile.open("C:\\Users\\Aum\\Documents\\Games Tech\\Coursework\\AGT_TEMPLATE\\game\\assets\\text\\menu.txt");
-    inFile.open(".\\assets\\text\\menu.txt");
+    inFile.open("assets/text/menu.txt");
 
 
     if (!inFile) {
@@ -169,8 +169,18 @@ example_layer::example_layer()
     sphere_props.mass = 0.000001f;
     mBall = engine::game_object::create(sphere_props);
 
+    const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(glm::vec3((float)engine::application::window().width()/500, 0.1f, (float)engine::application::window().height() / 500), false);
+   auto menuTexture =  engine::texture_2d::create("assets/textures/menu.png", true);
+    engine::game_object_properties menuProps;
+    menuProps.position = { 0.f, 0.f, 0.f };
+    menuProps.textures = { menuTexture };
+    menuProps.meshes = { menuShape->mesh() };
+    mMenu = engine::game_object::create(menuProps);
+
+
     mGameObjects.push_back(mTerrain);
     mGameObjects.push_back(mBall);
+
     //m_game_objects.push_back(m_cow);
     //m_game_objects.push_back(m_tree);
     //m_game_objects.push_back(m_pickup);
@@ -184,21 +194,17 @@ example_layer::example_layer()
 example_layer::~example_layer() {}
 
 void example_layer::on_update(const engine::timestep& timeStep) {
-    // m3DCamera.on_update(timeStep);
+    //Free flowing camera
+    m3DCamera.on_update(timeStep);
+    
 
     mPhysicsManager->dynamics_world_update(mGameObjects, double(timeStep));
 
     // mMannequin->animated_mesh()->on_update(timeStep);
     mPlayer.onUpdate(timeStep);
+    // mPlayer.updateCamera(m3DCamera, timeStep);
 
-    mPlayer.updateCamera3rdPerson(m3DCamera, timeStep);
-    // mPlayer.updateCamera(m3DCamera);
-    
-
-
-    // mPlayer.update1stPersonCamera(m3DCamera, timeStep);
-
-    checkBounce();
+     checkBounce();
 }
 
 void example_layer::on_render() {
@@ -237,6 +243,19 @@ void example_layer::on_render() {
     cowTransform = glm::scale(cowTransform, mCow->scale());
     engine::renderer::submit(textured_lighting_shader, cowTransform, mCow);
 
+
+    //render menu
+    mMenu->textures().at(0)->bind();
+
+    glm::mat4 menuTransform(1.0f);
+    menuTransform = glm::translate(menuTransform, glm::vec3(0, 10.f, 0));
+    
+    engine::renderer::submit(textured_lighting_shader, mMenu->meshes().at(0),
+        menuTransform);
+
+    RenderMenu();
+
+
     engine::renderer::end_scene();
 
     // Set up material shader. (does not render textures, renders materials instead)
@@ -262,13 +281,23 @@ void example_layer::on_render() {
 
     engine::renderer::end_scene();
 
-    //render menu
-    RenderMenu();
-}
+  }
 
 void example_layer::RenderMenu() {
     // Render text
-    const auto textShader = engine::renderer::shaders_library()->get("text_2D");
+    // const auto textShader = engine::renderer::shaders_library()->get("text_2D");
+    //
+    // const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(glm::vec3(5,0.1f,5),false);
+    // engine::texture_2d::create("assets/textures/sarkDouls4.png", true);
+    // engine::game_object_properties menuProps;
+    // menuProps.position = { 0.f, 0.f, 0.f };
+    // menuProps.meshes = { menuShape->mesh() };
+    // mMenu = engine::game_object::create(menuProps);
+
+    // mGameObjects.push_back(mMenu);
+
+
+
     // mTextManager->render_text(textShader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f,
     //     0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
     //

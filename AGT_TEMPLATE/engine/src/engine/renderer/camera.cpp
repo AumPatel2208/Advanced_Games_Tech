@@ -82,7 +82,7 @@ engine::perspective_camera::perspective_camera(
     LOG_CORE_TRACE("3d cam position: [{},{},{}]", m_position.x, m_position.y, m_position.z);
     LOG_CORE_TRACE("3d cam rotation: [{},{},{}]", m_rotation_angle.x, m_rotation_angle.y, m_rotation_angle.z);
 
-    prevMousePosition = input::mouse_position();
+    // prevMousePosition = input::mouse_position();
 }
 
 void engine::perspective_camera::on_update(const timestep& timestep) {
@@ -105,13 +105,13 @@ void engine::perspective_camera::on_update(const timestep& timestep) {
     //process_mouse_scroll(delta);
 }
 
-void engine::perspective_camera::onUpdate1stPerson(const timestep& timestep, glm::vec3 playerPosition) {
+void engine::perspective_camera::onUpdate1stPerson(const timestep& timestep, glm::vec3 cameraPosition) {
     auto [mouse_delta_x, mouse_delta_y] = input::mouse_position();
     process_mouse(mouse_delta_x, mouse_delta_y);
 
     update_camera_vectors();
 
-    m_position = playerPosition;
+    m_position = cameraPosition;
 
 
 }
@@ -139,6 +139,7 @@ const glm::mat4& engine::perspective_camera::view_matrix() const {
 const glm::mat4& engine::perspective_camera::view_projection_matrix() const {
     return m_view_projection_mat;
 }
+
 
 void engine::perspective_camera::process_mouse(float mouse_delta_x, float mouse_delta_y,
                                                bool constrain_pitch /*= true*/) {

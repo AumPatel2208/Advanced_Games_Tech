@@ -30,7 +30,7 @@ private:
 	engine::ref<engine::game_object>	mMannequin{};
 	engine::ref<engine::material>		mMaterial{};
 	Player								mPlayer{};
-
+	engine::ref<engine::game_object>	mMenu{};
 
 	engine::DirectionalLight            mDirectionalLight;
 

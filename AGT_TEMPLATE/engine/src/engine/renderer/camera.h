@@ -120,7 +120,7 @@ namespace engine
 
         void on_update(const timestep& timestep) override;
 
-        void onUpdate1stPerson(const timestep& timestep, glm::vec3 playerPosition);
+        void onUpdate1stPerson(const timestep& timestep, glm::vec3 cameraPosition);
 
         // To update from player to provide authentic 3rd person camera
         void on3rdPersonUpdate(const timestep& timestep,glm::vec3 position, glm::vec3 look_at);

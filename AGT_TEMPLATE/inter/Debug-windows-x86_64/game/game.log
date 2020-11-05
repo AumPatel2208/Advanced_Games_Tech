@@ -1,6 +1,4 @@
-﻿  player.cpp
-C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\game\src\player.cpp(94,62): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\game\src\player.cpp(173,37): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+﻿  example_layer.cpp
      Creating library ..\bin\Debug-windows-x86_64\game\game.lib and object ..\bin\Debug-windows-x86_64\game\game.exp
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
 engine.lib(ftdebug.obj) : warning LNK4099: PDB 'freetype.pdb' was not found with 'engine.lib(ftdebug.obj)' or at 'C:\Users\Aum\Documents\Games Tech\Coursework\AGT_TEMPLATE\bin\Debug-windows-x86_64\game\freetype.pdb'; linking object as if no debug info
