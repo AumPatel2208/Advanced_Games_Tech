@@ -195,14 +195,15 @@ example_layer::~example_layer() {}
 
 void example_layer::on_update(const engine::timestep& timeStep) {
     //Free flowing camera
-    m3DCamera.on_update(timeStep);
+    // m3DCamera.on_update(timeStep);
     
-
+   
     mPhysicsManager->dynamics_world_update(mGameObjects, double(timeStep));
 
     // mMannequin->animated_mesh()->on_update(timeStep);
     mPlayer.onUpdate(timeStep);
-    // mPlayer.updateCamera(m3DCamera, timeStep);
+    hasStarted = false;
+    mPlayer.updateCamera(m3DCamera, timeStep, hasStarted);
 
      checkBounce();
 }

@@ -13,7 +13,8 @@ public:
     void turn(float angle);
     void updateCamera3rdPerson(engine::perspective_camera& camera, const engine::timestep& timeStep);
     void update1stPersonCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
-    void updateCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
+    void menuUpdateCamera(engine::perspective_camera& camera, const engine::timestep& timestep, bool hasStarted);
+    void updateCamera(engine::perspective_camera& camera, const engine::timestep& timestep, bool hasStarted);
     void jump();
     
 
@@ -24,6 +25,8 @@ private:
     bool firstPerson = false; //
     bool canTransition = true;
     float mTransitionCameraTimer;
+    bool hasStarted= false;
+
     engine::ref<engine::game_object> mObject;
     glm::vec3 cameraFront = glm::vec3(0, 0, 0);
     float height = 1.f;
