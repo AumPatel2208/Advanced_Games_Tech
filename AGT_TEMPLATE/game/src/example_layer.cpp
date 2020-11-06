@@ -36,7 +36,7 @@ example_layer::example_layer()
     // Place the camera birds eye
     // m3DCamera.position(glm::vec3(0.f, 5.f, 0.f));
     // m3DCamera.set_view_matrix_custom(m3DCamera.position(), glm::vec3(0, -2.f, 0));
-    
+
 
     // Initialise audio and play background music
     mAudioManager = engine::audio_manager::instance();
@@ -125,7 +125,7 @@ example_layer::example_layer()
 
     // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
     const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
-        engine::texture_2d::create("assets/textures/terrain.bmp", false)
+        engine::texture_2d::create("assets/textures/sea_rock_terrain.jpg", false)
     };
     const engine::ref<engine::terrain> terrainShape = engine::terrain::create(100.f, 0.5f, 100.f);
     engine::game_object_properties terrainProps;
@@ -169,12 +169,15 @@ example_layer::example_layer()
     sphere_props.mass = 0.000001f;
     mBall = engine::game_object::create(sphere_props);
 
-    const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(glm::vec3((float)engine::application::window().width()/500, 0.1f, (float)engine::application::window().height() / 500), false);
-   auto menuTexture =  engine::texture_2d::create("assets/textures/menu.png", true);
+    const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
+        glm::vec3((float)engine::application::window().width() / 500, 0.1f,
+                  (float)engine::application::window().height() / 500), false);
+    auto menuTexture = engine::texture_2d::create("assets/textures/menu.png", true);
+    auto helpTexture = engine::texture_2d::create("assets/textures/help.png", true);
     engine::game_object_properties menuProps;
-    menuProps.position = { 0.f, 0.f, 0.f };
-    menuProps.textures = { menuTexture };
-    menuProps.meshes = { menuShape->mesh() };
+    menuProps.position = {0.f, 0.f, 0.f};
+    menuProps.textures = {menuTexture, helpTexture};
+    menuProps.meshes = {menuShape->mesh()};
     mMenu = engine::game_object::create(menuProps);
 
 
@@ -196,16 +199,59 @@ example_layer::~example_layer() {}
 void example_layer::on_update(const engine::timestep& timeStep) {
     //Free flowing camera
     // m3DCamera.on_update(timeStep);
-    
-   
-    mPhysicsManager->dynamics_world_update(mGameObjects, double(timeStep));
 
-    // mMannequin->animated_mesh()->on_update(timeStep);
-    mPlayer.onUpdate(timeStep);
-    hasStarted = false;
-    mPlayer.updateCamera(m3DCamera, timeStep, hasStarted);
+    if (hasStarted) {
+        mPhysicsManager->dynamics_world_update(mGameObjects, double(timeStep));
 
-     checkBounce();
+        // mMannequin->animated_mesh()->on_update(timeStep);
+        mPlayer.onUpdate(timeStep);
+        mPlayer.updateCamera(m3DCamera, timeStep);
+    }
+    else {
+        // set the camera on the menu if the game hasn't started yet
+        menuCamera();
+        if (engine::input::key_pressed(engine::key_codes::KEY_1)) {
+            hasStarted = true;
+            mPlayer.setHasStarted(true);
+            //SET TIMER TO TRANSITION HERE
+        }
+        else if (engine::input::key_pressed(engine::key_codes::KEY_2)) {
+            if (!menuInHelp) {
+                menuInHelp = true;
+            }
+        }
+        if(menuInHelp) {
+            if (engine::input::key_pressed(engine::key_codes::KEY_BACKSPACE)) {
+                menuInHelp = false;
+            }
+        }
+        
+    }
+
+
+    checkBounce();
+}
+
+// Set the camera to display the menu
+void example_layer::menuCamera() {
+    float A = 1.f;
+    float B = -3.f;
+    float C = 6.f;
+
+    auto menuForward = glm::vec3(0.f, 0.f, -1.f);
+    auto menuPosition = glm::vec3(0, 15.5f, 0);
+
+    menuForward = (glm::rotate(menuForward, glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f)));
+
+    menuForward = glm::normalize(menuForward);
+
+    glm::vec3 camPos = menuPosition - menuForward * B;
+    camPos.y += A;
+
+    glm::vec3 camLookAt = menuPosition + menuForward * C;
+    camLookAt.y = 0.f;
+    // camera.set_view_matrix_custom(cam_pos, cam_look_at, mObject->position(), timeStep);
+    m3DCamera.set_view_matrix(camPos, camLookAt);
 }
 
 void example_layer::on_render() {
@@ -245,16 +291,20 @@ void example_layer::on_render() {
     engine::renderer::submit(textured_lighting_shader, cowTransform, mCow);
 
 
-    //render menu
-    mMenu->textures().at(0)->bind();
+    if (!hasStarted) {
+        //render menu
+        if (menuInHelp) {
+            mMenu->textures().at(1)->bind();
+        }
+        else {
+            mMenu->textures().at(0)->bind();
+        }
+        glm::mat4 menuTransform(1.0f);
+        menuTransform = glm::translate(menuTransform, glm::vec3(0, 10.f, 0));
 
-    glm::mat4 menuTransform(1.0f);
-    menuTransform = glm::translate(menuTransform, glm::vec3(0, 10.f, 0));
-    
-    engine::renderer::submit(textured_lighting_shader, mMenu->meshes().at(0),
-        menuTransform);
-
-    RenderMenu();
+        engine::renderer::submit(textured_lighting_shader, mMenu->meshes().at(0),
+            menuTransform);
+    }
 
 
     engine::renderer::end_scene();
@@ -282,7 +332,7 @@ void example_layer::on_render() {
 
     engine::renderer::end_scene();
 
-  }
+}
 
 void example_layer::RenderMenu() {
     // Render text
@@ -296,7 +346,6 @@ void example_layer::RenderMenu() {
     // mMenu = engine::game_object::create(menuProps);
 
     // mGameObjects.push_back(mMenu);
-
 
 
     // mTextManager->render_text(textShader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f,

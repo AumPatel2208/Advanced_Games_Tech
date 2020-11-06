@@ -8,28 +8,36 @@ public:
     Player();
     ~Player();
     void initialise(engine::ref<engine::game_object> object);
-    void onUpdate(const engine::timestep& timeStep);
+    void onUpdate(const engine::timestep& timestep);
     engine::ref<engine::game_object> object() const { return mObject; }
-    void turn(float angle);
+    void turn(float angle) const;
     void updateCamera3rdPerson(engine::perspective_camera& camera, const engine::timestep& timeStep);
     void update1stPersonCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
     void menuUpdateCamera(engine::perspective_camera& camera, const engine::timestep& timestep, bool hasStarted);
-    void updateCamera(engine::perspective_camera& camera, const engine::timestep& timestep, bool hasStarted);
+    void updateCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
     void jump();
-    
+    void setHasStarted(bool pHasStarted);
+
 
 private:
     float mSpeed{0.f};
     float mJumpTimer;
-    float cameraRadius = 5.f;
-    bool firstPerson = false; //
-    bool canTransition = true;
-    float mTransitionCameraTimer;
-    bool hasStarted= false;
+    bool hasStarted = false;
 
     engine::ref<engine::game_object> mObject;
     glm::vec3 cameraFront = glm::vec3(0, 0, 0);
     float height = 1.f;
     glm::vec3 prevFront = glm::vec3(0, 0, 0);
     std::pair<float, float> prevMousePosition;
+    std::pair<float, float> currentMousePosition;
+
+    bool firstPerson = false; //
+    bool canTransition = true;
+    float mTransitionCameraTimer;
+    float camLookAtY = 0.f;
+    float camPosBehind = 0.f;
+    const float cameraPosY = 5.f;
+    const float cameraPosBehindLimit = 5.f;
+    float ySensitivity = 2.f;
+
 };

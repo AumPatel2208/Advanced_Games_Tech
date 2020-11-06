@@ -9,6 +9,7 @@ public:
 	~example_layer();
 
     void on_update(const engine::timestep& timeStep) override;
+    void menuCamera();
     void on_render() override;
     void RenderMenu();
     void on_event(engine::event& event) override;
@@ -18,6 +19,7 @@ private:
 
 	// to check if game has started
 	bool hasStarted = false;
+	bool menuInHelp = false;
 
 
     std::string							menuText;
