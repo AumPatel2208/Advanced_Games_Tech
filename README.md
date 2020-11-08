@@ -1,15 +1,16 @@
 # Advanced Games Tech
 
 ## TO-DO
-- [ ] Primitive Objects
-  - [ ] Power ups that scale up and down move around the map
+- [x] Primitive Objects
+  - [x] Power ups that scale up and down move around the map
+  - [x] transform
 - [ ] Camera
   - [ ] just need to limit to a radius/square/cube thing
-- [ ] Mesh Based object
+- [x] Mesh Based object
   - [x] make multiple enemies with movement and different scales and animations
   - [x] the change size when in close enough distance
-  - [ ] make it so that it agro's and starts moving only when the player is certain distance away
-- [ ] Commenting
+  - [x] make it so that it agro's and starts moving only when the player is certain distance away
+- [x] Commenting
 - [ ] Change help Screen
   - [ ] include P to load level 1 and transport the player
   - [ ] explain enemies

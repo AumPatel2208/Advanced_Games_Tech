@@ -11,6 +11,7 @@ Player::Player() {
 
 Player::~Player() {}
 
+// initialise the players object.
 void Player::initialise(engine::ref<engine::game_object> object) {
     mObject = object;
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
@@ -26,14 +27,16 @@ void Player::initialise(engine::ref<engine::game_object> object) {
     mObject->animated_mesh()->set_default_animation(1);
     // mObject->set_position(glm::vec3(0.f, 0.f, 0.f));
 
-    prevMousePosition = engine::input::mouse_position();
+    prevMousePosition = engine::input::mouse_position(); // assign the current mouse position as previous as it will be empty otherwise
 }
 
+// temporary method to move the player into position for the first level model
 void Player::moveIntoLevel1() {
     mObject->set_position(glm::vec3(0.16f, mObject->position().y, 1.72f));
     mObject->set_forward(glm::vec3(0.14f, 0, 1.f));
 }
 
+// call every game loop
 void Player::onUpdate(const engine::timestep& timestep) {
 
     if (hasStarted) {
@@ -73,8 +76,9 @@ void Player::onUpdate(const engine::timestep& timestep) {
         else if (prevMousePosition.first < currentMousePosition.first) {
             turn(-1.f * timestep); // Turn Right if mouse moves right
         }
-        mObject->set_rotation_amount(atan2(mObject->forward().x, mObject->forward().z));
+
         // Set the rotation to the new forward
+        mObject->set_rotation_amount(atan2(mObject->forward().x, mObject->forward().z));
 
         // y Sensitivity of the mouse/camera y Sensitivity of the mouse/camera 
         float ySens; // change based on if it is 1st person or 3rd

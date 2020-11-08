@@ -222,6 +222,7 @@ main_layer::main_layer()
 
 main_layer::~main_layer() {}
 
+// update method called every game loop
 void main_layer::on_update(const engine::timestep& timestep) {
 
     if (hasStarted) {
@@ -269,7 +270,6 @@ void main_layer::on_update(const engine::timestep& timestep) {
 
     }
 
-
     checkBounce();
 }
 
@@ -300,6 +300,8 @@ void main_layer::renderEnemies(const std::shared_ptr<engine::shader>& animatedMe
     }
 }
 
+
+// initialise the primitive shapes. pass through a scale and the amount of primitives to create.
 void main_layer::initialisePrimitives(const float& scale, const int& amount) {
     std::vector<glm::vec3> primitiveVerticies;
     std::vector<engine::ref<engine::texture_2d>> primTextures;
