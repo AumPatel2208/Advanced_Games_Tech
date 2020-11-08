@@ -1,19 +1,39 @@
 # Advanced Games Tech
 
+## TO-DO
+- [ ] Primitive Objects
+  - [ ] Power ups that scale up and down move around the map
+- [ ] Camera
+  - [ ] just need to limit to a radius/square/cube thing
+- [ ] Mesh Based object
+  - [ ] make multiple enemies with movement and different scales and animations
+  - [ ] drop box on head like reverse Mario mushroom
+    - [ ] they get smaller
+- [ ] Commenting
+- [ ] Report
+
+
+
+
 ## Checklist
 
-- [ ] intro screen
-  - [ ] top down camera view pan into the gameplay view
-  - [ ] interactible buttons?
+- [x] intro screen
+  - [ ]? top down camera view pan into the gameplay view
+  - [ ]? interactible buttons?
 - [ ] Primitive based object
   - [ ] with multiple transformations
-  - [ ] could have a power up move around the map, stay there for a bit and move around more afterwards
+  - [ ] could have a power up move around the map/scale up and down, stay there for a bit and move around more afterwards
 - [ ] Skybox and terrain textures
   - [x] skybox
+  - [x] terrain
 - [ ] Camera motion technique
+  - [x] mostly done
+  - [ ] just need to limit to a radius/square/cube thing
   - [ ] like ratchet and clank
     - [ ] strafe and free move
 - [ ] Mesh-based object
+  - [x] Level
+  - [ ] make multiple enemies with movement and different scales and animations
 - [ ] Report
 - [ ] Source Code Design, organization and coding style
 - [ ] Plagiarism Check

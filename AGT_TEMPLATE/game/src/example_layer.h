@@ -1,6 +1,7 @@
 #pragma once
 #include <engine.h>
 #include "player.h"
+#include "Enemy.h"
 
 class example_layer : public engine::layer
 {
@@ -8,10 +9,12 @@ public:
     example_layer();
 	~example_layer();
 
-    void on_update(const engine::timestep& timeStep) override;
+    void on_update(const engine::timestep& timestep) override;
+    void initialiseEnemies();
+    void updateEnemies(const engine::timestep& timestep);
+    void renderEnemies(const std::shared_ptr<engine::shader>& animatedMeshShader);
     void menuCamera();
     void on_render() override;
-    void RenderMenu();
     void on_event(engine::event& event) override;
 
 private:
@@ -33,6 +36,13 @@ private:
 	engine::ref<engine::material>		mMaterial{};
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};
+
+	//Levels
+	std::list<engine::ref<engine::game_object>>	mLevels {};
+
+	//List of enemies
+	std::list<Enemy> mEnemies {};
+
 
 	engine::DirectionalLight            mDirectionalLight;
 

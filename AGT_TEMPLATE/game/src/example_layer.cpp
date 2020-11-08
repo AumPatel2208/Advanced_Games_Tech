@@ -86,6 +86,19 @@ example_layer::example_layer()
                                                                               .width(), 0.f,
                                                                               (float)engine::application::window().
                                                                               height()));
+
+
+    engine::ref<engine::game_object> level1{};
+    engine::game_object_properties level1Props;
+    engine::ref<engine::model> level1Model = engine::model::create("assets/levels/level_1.dae");
+
+    level1Props.position = glm::vec3(0.f, 0.f, 0.f);
+    level1Props.meshes = level1Model->meshes();
+    level1Props.scale = glm::vec3(1.f);
+    level1 = engine::game_object::create(level1Props);
+    mLevels.push_back(level1);
+
+
     mMaterial = engine::material::create(1.0f, glm::vec3(1.0f, 0.1f, 0.07f),
                                          glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
 
@@ -123,6 +136,16 @@ example_layer::example_layer()
     mMannequin = engine::game_object::create(mannequinProps);
     mPlayer.initialise(mMannequin);
 
+
+    // Enemy tempEnemy = {};
+    // tempEnemy.initialise();
+    //
+    // mEnemies.push_back(tempEnemy.object());
+
+    // initialise Enemies
+    initialiseEnemies();
+
+
     // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
     const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
         engine::texture_2d::create("assets/textures/sea_rock_terrain.jpg", false)
@@ -147,7 +170,7 @@ example_layer::example_layer()
     cow_props.scale = glm::vec3(cowScale);
     cow_props.bounding_shape = cowModel->size() / 2.f * cowScale;
     mCow = engine::game_object::create(cow_props);
-
+    
     // Load the tree model. Create a tree object. Set its properties
     engine::ref<engine::model> treeModel = engine::model::create("assets/models/static/elm.3ds");
     engine::game_object_properties tree_props;
@@ -181,8 +204,12 @@ example_layer::example_layer()
     mMenu = engine::game_object::create(menuProps);
 
 
+
+
+
     mGameObjects.push_back(mTerrain);
     mGameObjects.push_back(mBall);
+    // mGameObjects.push_back(mLevels.front());
 
     //m_game_objects.push_back(m_cow);
     //m_game_objects.push_back(m_tree);
@@ -191,21 +218,35 @@ example_layer::example_layer()
 
     mTextManager = engine::text_manager::create();
 
-    mSkinnedMesh->switch_animation(1);
+    // mSkinnedMesh->switch_animation(1);
+    mPlayer.object()->animated_mesh()->switch_animation(1);
+
+    // for (auto& enemy: mEnemies) {
+    //     enemy.object()->animated_mesh()->switch_animation(1);
+    // }
+    // mEnemies.front()->animated_mesh()->switch_animation(3);
 }
 
 example_layer::~example_layer() {}
 
-void example_layer::on_update(const engine::timestep& timeStep) {
-    //Free flowing camera
-    // m3DCamera.on_update(timeStep);
+void example_layer::on_update(const engine::timestep& timestep) {
 
     if (hasStarted) {
-        mPhysicsManager->dynamics_world_update(mGameObjects, double(timeStep));
+        mPhysicsManager->dynamics_world_update(mGameObjects, double(timestep));
 
+        //Free flowing camera
+        // m3DCamera.on_update(timestep);
         // mMannequin->animated_mesh()->on_update(timeStep);
-        mPlayer.onUpdate(timeStep);
-        mPlayer.updateCamera(m3DCamera, timeStep);
+        mPlayer.onUpdate(timestep);
+
+        mPlayer.updateCamera(m3DCamera, timestep);
+
+        // Put the player into the level that already exists
+        if (engine::input::key_pressed(engine::key_codes::KEY_P)) {
+            mPlayer.moveIntoLevel1();
+        }
+
+        updateEnemies(timestep);
     }
     else {
         // set the camera on the menu if the game hasn't started yet
@@ -213,6 +254,7 @@ void example_layer::on_update(const engine::timestep& timeStep) {
         if (engine::input::key_pressed(engine::key_codes::KEY_1)) {
             hasStarted = true;
             mPlayer.setHasStarted(true);
+            // m3DCamera.position(glm::vec3(0.f, 1.f, 0.f));
             //SET TIMER TO TRANSITION HERE
         }
         else if (engine::input::key_pressed(engine::key_codes::KEY_2)) {
@@ -231,6 +273,32 @@ void example_layer::on_update(const engine::timestep& timeStep) {
 
     checkBounce();
 }
+
+void example_layer::initialiseEnemies() {
+    int numberOfEnemies = 3;
+    for (int i = 0; i < numberOfEnemies; ++i) {
+        Enemy enemy = {};
+        enemy.initialise();
+        enemy.setRandomPosition();
+        enemy.setRandomScale();
+        mEnemies.push_back(enemy);
+    }
+}
+
+void example_layer::updateEnemies(const engine::timestep& timestep) {
+    for (auto& enemy: mEnemies) {
+        enemy.onUpdate(timestep, mPlayer);
+        enemy.object()->animated_mesh()->on_update(timestep);
+    }
+
+}
+
+void example_layer::renderEnemies(const std::shared_ptr<engine::shader> &animatedMeshShader) {
+    for (auto& enemy : mEnemies) {
+        engine::renderer::submit(animatedMeshShader, enemy.object());
+    }
+}
+
 
 // Set the camera to display the menu
 void example_layer::menuCamera() {
@@ -278,18 +346,25 @@ void example_layer::on_render() {
 
     engine::renderer::submit(textured_lighting_shader, mTerrain);
 
+    
     glm::mat4 treeTransform(1.0f);
     treeTransform = glm::translate(treeTransform, glm::vec3(4.f, 0.5, -5.0f));
     treeTransform = glm::rotate(treeTransform, mTree->rotation_amount(), mTree->rotation_axis());
     treeTransform = glm::scale(treeTransform, mTree->scale());
     engine::renderer::submit(textured_lighting_shader, treeTransform, mTree);
-
+    
     glm::mat4 cowTransform(1.0f);
     cowTransform = glm::translate(cowTransform, mCow->position());
     cowTransform = glm::rotate(cowTransform, mCow->rotation_amount(), mCow->rotation_axis());
     cowTransform = glm::scale(cowTransform, mCow->scale());
     engine::renderer::submit(textured_lighting_shader, cowTransform, mCow);
 
+    glm::mat4 level1Transform(1.f);
+    level1Transform = glm::translate(level1Transform, glm::vec3(0.f, 2.9f, 0.f));
+    level1Transform = glm::rotate(level1Transform, glm::radians(270.f), glm::vec3(1.f,0.f,0.f));
+    level1Transform = glm::scale(level1Transform, glm::vec3(2.5f));
+
+    engine::renderer::submit(textured_lighting_shader,level1Transform, mLevels.front());
 
     if (!hasStarted) {
         //render menu
@@ -320,55 +395,27 @@ void example_layer::on_render() {
 
     engine::renderer::end_scene();
 
+
+    
     const auto animatedMeshShader = engine::renderer::shaders_library()->get("animated_mesh");
     engine::renderer::begin_scene(m3DCamera, animatedMeshShader);
     std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->set_uniform(
         "gEyeWorldPos", m3DCamera.position());
 
-    glm::mat4 aniTransform = glm::mat4(1.0f);
-
+    // glm::mat4 aniTransform = glm::mat4(1.0f);
+    // aniTransform = glm::translate(glm::vec3(0.f,1.f,0.f));
     engine::renderer::submit(animatedMeshShader, mPlayer.object());
     // engine::renderer::submit(animatedMeshShader, mMannequin);
 
+    glm::mat4 enemyTransform = glm::mat4(1.f);
+    enemyTransform = glm::translate(enemyTransform, glm::vec3(0.f, .5f, 0.f));
+    // enemyTransform = glm::rotate(enemyTransform, glm::radians(270.f), glm::vec3(1.f,0.f,0.f));
+    // enemyTransform = glm::scale(enemyTransform, glm::vec3(10.f));
+    // engine::renderer::submit(animatedMeshShader, enemyTransform, mEnemies.front());
+
+    renderEnemies(animatedMeshShader);
+
     engine::renderer::end_scene();
-
-}
-
-void example_layer::RenderMenu() {
-    // Render text
-    // const auto textShader = engine::renderer::shaders_library()->get("text_2D");
-    //
-    // const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(glm::vec3(5,0.1f,5),false);
-    // engine::texture_2d::create("assets/textures/sarkDouls4.png", true);
-    // engine::game_object_properties menuProps;
-    // menuProps.position = { 0.f, 0.f, 0.f };
-    // menuProps.meshes = { menuShape->mesh() };
-    // mMenu = engine::game_object::create(menuProps);
-
-    // mGameObjects.push_back(mMenu);
-
-
-    // mTextManager->render_text(textShader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f,
-    //     0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-    //
-    //
-    // mTextManager->render_text(textShader, "sark douls v1",
-    //                           (float)engine::application::window().width() / 2 - (float)engine::application::window().width() / 12,
-    //                           (float)engine::application::window().height() / 2 - 10.f,
-    //                           2.f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-    // mTextManager->render_text(textShader, "Options:",
-    //                           (float)engine::application::window().width() / 4,
-    //                           (float)engine::application::window().height() / 2 - 10.f,
-    //                           0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-    // mTextManager->render_text(textShader, "    1) Play Game",
-    //                           (float)engine::application::window().width() / 4,
-    //                           (float)engine::application::window().height() / 2 - 10.f,
-    //                           0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-    // mTextManager->render_text(textShader, "    2) Help",
-    //                           (float)engine::application::window().width() / 4,
-    //                           (float)engine::application::window().height() / 2 - 10.f,
-    //                           0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-
 
 }
 

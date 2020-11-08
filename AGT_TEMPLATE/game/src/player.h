@@ -8,6 +8,7 @@ public:
     Player();
     ~Player();
     void initialise(engine::ref<engine::game_object> object);
+    void moveIntoLevel1();
     void onUpdate(const engine::timestep& timestep);
     engine::ref<engine::game_object> object() const { return mObject; }
     void turn(float angle) const;
@@ -33,11 +34,13 @@ private:
 
     bool firstPerson = false; //
     bool canTransition = true;
-    float mTransitionCameraTimer;
+    float mTransitionCameraTimer = 0.f;
     float camLookAtY = 0.f;
     float camPosBehind = 0.f;
-    const float cameraPosY = 5.f;
+    const float cameraPosYLimit = 4.f;
     const float cameraPosBehindLimit = 5.f;
-    float ySensitivity = 2.f;
+    float ySensitivity3rdPerson = 2.f;
+    float ySensitivity1stPerson = 5.f;
+
 
 };
