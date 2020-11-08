@@ -17,7 +17,7 @@ public:
     void menuUpdateCamera(engine::perspective_camera& camera, const engine::timestep& timestep, bool hasStarted);
     void updateCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
     void jump();
-    void setHasStarted(bool pHasStarted);
+    void setHasStarted(bool _hasStarted);
 
 
 private:

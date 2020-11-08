@@ -23,7 +23,7 @@ public:
 
 	void idle();
 	void attack();
-    void die(const bool& isHitLight);
+    void die();
     void walk(engine::timestep timestep, const Player& player);
     float calculateSpeed(bool isWalking);
     void run();
@@ -35,12 +35,10 @@ public:
     //Static references to animations to make it easier to point to the index
 	static const int ANIM_IDLE = 0;
 	static const int ANIM_WALK = 1;
-	static const int ANIM_RUN = 2;
-	static const int ANIM_ATTACK = 3;
-	static const int ANIM_DEATH1 = 4;
-	static const int ANIM_DEATH2 = 5;
-	static const int ANIM_GET_HIT = 6;
-	static const int ANIM_SHOUT = 7;
+	static const int ANIM_ATTACK = 2;
+	static const int ANIM_DEATH1 = 3;
+	static const int ANIM_GET_HIT = 4;
+	static const int ANIM_SHOUT = 5;
 
 
 	// Enemy Types based on integer

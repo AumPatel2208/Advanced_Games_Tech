@@ -543,6 +543,7 @@ IF EXIST ..\engine\external\FMOD\lib\x64\fmod.dll\ (xcopy /Q /E /Y /I ..\engine\
     <ClInclude Include="src\engine\entities\grid.h" />
     <ClInclude Include="src\engine\entities\shapes\cuboid.h" />
     <ClInclude Include="src\engine\entities\shapes\heightmap.h" />
+    <ClInclude Include="src\engine\entities\shapes\PrimitiveShape.h" />
     <ClInclude Include="src\engine\entities\shapes\sphere.h" />
     <ClInclude Include="src\engine\entities\skybox.h" />
     <ClInclude Include="src\engine\entities\terrain.h" />
@@ -600,6 +601,7 @@ IF EXIST ..\engine\external\FMOD\lib\x64\fmod.dll\ (xcopy /Q /E /Y /I ..\engine\
     <ClCompile Include="src\engine\entities\grid.cpp" />
     <ClCompile Include="src\engine\entities\shapes\cuboid.cpp" />
     <ClCompile Include="src\engine\entities\shapes\heightmap.cpp" />
+    <ClCompile Include="src\engine\entities\shapes\PrimitiveShape.cpp" />
     <ClCompile Include="src\engine\entities\shapes\sphere.cpp" />
     <ClCompile Include="src\engine\entities\skybox.cpp" />
     <ClCompile Include="src\engine\entities\terrain.cpp" />

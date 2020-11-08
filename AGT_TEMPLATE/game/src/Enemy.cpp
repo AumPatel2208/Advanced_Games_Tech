@@ -6,10 +6,8 @@ Enemy::Enemy() {
     enemyMesh = engine::skinned_mesh::create("assets/models/animated/minotaur/Mesh.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Idle.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Walk.FBX");
-    enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Run.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Attack.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Death1.FBX");
-    enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Death2.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Get_Hit.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Shout.FBX");
 }
@@ -25,7 +23,6 @@ void Enemy::initialise() {
     mObject = engine::game_object::create(enemyProps);
     mObject->set_scale(glm::vec3(3.f));
     toTriggerAnimation = true;
-    // idle();
 }
 
 void Enemy::setRandomPosition() const {
@@ -121,10 +118,6 @@ void Enemy::animationHandler() {
         mObject->animated_mesh()->switch_animation(ANIM_WALK);
         currentAnimation = nextAnimation;
         break;
-    case ANIM_RUN:
-        mObject->animated_mesh()->switch_animation(ANIM_RUN);
-        currentAnimation = nextAnimation;
-        break;
     case ANIM_SHOUT:
         mObject->animated_mesh()->switch_animation(ANIM_SHOUT);
         currentAnimation = nextAnimation;
@@ -164,19 +157,12 @@ float Enemy::calculateSpeed(bool isWalking) {
         return mSpeed;
 }
 
-void Enemy::run() {
-    nextAnimation = ANIM_RUN;
-}
-
 void Enemy::attack() {
     nextAnimation = ANIM_ATTACK;
 }
 
-void Enemy::die(const bool& isHitLight) {
-    if (isHitLight)
-        nextAnimation = ANIM_DEATH1;
-    else
-        nextAnimation = ANIM_DEATH1;
+void Enemy::die() {
+    nextAnimation = ANIM_DEATH1;
 }
 
 void Enemy::shout() {

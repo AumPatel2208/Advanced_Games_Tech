@@ -36,13 +36,6 @@ void Player::moveIntoLevel1() {
 
 void Player::onUpdate(const engine::timestep& timestep) {
 
-    // idle animation
-    // mObject->animated_mesh()->switch_animation(1);
-
-    // std::cout << "Player Location" << mObject->position().x << " " <<mObject->position().z << "\n";
-    // std::cout << "Forward:" << mObject->forward().x << " " << mObject->forward().y << " " << mObject->forward().z << "\n";
-
-
     if (hasStarted) {
         if (mTransitionCameraTimer > 0.f) {
             mTransitionCameraTimer -= static_cast<float>(timestep);
@@ -51,11 +44,13 @@ void Player::onUpdate(const engine::timestep& timestep) {
             }
         }
 
+        // change the camera mode (1st and 3rd person)
         if (engine::input::key_pressed(engine::key_codes::KEY_T)) {
             if (canTransition) {
                 canTransition = false;
-                mTransitionCameraTimer = 0.5f;
-                firstPerson = !firstPerson;
+                // turn false to prevent transitioning. only for a short while as is changed to true after timer runs out
+                mTransitionCameraTimer = 0.5f; // Timer to stop unwanted multiple key registrations
+                firstPerson = !firstPerson; // flip the boolean
             }
         }
 
@@ -65,39 +60,40 @@ void Player::onUpdate(const engine::timestep& timestep) {
             if (mJumpTimer < 0.f) {
                 mObject->animated_mesh()->switch_root_movement(false);
                 mObject->animated_mesh()->switch_animation(mObject->animated_mesh()->default_animation());
-                mSpeed = 1.0f;
+                // switch back to walking animation
+                mSpeed = 1.0f; //reset speed back to 1
             }
         }
 
         //turning
         currentMousePosition = engine::input::mouse_position();
         if (prevMousePosition.first > currentMousePosition.first) {
-            turn(1.f * timestep);
+            turn(1.f * timestep); // Turn Left if the mouse moves left
         }
-            // Turn Right if mouse moves right
         else if (prevMousePosition.first < currentMousePosition.first) {
-            turn(-1.f * timestep);
+            turn(-1.f * timestep); // Turn Right if mouse moves right
         }
         mObject->set_rotation_amount(atan2(mObject->forward().x, mObject->forward().z));
+        // Set the rotation to the new forward
 
-        float sens;
+        // y Sensitivity of the mouse/camera y Sensitivity of the mouse/camera 
+        float ySens; // change based on if it is 1st person or 3rd
         if (firstPerson)
-            sens = ySensitivity1stPerson;
+            ySens = ySensitivity1stPerson;
         else
-            sens = ySensitivity3rdPerson;
-
+            ySens = ySensitivity3rdPerson;
         if (prevMousePosition.second > currentMousePosition.second) {
-            camLookAtY += sens * timestep;
+            camLookAtY += ySens * timestep;
         }
         else if (prevMousePosition.second < currentMousePosition.second) {
-            camLookAtY -= sens * timestep;
+            camLookAtY -= ySens * timestep;
         }
-
 
         // Get Strafing Directions
         const glm::vec3 up = glm::vec3(0, 1, 0);
         const glm::vec3 right = glm::cross(glm::normalize(mObject->forward()), glm::normalize(up));
-        const glm::vec3 left = -right;
+        // do a cross product with the forward vector and up vector to return the 'right' direction vector
+        const glm::vec3 left = -right; // left direction vector is the negative of the right
 
         // KEYBOARD CONTROLS
         // Press A to strafe Left
@@ -131,7 +127,6 @@ void Player::onUpdate(const engine::timestep& timestep) {
         // Animate the mesh
         mObject->animated_mesh()->on_update(timestep);
     }
-    else { }
 }
 
 void Player::turn(float angle) const {
@@ -145,8 +140,8 @@ void Player::jump() {
     // mSpeed = 0.0f;
 }
 
-void Player::setHasStarted(const bool pHasStarted) {
-    hasStarted = pHasStarted;
+void Player::setHasStarted(const bool _hasStarted) {
+    hasStarted = _hasStarted;
 }
 
 void Player::updateCamera3rdPerson(engine::perspective_camera& camera, const engine::timestep& timeStep) {
