@@ -142,7 +142,8 @@ main_layer::main_layer()
 
     // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
     const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
-        engine::texture_2d::create("assets/textures/sea_rock_terrain.jpg", false) // Load Sea Rock Texture. sourced from https://3dtextures.me/
+        engine::texture_2d::create("assets/textures/sea_rock_terrain.jpg", false)
+        // Load Sea Rock Texture. sourced from https://3dtextures.me/
     };
     const engine::ref<engine::terrain> terrainShape = engine::terrain::create(100.f, 0.5f, 100.f);
     engine::game_object_properties terrainProps;
@@ -164,7 +165,7 @@ main_layer::main_layer()
     cow_props.scale = glm::vec3(cowScale);
     cow_props.bounding_shape = cowModel->size() / 2.f * cowScale;
     mCow = engine::game_object::create(cow_props);
-    
+
     // Load the tree model. Create a tree object. Set its properties
     engine::ref<engine::model> treeModel = engine::model::create("assets/models/static/elm.3ds");
     engine::game_object_properties tree_props;
@@ -187,7 +188,7 @@ main_layer::main_layer()
     mBall = engine::game_object::create(sphere_props);
 
     //initialise the primitive
-    initialisePrimitive(10.f);
+    initialisePrimitives(1.f, 3);
 
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
@@ -200,9 +201,6 @@ main_layer::main_layer()
     menuProps.textures = {menuTexture, helpTexture};
     menuProps.meshes = {menuShape->mesh()};
     mMenu = engine::game_object::create(menuProps);
-
-
-
 
 
     mGameObjects.push_back(mTerrain);
@@ -230,11 +228,11 @@ void main_layer::on_update(const engine::timestep& timestep) {
         mPhysicsManager->dynamics_world_update(mGameObjects, double(timestep));
 
         //Free flowing camera uses the keys - UJHK. Uncomment line below, and comment out mPLayer.updateCamera
-        m3DCamera.on_update(timestep);
+        // m3DCamera.on_update(timestep);
 
         mPlayer.onUpdate(timestep); // Update the player object
 
-        // mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
+        mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
 
         // Put the player into the level that already exists
         if (engine::input::key_pressed(engine::key_codes::KEY_P)) {
@@ -243,29 +241,32 @@ void main_layer::on_update(const engine::timestep& timestep) {
         }
 
         updateEnemies(timestep);
+        updatePrimitives(timestep);
     }
     else {
         // set the camera on the menu if the game hasn't started yet
         menuCamera();
 
         // Key inputs for the menu system
-        if (engine::input::key_pressed(engine::key_codes::KEY_1)) { // 1 to start the game
+        if (engine::input::key_pressed(engine::key_codes::KEY_1)) {
+            // 1 to start the game
             hasStarted = true;
             mPlayer.setHasStarted(true);
             //SET TIMER TO TRANSITION HERE
             // TO-DO Transition camera from the top/menu to behind the player
         }
-        else if (engine::input::key_pressed(engine::key_codes::KEY_2)) { // 2 to go into the help menu
+        else if (engine::input::key_pressed(engine::key_codes::KEY_2)) {
+            // 2 to go into the help menu
             if (!menuInHelp) {
                 menuInHelp = true; // will trigger a texture change to the help texture
             }
         }
-        if(menuInHelp) {
+        if (menuInHelp) {
             if (engine::input::key_pressed(engine::key_codes::KEY_BACKSPACE)) {
                 menuInHelp = false; // if in the help menu, return to main menu
             }
         }
-        
+
     }
 
 
@@ -273,7 +274,7 @@ void main_layer::on_update(const engine::timestep& timestep) {
 }
 
 // initialise enemies into the level
-void main_layer::initialiseEnemies() { 
+void main_layer::initialiseEnemies() {
     int numberOfEnemies = 3; // temporarily 3. will change to a parameter to make method more flexible
     for (int i = 0; i < numberOfEnemies; ++i) {
         Enemy enemy = {};
@@ -286,40 +287,109 @@ void main_layer::initialiseEnemies() {
 
 // update the list of enemies mEnemies
 void main_layer::updateEnemies(const engine::timestep& timestep) {
-    for (auto& enemy: mEnemies) {
+    for (auto& enemy : mEnemies) {
         enemy.onUpdate(timestep, mPlayer); // update the enemy
         enemy.object()->animated_mesh()->on_update(timestep); // update the enemy's animation
     }
 }
 
 // render the list of enemies into the scene
-void main_layer::renderEnemies(const std::shared_ptr<engine::shader> &animatedMeshShader) {
+void main_layer::renderEnemies(const std::shared_ptr<engine::shader>& animatedMeshShader) {
     for (auto& enemy : mEnemies) {
         engine::renderer::submit(animatedMeshShader, enemy.object()); // submit the enemy into the renderer
     }
 }
 
-void main_layer::initialisePrimitive(const float& scale) {
+void main_layer::initialisePrimitives(const float& scale, const int& amount) {
     std::vector<glm::vec3> primitiveVerticies;
+    std::vector<engine::ref<engine::texture_2d>> primTextures;
+    primTextures.push_back(engine::texture_2d::create("assets/textures/green_brick.png", false));
+    primTextures.push_back(engine::texture_2d::create("assets/textures/yellow_brick.png", false));
+    primTextures.push_back(engine::texture_2d::create("assets/textures/grey_brick.png", false));
 
-    primitiveVerticies.push_back(glm::vec3(0.f, 1.f * scale, 0.f));//0
-    primitiveVerticies.push_back(glm::vec3(0.f, 0.f, 1.f * scale));//1
-    primitiveVerticies.push_back(glm::vec3(-1.f * scale, 0.f, -1.f * scale)); //2
-    primitiveVerticies.push_back(glm::vec3(1.f * scale, 0.f, -1.f * scale)); //3
 
-    //
-    // primitiveVerticies.push_back(glm::vec3(0.f, 10.f, 0.f));//0
-    // primitiveVerticies.push_back(glm::vec3(0.f, 0.f, 10.f));//1
-    // primitiveVerticies.push_back(glm::vec3(-10.f, 0.f, -10.f)); //2
-    // primitiveVerticies.push_back(glm::vec3(10.f, 0.f, -10.f)); //3
-    engine::ref<engine::PrimitiveShape> primitiveShape =
-        engine::PrimitiveShape::create(primitiveVerticies);
-    engine::game_object_properties primitiveProps;
-    primitiveProps.position = { 0.f, 0.5f, -20.f };
-    primitiveProps.meshes = { primitiveShape->mesh() };
+    maxPrimSize *= scale;
+    minPrimSize *= scale;
 
-    mPrimitive = engine::game_object::create(primitiveProps);
-    
+    for (int i = 0; i < amount; ++i) {
+        // auto relativeScale = scale * static_cast<float>(rand() % (i+1) + 1);
+        // relativeScale = scale + i;
+
+
+        primitiveVerticies.push_back(glm::vec3(0.f, 1.f * scale, 0.f)); //0 //top vertex
+        primitiveVerticies.push_back(glm::vec3(0.f, 0.f, 1.f * scale)); //1
+        primitiveVerticies.push_back(glm::vec3(-1.f * scale, 0.f, -1.f * scale)); //2
+        primitiveVerticies.push_back(glm::vec3(1.f * scale, 0.f, -1.f * scale)); //3
+        engine::ref<engine::PrimitiveShape> primitiveShape =
+            engine::PrimitiveShape::create(primitiveVerticies);
+        engine::game_object_properties primitiveProps;
+
+        float positionX = (rand() % 100) / 10.f;
+        float positionY = (rand() % 100) / 10.f;
+        primitiveProps.position = {positionX, 0.5f, positionY};
+        primitiveProps.meshes = {primitiveShape->mesh()};
+        if ((i + 1) % 3 == 0) {
+            primitiveProps.textures = {primTextures.at(2)};
+        }
+        else if ((i + 1) % 2 == 0) {
+            primitiveProps.textures = {primTextures.at(1)};
+        }
+        else {
+            primitiveProps.textures = {primTextures.at(0)};
+        }
+
+
+        auto primitive = engine::game_object::create(primitiveProps);
+        mPrimitives.push_back(primitive);
+    }
+
+
+}
+
+// update the primitives
+void main_layer::updatePrimitives(const engine::timestep& timestep) {
+
+
+    const auto rotationSpeed = 1.5f;
+    const auto scaleSpeed = 0.5f;
+
+    for (auto& primitive : mPrimitives) {
+        primitive->set_rotation_amount(primitive->rotation_amount() + timestep * rotationSpeed);
+
+
+        if (primitive->scale().x > maxPrimSize) {
+            isPrimGrowing = false;
+        }
+        else if (primitive->scale().x < minPrimSize) {
+            isPrimGrowing = true;
+        }
+
+
+        if (isPrimGrowing) {
+            primitive->set_scale(primitive->scale() + timestep * scaleSpeed);
+        }
+        else {
+            primitive->set_scale(primitive->scale() - timestep * scaleSpeed);
+        }
+
+        auto d = primitive->position() - mPlayer.object()->position();
+        if (glm::length(d) <= primitive->scale().x) {
+            float randX = (rand() % 100) / 10.f;
+            float randZ = (rand() % 100) / 10.f;
+
+            const auto randPosition = glm::vec3(randX, 0.5f, randZ);
+            primitive->set_position(randPosition);
+        }
+
+
+    }
+}
+
+// render the primitives
+void main_layer::renderPrimitives(const std::shared_ptr<engine::shader> shader) {
+    for (auto& primitive : mPrimitives) {
+        engine::renderer::submit(shader, primitive);
+    }
 }
 
 // Set the camera to display the menu
@@ -335,13 +405,14 @@ void main_layer::menuCamera() {
     menuForward = (glm::rotate(menuForward, glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f)));
 
     menuForward = glm::normalize(menuForward); // normalise the vector
-    
+
     glm::vec3 camPos = menuPosition - menuForward * B; // calculate the position of the camera
     camPos.y += A;
 
     glm::vec3 camLookAt = menuPosition + menuForward * C; // calculate what the camera is looking at    
     camLookAt.y = 0.f;
-    m3DCamera.set_view_matrix(camPos, camLookAt); // set the view matrix of the camera to the previously calculated figures
+    m3DCamera.set_view_matrix(camPos, camLookAt);
+    // set the view matrix of the camera to the previously calculated figures
 }
 
 void main_layer::on_render() {
@@ -366,13 +437,16 @@ void main_layer::on_render() {
 
     engine::renderer::submit(textured_lighting_shader, mTerrain);
 
-    
+    // render the primitives into the scene
+    renderPrimitives(textured_lighting_shader);
+
+
     glm::mat4 treeTransform(1.0f);
     treeTransform = glm::translate(treeTransform, glm::vec3(4.f, 0.5, -5.0f));
     treeTransform = glm::rotate(treeTransform, mTree->rotation_amount(), mTree->rotation_axis());
     treeTransform = glm::scale(treeTransform, mTree->scale());
     engine::renderer::submit(textured_lighting_shader, treeTransform, mTree);
-    
+
     glm::mat4 cowTransform(1.0f);
     cowTransform = glm::translate(cowTransform, mCow->position());
     cowTransform = glm::rotate(cowTransform, mCow->rotation_amount(), mCow->rotation_axis());
@@ -386,9 +460,9 @@ void main_layer::on_render() {
         level1Transform = glm::rotate(level1Transform, glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f));
         level1Transform = glm::scale(level1Transform, glm::vec3(2.5f));
 
-        engine::renderer::submit(textured_lighting_shader, level1Transform, mLevels.front()); // render the level with the transformation matrix applied
+        engine::renderer::submit(textured_lighting_shader, level1Transform, mLevels.front());
+        // render the level with the transformation matrix applied
     }
-
 
 
     // render the menu if the game hasn't fully started yet
@@ -404,11 +478,12 @@ void main_layer::on_render() {
         menuTransform = glm::translate(menuTransform, glm::vec3(0, 10.f, 0));
 
         engine::renderer::submit(textured_lighting_shader, mMenu->meshes().at(0),
-            menuTransform);
+                                 menuTransform);
     }
 
 
     engine::renderer::end_scene();
+
 
     // Set up material shader. (does not render textures, renders materials instead)
     const auto materialShader = engine::renderer::shaders_library()->get("mesh_material");
@@ -419,7 +494,7 @@ void main_layer::on_render() {
 
     engine::renderer::submit(materialShader, mBall);
 
-    engine::renderer::submit(materialShader,mPrimitive);
+
 
     engine::renderer::end_scene();
 

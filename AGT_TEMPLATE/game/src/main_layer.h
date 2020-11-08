@@ -13,7 +13,9 @@ public:
     void initialiseEnemies();
     void updateEnemies(const engine::timestep& timestep);
     void renderEnemies(const std::shared_ptr<engine::shader>& animatedMeshShader);
-    void initialisePrimitive(const float& scale);
+    void initialisePrimitives(const float& scale, const int& amount);
+    void updatePrimitives(const engine::timestep& timestep);
+    void renderPrimitives(std::shared_ptr<engine::shader> shader);
     void menuCamera();
     void on_render() override;
     void on_event(engine::event& event) override;
@@ -36,9 +38,16 @@ private:
 	engine::ref<engine::game_object>	mBall{};
 	engine::ref<engine::game_object>	mMannequin{};
 	engine::ref<engine::game_object>	mPrimitive{};
+	std::list<engine::ref<engine::game_object>>	mPrimitives{};
 	engine::ref<engine::material>		mMaterial{};
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};
+
+
+	// Max/Min for primitive
+	float maxPrimSize = 1.2f;
+	float minPrimSize = 0.8f;
+	bool isPrimGrowing = true;
 
 	//Levels
 	std::list<engine::ref<engine::game_object>>	mLevels {};
