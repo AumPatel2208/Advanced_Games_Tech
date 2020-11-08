@@ -13,7 +13,7 @@ public:
     void initialiseEnemies();
     void updateEnemies(const engine::timestep& timestep);
     void renderEnemies(const std::shared_ptr<engine::shader>& animatedMeshShader);
-    void initialisePrimitive();
+    void initialisePrimitive(const float& scale);
     void menuCamera();
     void on_render() override;
     void on_event(engine::event& event) override;

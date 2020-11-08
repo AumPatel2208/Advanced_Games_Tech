@@ -99,7 +99,7 @@ void Enemy::onUpdate(const engine::timestep& timestep, const Player& player) {
             toAttack = true;
         }
     }
-    std::cout << "Shout timer: " << mShoutTimer << "\n";
+    // std::cout << "Shout timer: " << mShoutTimer << "\n";
 
 
 }

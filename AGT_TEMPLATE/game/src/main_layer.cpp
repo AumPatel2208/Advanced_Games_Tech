@@ -187,7 +187,7 @@ main_layer::main_layer()
     mBall = engine::game_object::create(sphere_props);
 
     //initialise the primitive
-    initialisePrimitive();
+    initialisePrimitive(10.f);
 
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
@@ -230,11 +230,11 @@ void main_layer::on_update(const engine::timestep& timestep) {
         mPhysicsManager->dynamics_world_update(mGameObjects, double(timestep));
 
         //Free flowing camera uses the keys - UJHK. Uncomment line below, and comment out mPLayer.updateCamera
-        //m3DCamera.on_update(timestep);
+        m3DCamera.on_update(timestep);
 
         mPlayer.onUpdate(timestep); // Update the player object
 
-        mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
+        // mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
 
         // Put the player into the level that already exists
         if (engine::input::key_pressed(engine::key_codes::KEY_P)) {
@@ -299,20 +299,27 @@ void main_layer::renderEnemies(const std::shared_ptr<engine::shader> &animatedMe
     }
 }
 
-void main_layer::initialisePrimitive() {
+void main_layer::initialisePrimitive(const float& scale) {
     std::vector<glm::vec3> primitiveVerticies;
 
-    primitiveVerticies.push_back(glm::vec3(0.f, 10.f, 0.f));//0
-    primitiveVerticies.push_back(glm::vec3(0.f, 0.f, 10.f));//1
-    primitiveVerticies.push_back(glm::vec3(-10.f, 0.f, -10.f)); //2
-    primitiveVerticies.push_back(glm::vec3(10.f, 0.f, -10.f)); //3
+    primitiveVerticies.push_back(glm::vec3(0.f, 1.f * scale, 0.f));//0
+    primitiveVerticies.push_back(glm::vec3(0.f, 0.f, 1.f * scale));//1
+    primitiveVerticies.push_back(glm::vec3(-1.f * scale, 0.f, -1.f * scale)); //2
+    primitiveVerticies.push_back(glm::vec3(1.f * scale, 0.f, -1.f * scale)); //3
+
+    //
+    // primitiveVerticies.push_back(glm::vec3(0.f, 10.f, 0.f));//0
+    // primitiveVerticies.push_back(glm::vec3(0.f, 0.f, 10.f));//1
+    // primitiveVerticies.push_back(glm::vec3(-10.f, 0.f, -10.f)); //2
+    // primitiveVerticies.push_back(glm::vec3(10.f, 0.f, -10.f)); //3
     engine::ref<engine::PrimitiveShape> primitiveShape =
         engine::PrimitiveShape::create(primitiveVerticies);
     engine::game_object_properties primitiveProps;
     primitiveProps.position = { 0.f, 0.5f, -20.f };
     primitiveProps.meshes = { primitiveShape->mesh() };
-    mPrimitive = engine::game_object::create(primitiveProps);
 
+    mPrimitive = engine::game_object::create(primitiveProps);
+    
 }
 
 // Set the camera to display the menu
