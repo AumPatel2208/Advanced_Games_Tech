@@ -12,9 +12,9 @@
   - [x] make it so that it agro's and starts moving only when the player is certain distance away
 - [x] Commenting
 - [ ] Change help Screen
-  - [ ] include P to load level 1 and transport the player
-  - [ ] explain enemies
-  - [ ] write that you can press 1 to start the game and escape to quit
+  - [x] include P to load level 1 and transport the player
+  - [x] explain enemies
+  - [x] write that you can press 1 to start the game and escape to quit
 - [ ] Report
   - [ ] mention having the menu as a small camera technique as well
   - [ ] mention that I created the level in blender as well

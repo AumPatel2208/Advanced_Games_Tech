@@ -1,7 +1,7 @@
 #include "Enemy.h"
 
 
-Enemy::Enemy() {
+Enemy::Enemy()  {
     // Initialise the animated mesh
     enemyMesh = engine::skinned_mesh::create("assets/models/animated/minotaur/Mesh.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Idle.FBX");
@@ -10,6 +10,8 @@ Enemy::Enemy() {
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Death1.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Get_Hit.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Shout.FBX");
+
+
 }
 
 
@@ -23,6 +25,10 @@ void Enemy::initialise() {
     mObject = engine::game_object::create(enemyProps);
     mObject->set_scale(glm::vec3(3.f));
     toTriggerAnimation = true;
+
+    testAnimationHandler = AnimationHandler(mObject);
+
+
 }
 
 void Enemy::setRandomPosition() const {
@@ -68,21 +74,26 @@ void Enemy::onUpdate(const engine::timestep& timestep, const Player& player) {
 
 
     // Animation Handler handles the current animation that needs to be played
-    animationHandler();
+    // animationHandler();
+    testAnimationHandler.onUpdate(timestep);
 
-    //check distance from player and stop walking and shout at the player
+    //check distance from player and stop walking and shout at the player (2.f currently)
     auto d = mObject->position() - player.object()->position();
+
     if (glm::length(d) < 2.f) {
-        if (!isAgro) {
+        if (!isInShoutRange) {
             // the animation duration is being returned in frames, so i divided it by 30 to get the answer in seconds as then i can accurately get the timer
             mShoutTimer = static_cast<float>(mObject->animated_mesh()->animations().at(ANIM_SHOUT)->mDuration) / 30.f;
-            isAgro = true;
+            isInShoutRange = true;
         }
-        agro(timestep);
+        shoutAttack(timestep);
     }
-    else {
+    else if (glm::length(d) < agroRange) {
         // move the enemy
         walk(timestep, player);
+    }
+    else {
+        idle();
     }
     // toTriggerAnimation = true;
 
@@ -128,27 +139,11 @@ void Enemy::animationHandler() {
         mObject->animated_mesh()->switch_animation(ANIM_ATTACK);
         currentAnimation = nextAnimation;
         break;
+    default:
+        break;
     }
 
 
-}
-
-// Turn Enemy towards the player
-void Enemy::turn(float angle) {
-    mObject->set_rotation_amount(angle);
-    angleFromPlayer = angle;
-}
-
-void Enemy::idle() {
-    nextAnimation = ANIM_IDLE;
-}
-
-// walk the enemy in relation to the player
-void Enemy::walk(engine::timestep timestep, const Player& player) {
-    nextAnimation = ANIM_WALK;
-    glm::vec3 directionVector = glm::normalize(player.object()->position() - mObject->position());
-
-    mObject->set_position(mObject->position() += directionVector * glm::vec3(timestep) * calculateSpeed(true));
 }
 
 // calculate the speed based on the size of the enemy
@@ -159,24 +154,52 @@ float Enemy::calculateSpeed(bool isWalking) {
         return mSpeed;
 }
 
+
+// Turn Enemy towards the player
+void Enemy::turn(float angle) {
+    mObject->set_rotation_amount(angle);
+    angleFromPlayer = angle;
+}
+
+void Enemy::idle() {
+    nextAnimation = ANIM_IDLE;
+   testAnimationHandler.nextAnimation(AnimationHandler::ANIM_IDLE);
+}
+
+// walk the enemy in relation to the player
+void Enemy::walk(engine::timestep timestep, const Player& player) {
+    nextAnimation = ANIM_WALK; // tell the system that the next animation will be a walking animation
+   testAnimationHandler.nextAnimation(  AnimationHandler::ANIM_WALK); // tell the system that the next animation will be a walking animation
+    
+    // calculate the direction vector to walk towards the player
+    glm::vec3 directionVector = glm::normalize(player.object()->position() - mObject->position());
+
+    // move the game object
+    mObject->set_position(mObject->position() += directionVector * glm::vec3(timestep) * calculateSpeed(true));
+}
+
+
 // play the attack animation // will be expanded to contain collisions.
 void Enemy::attack() {
     nextAnimation = ANIM_ATTACK;
+    testAnimationHandler.nextAnimation(AnimationHandler::ANIM_ATTACK);
 }
 
 // play the death animation and also will handle turning into a ragdoll
 void Enemy::die() {
     nextAnimation = ANIM_DEATH1;
+   testAnimationHandler.nextAnimation(AnimationHandler::ANIM_DEATH);
 }
 
 // play the shout animation
 void Enemy::shout() {
     nextAnimation = ANIM_SHOUT;
+   testAnimationHandler.nextAnimation (AnimationHandler::ANIM_SHOUT);
 }
 
 
 // if the enmey get close enough to the player, this is called.
-void Enemy::agro(const engine::timestep& timestep) {
+void Enemy::shoutAttack(const engine::timestep& timestep) {
     //set timer for shout animation and then scale up while that is happening and then start attacking
     if (!toAttack) {
         shout();
