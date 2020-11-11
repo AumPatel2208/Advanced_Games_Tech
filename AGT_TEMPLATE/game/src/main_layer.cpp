@@ -289,7 +289,6 @@ void main_layer::initialiseEnemies() {
 void main_layer::updateEnemies(const engine::timestep& timestep) {
     for (auto& enemy : mEnemies) {
         enemy.onUpdate(timestep, mPlayer); // update the enemy
-        enemy.object()->animated_mesh()->on_update(timestep); // update the enemy's animation
     }
 }
 

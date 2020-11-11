@@ -8,6 +8,7 @@ AnimationHandler::~AnimationHandler() {
 }
 
 void AnimationHandler::onUpdate(const engine::timestep& timestep) {
+    mObject->animated_mesh()->on_update(timestep);
 
     // if the current animation is the same as the next animation then do not do anything
     if (currentAnimation == mNextAnimation)
