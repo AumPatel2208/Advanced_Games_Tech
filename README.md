@@ -1,5 +1,9 @@
 # Advanced Games Tech
 
+## top priority
+- [ ] change the enemy models to lower poly to reduce file size, as will not have enough space later on
+
+
 ## TO-DO
 - [x] Primitive Objects
   - [x] Power ups that scale up and down move around the map
@@ -44,6 +48,33 @@
 - [ ] Report
 - [ ] Source Code Design, organization and coding style
 - [ ] Plagiarism Check
+- [ ] NPC dialogue
+  - [ ] maybe have 2 or 3 choices of branching dialogue (resets on playing the game again). gives you the weapon
+    - [ ] offers you the weapon to help you in the journey
+    - [ ] or scoffs at you if you dont gain his respect. he gives you the weapon but might say "you'll die out there without this"
+- [ ] Light
+  - [ ] have a light source around the player, lighting up the scene.
+- [ ] Effects
+  - [ ] on collision have blood or sparks based on what they hit
+  - [ ] have a different coloured blood when the player is hit
+  - [ ] add fog on the outside
+- [ ] mesh based objects
+  - [ ] Level
+  - [ ] door (opens and closes) - make it into a gate maybe, opened and closed with a switch
+  - [ ] maybe torches
+  - [ ] friendly NPC with dialogue
+  - [ ] enemies
+  - [ ] boss
+- [ ] difficulty
+  - [ ] difficulty switches maybe based on how much time the player took in the beginning section, or killing a few enemies
+  - [ ] it could just have a bell/switch you can activate that ups the health and the attack damage of the enemies
+  - [ ] it could just up the difficulty and reset you to the beginning of the level
+    - [ ] can be attached to a stop watch showing how long the player has survuved in the game.
+    
+    
+## Documentation checklist
+- finite state machines for the enemies
+- maybe describe the animation handler or something better if i do come up with something
 
 ## Souls-Like Game
 
