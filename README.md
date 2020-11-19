@@ -71,7 +71,27 @@
   - [ ] it could just up the difficulty and reset you to the beginning of the level
     - [ ] can be attached to a stop watch showing how long the player has survuved in the game.
     
-    
+
+
+
+### Dialogue for the NPC
+
+- "hello there"  `greeting_1`
+- "hmm, what's that smell" `greeting_2` "you been killing 'em beasts'" `greeting_3`
+  - Yes
+    - "ahh, a hunter are you, same here" `yes_1`
+    - "I think you could help me out with something here" `yes_2`
+    - "would you mind going through those doors and killing that big guy in there?" `yes_3`
+      - REPEAT
+  - No
+    - "must be from me then, beasts all over the shop"`no_1`
+    - "Would you like to do something for me?" `no_2`
+    - "I need that guy on the other side of that door dead? Be a good laddie and help a man out, would ya." `no_3`
+      - REPEAT
+- After beating the guy. "Here have this." `end_1` {Gives item} "Many thanks for beating him, scary fella he is." `end_2`
+
+
+
 ## Documentation checklist
 - finite state machines for the enemies
 - maybe describe the animation handler or something better if i do come up with something
