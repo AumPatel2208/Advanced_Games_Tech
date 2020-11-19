@@ -6,28 +6,52 @@
 
 Player::Player() {
     mJumpTimer = 0.f;
+    mMovementTimer = 0.f;
     mSpeed = 1.f;
 }
 
+
 Player::~Player() {}
 
+
 // initialise the players object.
-void Player::initialise(engine::ref<engine::game_object> object) {
-    mObject = object;
+void Player::initialise() {
+    // create skinned mesh for the player object applied to the player
+    engine::ref<engine::skinned_mesh> mSkinnedMesh = engine::skinned_mesh::create(
+        "assets/models/animated/mannequin/free3Dmodel.dae");
+    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/walk.dae");
+    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
+    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/jump.dae");
+    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/standard_run.dae");
+    mSkinnedMesh->switch_root_movement(false);
+
+    engine::game_object_properties objectProperties;
+    objectProperties.animated_mesh = mSkinnedMesh;
+    objectProperties.scale = glm::vec3(1.f / glm::max(mSkinnedMesh->size().x,
+                                                      glm::max(mSkinnedMesh->size().y, mSkinnedMesh->size().z)));
+    objectProperties.position = glm::vec3(3.0f, 0.5f, -5.0f);
+    objectProperties.type = 0;
+    objectProperties.bounding_shape = mSkinnedMesh->size() / 2.f * objectProperties.scale.x;
+
+    mObject = engine::game_object::create(objectProperties);
+
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
     mObject->set_position(glm::vec3(0.f, 0.5f, 10.f));
-    // mObject->set_forward(glm::vec3(0.f, 0.f, 1.f));
-    // mObject->set_position(glm::vec3(0.f, 15.f, 0.f));
-    // mObject->set_forward(glm::rotate(mObject->forward(), 180.f, glm::vec3(1.f, 0.f, 0.f)));
 
-    // Forward that points down
-    // mObject->set_forward(glm::rotate(mObject->forward(), glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f)));
+    //Set the animations based on the objeect loaded
+    // animationHandler = AnimationHandler(mObject);
+    animationHandler = AnimationHandler(mObject);
+    animationHandler.setAnimWalk(0);
+    animationHandler.setIdleAnim(1);
+    animationHandler.setAnimJump(2);
+    animationHandler.setAnimRun(3);
+    std::cout << "Anim Walk"<< animationHandler.animWalk() <<"\n";
+    std::cout << "Anim Idle"<< animationHandler.animIdle() <<"\n";
+    animationHandler.nextAnimation(animationHandler.animIdle());
 
+    prevMousePosition = engine::input::mouse_position();
 
-    mObject->animated_mesh()->set_default_animation(1);
-    // mObject->set_position(glm::vec3(0.f, 0.f, 0.f));
-
-    prevMousePosition = engine::input::mouse_position(); // assign the current mouse position as previous as it will be empty otherwise
+    // assign the current mouse position as previous as it will be empty otherwise
 }
 
 // temporary method to move the player into position for the first level model
@@ -38,6 +62,7 @@ void Player::moveIntoLevel1() {
 
 // call every game loop
 void Player::onUpdate(const engine::timestep& timestep) {
+    // idle(timestep);
 
     if (hasStarted) {
         if (mTransitionCameraTimer > 0.f) {
@@ -62,7 +87,8 @@ void Player::onUpdate(const engine::timestep& timestep) {
             mJumpTimer -= static_cast<float>(timestep);
             if (mJumpTimer < 0.f) {
                 mObject->animated_mesh()->switch_root_movement(false);
-                mObject->animated_mesh()->switch_animation(mObject->animated_mesh()->default_animation());
+                // mObject->animated_mesh()->switch_animation(mObject->animated_mesh()->default_animation());
+                animationHandler.nextAnimation(animationHandler.animIdle());
                 // switch back to walking animation
                 mSpeed = 1.0f; //reset speed back to 1
             }
@@ -109,28 +135,60 @@ void Player::onUpdate(const engine::timestep& timestep) {
             mObject->set_position(mObject->position() += right * mSpeed * static_cast<float>(timestep));
         }
 
+
+        // timer for movement
+        if (mMovementTimer > 0.f) {
+            mMovementTimer -= static_cast<float>(timestep);
+            if (mMovementTimer < 0.f) {
+                // mObject->animated_mesh()->switch_root_movement(false);
+                // animationHandler.nextAnimation(animationHandler.animIdle());
+                idle(timestep);
+                // switch back to walking animation
+                mSpeed = 1.0f; //reset speed back to 1
+            }
+        }
+
+
         // Move Forward if W is pressed
         if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
-            mObject->animated_mesh()->default_animation();
-            mObject->set_position(mObject->position() += mObject->forward() * mSpeed * static_cast<float>(timestep));
-            mObject->set_position(glm::vec3(mObject->position().x, height / 2, mObject->position().z));
-            mObject->set_rotation_amount(atan2(mObject->forward().x, mObject->forward().z));
+            // mObject->animated_mesh()->switch_animation(0);
+            walk(true, timestep);
+            mMovementTimer = 1.f;
         }
             // Move Back if S is pressed
         else if (engine::input::key_pressed(engine::key_codes::KEY_S)) {
-            mObject->set_position(mObject->position() -= mObject->forward() * mSpeed * static_cast<float>(timestep));
-            mObject->set_position(glm::vec3(mObject->position().x, height / 2, mObject->position().z));
-            mObject->set_rotation_amount(atan2(mObject->forward().x, mObject->forward().z));
+            // mObject->animated_mesh()->switch_animation(0);
+            walk(false, timestep);
+            mMovementTimer = 1.f;
         }
 
         // Jump if Space is pressed
         if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
             jump();
+            mMovementTimer = 1.f;
         }
 
         // Animate the mesh
-        mObject->animated_mesh()->on_update(timestep);
+        animationHandler.onUpdate(timestep);
+        // mObject->animated_mesh()->on_update(timestep);
     }
+}
+
+void Player::idle(const engine::timestep timestep) {
+    animationHandler.nextAnimation(animationHandler.animIdle());
+}
+
+void Player::walk(const bool& forward, const engine::timestep& timestep) {
+
+    animationHandler.nextAnimation(animationHandler.animWalk());
+
+    if (forward)
+        mObject->set_position(mObject->position() += mObject->forward() * mSpeed * static_cast<float>(timestep));
+    else
+        mObject->set_position(mObject->position() -= mObject->forward() * mSpeed * static_cast<float>(timestep));
+    mObject->set_position(glm::vec3(mObject->position().x, height / 2, mObject->position().z));
+    mObject->set_rotation_amount(atan2(mObject->forward().x, mObject->forward().z));
+
 }
 
 void Player::turn(float angle) const {
@@ -138,10 +196,9 @@ void Player::turn(float angle) const {
 }
 
 void Player::jump() {
-    mJumpTimer = mObject->animated_mesh()->animations().at(3)->mDuration;
-    mObject->animated_mesh()->switch_root_movement(true);
-    mObject->animated_mesh()->switch_animation(3);
-    // mSpeed = 0.0f;
+    animationHandler.nextAnimation(animationHandler.animJump());
+    // timer set for the jump
+    mJumpTimer = mObject->animated_mesh()->animations().at(animationHandler.animJump())->mDuration;
 }
 
 void Player::setHasStarted(const bool _hasStarted) {

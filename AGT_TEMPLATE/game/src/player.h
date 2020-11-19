@@ -1,5 +1,7 @@
 #pragma once
 #include <engine.h>
+
+#include "AnimationHandler.h"
 #include "glm/gtx/rotate_vector.hpp"
 
 class Player {
@@ -7,9 +9,11 @@ class Player {
 public:
     Player();
     ~Player();
-    void initialise(engine::ref<engine::game_object> object);
+    void initialise();
     void moveIntoLevel1();
     void onUpdate(const engine::timestep& timestep);
+    void idle(engine::timestep timestep);
+    void walk(const bool& forward, const engine::timestep& timestep);
     engine::ref<engine::game_object> object() const { return mObject; }
     void turn(float angle) const;
     void updateCamera3rdPerson(engine::perspective_camera& camera, const engine::timestep& timeStep);
@@ -21,8 +25,9 @@ public:
 
 
 private:
-    float mSpeed{0.f};
+    float mSpeed{ 0.f };
     float mJumpTimer;
+    float mMovementTimer;
     bool hasStarted = false;
 
     engine::ref<engine::game_object> mObject;
@@ -41,6 +46,6 @@ private:
     const float cameraPosBehindLimit = 5.f;
     float ySensitivity3rdPerson = 2.f;
     float ySensitivity1stPerson = 5.f;
-
+    AnimationHandler animationHandler ={};
 
 };

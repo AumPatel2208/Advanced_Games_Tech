@@ -117,25 +117,25 @@ main_layer::main_layer()
                                                                     true)
                                      });
 
-    // create skinned mesh for the mannequin object applied to the player
-    engine::ref<engine::skinned_mesh> mSkinnedMesh = engine::skinned_mesh::create(
-        "assets/models/animated/mannequin/free3Dmodel.dae");
-    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/walking.dae");
-    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
-    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/jump.dae");
-    mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/standard_run.dae");
-    mSkinnedMesh->switch_root_movement(false);
-
-    engine::game_object_properties mannequinProps;
-    mannequinProps.animated_mesh = mSkinnedMesh;
-    mannequinProps.scale = glm::vec3(1.f / glm::max(mSkinnedMesh->size().x,
-                                                    glm::max(mSkinnedMesh->size().y, mSkinnedMesh->size().z)));
-    mannequinProps.position = glm::vec3(3.0f, 0.5f, -5.0f);
-    mannequinProps.type = 0;
-    mannequinProps.bounding_shape = mSkinnedMesh->size() / 2.f * mannequinProps.scale.x;
-
-    mMannequin = engine::game_object::create(mannequinProps);
-    mPlayer.initialise(mMannequin); // initialise the player using the mannequin game object
+    // // create skinned mesh for the mannequin object applied to the player
+    // engine::ref<engine::skinned_mesh> mSkinnedMesh = engine::skinned_mesh::create(
+    //     "assets/models/animated/mannequin/free3Dmodel.dae");
+    // mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/walking.dae");
+    // mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
+    // mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/jump.dae");
+    // mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/standard_run.dae");
+    // mSkinnedMesh->switch_root_movement(false);
+    //
+    // engine::game_object_properties mannequinProps;
+    // mannequinProps.animated_mesh = mSkinnedMesh;
+    // mannequinProps.scale = glm::vec3(1.f / glm::max(mSkinnedMesh->size().x,
+    //                                                 glm::max(mSkinnedMesh->size().y, mSkinnedMesh->size().z)));
+    // mannequinProps.position = glm::vec3(3.0f, 0.5f, -5.0f);
+    // mannequinProps.type = 0;
+    // mannequinProps.bounding_shape = mSkinnedMesh->size() / 2.f * mannequinProps.scale.x;
+    //
+    // mMannequin = engine::game_object::create(mannequinProps);
+    mPlayer.initialise(); // initialise the player using the mannequin game object
 
     // Initialis the enemies
     initialiseEnemies();
@@ -217,7 +217,7 @@ main_layer::main_layer()
 
     // fixed animation for the player
     // have not implemented the animation manager for the player
-    mPlayer.object()->animated_mesh()->switch_animation(1);
+    // mPlayer.object()->animated_mesh()->switch_animation(1);
 }
 
 main_layer::~main_layer() {}

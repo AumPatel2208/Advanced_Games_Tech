@@ -24,9 +24,14 @@ void Enemy::initialise() {
     mObject->set_scale(glm::vec3(3.f));
     toTriggerAnimation = true;
 
+    // Set the positions of the animations based on the order they are loaded into the mesh
     animationHandler = AnimationHandler(mObject);
-
-
+    animationHandler.setIdleAnim(0);
+    animationHandler.setAnimWalk(1);
+    animationHandler.setAnimAttack(2);
+    animationHandler.setAnimDeath(3);
+    animationHandler.setAnimGetHit(4);
+    animationHandler.setAnimShout(5);
 }
 
 void Enemy::setRandomPosition() const {
@@ -81,7 +86,7 @@ void Enemy::onUpdate(const engine::timestep& timestep, const Player& player) {
     if (glm::length(d) < 2.f) {
         if (!isInShoutRange) {
             // the animation duration is being returned in frames, so i divided it by 30 to get the answer in seconds as then i can accurately get the timer
-            mShoutTimer = static_cast<float>(mObject->animated_mesh()->animations().at(AnimationHandler::ANIM_SHOUT)->mDuration) / 30.f;
+            mShoutTimer = static_cast<float>(mObject->animated_mesh()->animations().at(animationHandler.animShout())->mDuration) / 30.f;
             isInShoutRange = true;
         }
         shoutAttack(timestep);
@@ -126,12 +131,12 @@ void Enemy::turn(float angle) {
 }
 
 void Enemy::idle() {
-   animationHandler.nextAnimation(AnimationHandler::ANIM_IDLE);
+    animationHandler.nextAnimation(animationHandler.animIdle());
 }
 
 // walk the enemy in relation to the player
 void Enemy::walk(engine::timestep timestep, const Player& player) {
-   animationHandler.nextAnimation(  AnimationHandler::ANIM_WALK); // tell the system that the next animation will be a walking animation
+   animationHandler.nextAnimation(  animationHandler.animWalk()); // tell the system that the next animation will be a walking animation
     
     // calculate the direction vector to walk towards the player
     glm::vec3 directionVector = glm::normalize(player.object()->position() - mObject->position());
@@ -143,17 +148,17 @@ void Enemy::walk(engine::timestep timestep, const Player& player) {
 
 // play the attack animation // will be expanded to contain collisions.
 void Enemy::attack() {
-    animationHandler.nextAnimation(AnimationHandler::ANIM_ATTACK);
+    animationHandler.nextAnimation(animationHandler.animAttack());
 }
 
 // play the death animation and also will handle turning into a ragdoll
 void Enemy::die() {
-   animationHandler.nextAnimation(AnimationHandler::ANIM_DEATH);
+   animationHandler.nextAnimation(animationHandler.animDeath());
 }
 
 // play the shout animation
 void Enemy::shout() {
-   animationHandler.nextAnimation (AnimationHandler::ANIM_SHOUT);
+   animationHandler.nextAnimation (animationHandler.animShout());
 }
 
 
