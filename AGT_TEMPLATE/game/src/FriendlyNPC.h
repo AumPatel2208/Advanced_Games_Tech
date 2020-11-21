@@ -18,7 +18,9 @@ public:
     void progress();
 
 private:
+    engine::ref<engine::game_object> mObject;
     engine::ref<engine::audio_manager> mAudioManager {};
+	engine::ref<engine::skinned_mesh>	npcMesh;
 
     bool isYes = false;
     bool isBossBeaten = false;
@@ -26,7 +28,5 @@ private:
     
     std::string dialoguePath = "greeting";
     int         dialogueNumber = 1;
-
-    engine::ref<engine::game_object> mObject;
 
 };

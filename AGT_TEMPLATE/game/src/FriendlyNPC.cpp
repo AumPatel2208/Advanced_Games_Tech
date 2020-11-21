@@ -15,11 +15,14 @@ FriendlyNPC::FriendlyNPC() {
     mAudioManager->load_sound("", engine::sound_type::event, "no_3");
     mAudioManager->load_sound("", engine::sound_type::event, "end_1");
     mAudioManager->load_sound("", engine::sound_type::event, "end_2");
+
+    npcMesh = engine::skinned_mesh::create("assets/models/animated/mannequin/free3Dmodel.dae");
+    npcMesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
 }
 
 void FriendlyNPC::initialise() {
     engine::game_object_properties npcProps;
-    npcProps.meshes = ;
+    npcProps.meshes = npcMesh;
     npcProps.textures = { engine::texture_2d::create("assets/models/animated/minotaur/Minotaur_diffuse.tga", false) };
     npcProps.type = 0;
     mObject = engine::game_object::create(npcProps);
