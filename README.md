@@ -15,10 +15,6 @@
   - [x] the change size when in close enough distance
   - [x] make it so that it agro's and starts moving only when the player is certain distance away
 - [x] Commenting
-- [ ] Change help Screen
-  - [x] include P to load level 1 and transport the player
-  - [x] explain enemies
-  - [x] write that you can press 1 to start the game and escape to quit
 - [ ] Report
   - [ ] mention having the menu as a small camera technique as well
   - [ ] mention that I created the level in blender as well
@@ -31,27 +27,33 @@
 - [x] intro screen
   - [ ]? top down camera view pan into the gameplay view
   - [ ]? interactible buttons?
-- [ ] Primitive based object
+- [ ] Primitive based objects [1/3]
   - [ ] with multiple transformations
   - [ ] could have a power up move around the map/scale up and down, stay there for a bit and move around more afterwards
+  - [ ] Power Up Effect
+    - [ ] texture
 - [ ] Skybox and terrain textures
   - [x] skybox
   - [x] terrain
 - [ ] Camera motion technique
   - [x] mostly done
-  - [ ] just need to limit to a radius/square/cube thing
-  - [ ] like ratchet and clank
-    - [ ] strafe and free move
+  - [x] just need to limit to a radius/square/cube thing
+  - [ ] Add  the camera transition from menu to player
 - [ ] Mesh-based object
   - [x] Level
+    - [ ] add collision
+    - [ ] add texture
+    - [ ] add a door?
   - [ ] make multiple enemies with movement and different scales and animations
+  - [ ] NPC dialogue
+    - [x] record dialogue
+    - [ ] Fix multiple calls of the dialogue
+    - [ ] add yes/no gui
+- [ ] HUD
+  - [ ] Health
+  - [ ] Ammo/Stamina
 - [ ] Report
 - [ ] Source Code Design, organization and coding style
-- [ ] Plagiarism Check
-- [ ] NPC dialogue
-  - [ ] maybe have 2 or 3 choices of branching dialogue (resets on playing the game again). gives you the weapon
-    - [ ] offers you the weapon to help you in the journey
-    - [ ] or scoffs at you if you dont gain his respect. he gives you the weapon but might say "you'll die out there without this"
 - [ ] Light
   - [ ] have a light source around the player, lighting up the scene.
 - [ ] Effects
@@ -60,16 +62,18 @@
   - [ ] add fog on the outside
 - [ ] mesh based objects
   - [ ] Level
+    - [ ] collision with wall using off roading and a fixed path
+    - [ ] 
   - [ ] door (opens and closes) - make it into a gate maybe, opened and closed with a switch
   - [ ] maybe torches
   - [ ] friendly NPC with dialogue
   - [ ] enemies
   - [ ] boss
 - [ ] difficulty
-  - [ ] difficulty switches maybe based on how much time the player took in the beginning section, or killing a few enemies
   - [ ] it could just have a bell/switch you can activate that ups the health and the attack damage of the enemies
+    - [ ] change HP/AP when bell is interacted with
   - [ ] it could just up the difficulty and reset you to the beginning of the level
-    - [ ] can be attached to a stop watch showing how long the player has survuved in the game.
+    - [ ] can be attached to a stop watch showing how long the player has survived in the game.
     
 
 

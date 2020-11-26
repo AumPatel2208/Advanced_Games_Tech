@@ -6,6 +6,7 @@
 #include "engine/events/key_event.h"
 #include "engine/utils/track.h"
 #include <fstream>
+#include <filesystem>
 
 
 main_layer::main_layer()
@@ -46,6 +47,8 @@ main_layer::main_layer()
     mAudioManager->load_sound("assets/audio/DST-impuretechnology.mp3", engine::sound_type::track, "music");
     // Royalty free music from http://www.nosoapradio.us/
     //m_audio_manager->play("music");
+
+    loadMusic();
 
 
     // Initialise the shaders, materials and lights
@@ -117,28 +120,12 @@ main_layer::main_layer()
                                                                     true)
                                      });
 
-    // // create skinned mesh for the mannequin object applied to the player
-    // engine::ref<engine::skinned_mesh> mSkinnedMesh = engine::skinned_mesh::create(
-    //     "assets/models/animated/mannequin/free3Dmodel.dae");
-    // mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/walking.dae");
-    // mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
-    // mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/jump.dae");
-    // mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/standard_run.dae");
-    // mSkinnedMesh->switch_root_movement(false);
-    //
-    // engine::game_object_properties mannequinProps;
-    // mannequinProps.animated_mesh = mSkinnedMesh;
-    // mannequinProps.scale = glm::vec3(1.f / glm::max(mSkinnedMesh->size().x,
-    //                                                 glm::max(mSkinnedMesh->size().y, mSkinnedMesh->size().z)));
-    // mannequinProps.position = glm::vec3(3.0f, 0.5f, -5.0f);
-    // mannequinProps.type = 0;
-    // mannequinProps.bounding_shape = mSkinnedMesh->size() / 2.f * mannequinProps.scale.x;
-    //
-    // mMannequin = engine::game_object::create(mannequinProps);
     mPlayer.initialise(); // initialise the player using the mannequin game object
 
-    // Initialis the enemies
+    // Initialise the enemies
     initialiseEnemies();
+
+    mFriendlyNpc.initialise(); // initialise the npc
 
     // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
     const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
@@ -157,6 +144,7 @@ main_layer::main_layer()
 
     // Load the cow model. Create a cow object. Set its properties
     engine::ref<engine::model> cowModel = engine::model::create("assets/models/static/cow4.3ds");
+    // engine::ref<engine::model> cowModel = engine::model::create("assets/models/static/npc.dae");
     engine::game_object_properties cow_props;
     cow_props.meshes = cowModel->meshes();
     cow_props.textures = cowModel->textures();
@@ -210,6 +198,7 @@ main_layer::main_layer()
     //m_game_objects.push_back(m_tree);
     //m_game_objects.push_back(m_pickup);
     mPhysicsManager = engine::bullet_manager::create(mGameObjects);
+
 
     // create a text manager used to display text onto the screen
     mTextManager = engine::text_manager::create();
@@ -269,6 +258,8 @@ void main_layer::on_update(const engine::timestep& timestep) {
         }
 
     }
+
+    mFriendlyNpc.onUpdate(timestep, mPlayer);
 
     checkBounce();
 }
@@ -386,6 +377,35 @@ void main_layer::updatePrimitives(const engine::timestep& timestep) {
     }
 }
 
+void main_layer::loadMusic() {
+    const std::string path = "assets/audio/music/";
+
+    for (const auto& file : std::filesystem::directory_iterator(path)) {
+        std::cout << file.path() << std::endl;
+        std::string name = file.path().string();
+        name.erase(0, 19);
+
+        // std::cout << name << "\n";
+        mAudioManager->load_sound(file.path().string(), engine::sound_type::track, name);
+        mMusicFileNames.push_back(name);
+    }
+}
+
+void main_layer::renderMusicHud() {
+    if (hasStarted) {
+        // Render text
+        const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
+        float offsetAdd = 0.f;
+        for (auto& name : mMusicFileNames) {
+            mTextManager->render_text(text_shader, name, 10.f, (float)engine::application::window().height()/2- 25.f-offsetAdd, .5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+            offsetAdd += 20.f;
+        }
+        // textManager->render_text(text_shader, text, 10.f, (float)engine::application::window().height() - 25.f,1.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+    }
+}
+
+void main_layer::changeMusicTrack() { }
+
 // render the primitives
 void main_layer::renderPrimitives(const std::shared_ptr<engine::shader> shader) {
     for (auto& primitive : mPrimitives) {
@@ -454,6 +474,14 @@ void main_layer::on_render() {
     cowTransform = glm::scale(cowTransform, mCow->scale());
     engine::renderer::submit(textured_lighting_shader, cowTransform, mCow);
 
+    glm::mat4 npcTransform(1.0f);
+    npcTransform = glm::translate(npcTransform, mFriendlyNpc.object()->position());
+    npcTransform = glm::rotate(npcTransform, glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f));
+    npcTransform = glm::scale(npcTransform, glm::vec3(0.3f));
+
+    engine::renderer::submit(textured_lighting_shader, npcTransform, mFriendlyNpc.object());
+
+
     // render the maze level if the player has chosen too
     if (renderLevel1) {
         glm::mat4 level1Transform(1.f);
@@ -495,8 +523,6 @@ void main_layer::on_render() {
 
     engine::renderer::submit(materialShader, mBall);
 
-
-
     engine::renderer::end_scene();
 
 
@@ -512,6 +538,8 @@ void main_layer::on_render() {
     renderEnemies(animatedMeshShader);
 
     engine::renderer::end_scene();
+
+    mPlayer.renderHud(mTextManager);
 }
 
 // Display a wireframe view when TAB is pressed

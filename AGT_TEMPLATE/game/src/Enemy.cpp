@@ -22,7 +22,6 @@ void Enemy::initialise() {
     enemyProps.type = 0;
     mObject = engine::game_object::create(enemyProps);
     mObject->set_scale(glm::vec3(3.f));
-    toTriggerAnimation = true;
 
     // Set the positions of the animations based on the order they are loaded into the mesh
     animationHandler = AnimationHandler(mObject);

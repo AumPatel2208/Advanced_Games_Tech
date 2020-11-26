@@ -52,8 +52,6 @@ private:
 	float agroRange = 5.f;
 	AnimationHandler animationHandler = {};
 
-	// Trigger animation when first executing the action
-	bool toTriggerAnimation = true;
 
 };
 

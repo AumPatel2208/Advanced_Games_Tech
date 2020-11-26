@@ -7,6 +7,7 @@
 Player::Player() {
     mJumpTimer = 0.f;
     mMovementTimer = 0.f;
+    mStaminaRecoveryTimer = 0.f;
     mSpeed = 1.f;
 }
 
@@ -45,8 +46,8 @@ void Player::initialise() {
     animationHandler.setIdleAnim(1);
     animationHandler.setAnimJump(2);
     animationHandler.setAnimRun(3);
-    std::cout << "Anim Walk"<< animationHandler.animWalk() <<"\n";
-    std::cout << "Anim Idle"<< animationHandler.animIdle() <<"\n";
+    std::cout << "Anim Walk" << animationHandler.animWalk() << "\n";
+    std::cout << "Anim Idle" << animationHandler.animIdle() << "\n";
     animationHandler.nextAnimation(animationHandler.animIdle());
 
     prevMousePosition = engine::input::mouse_position();
@@ -55,7 +56,7 @@ void Player::initialise() {
 }
 
 // temporary method to move the player into position for the first level model
-void Player::moveIntoLevel1() {
+void Player::moveIntoLevel1() const {
     mObject->set_position(glm::vec3(0.16f, mObject->position().y, 1.72f));
     mObject->set_forward(glm::vec3(0.14f, 0, 1.f));
 }
@@ -63,7 +64,6 @@ void Player::moveIntoLevel1() {
 // call every game loop
 void Player::onUpdate(const engine::timestep& timestep) {
     // idle(timestep);
-
     if (hasStarted) {
         if (mTransitionCameraTimer > 0.f) {
             mTransitionCameraTimer -= static_cast<float>(timestep);
@@ -80,6 +80,11 @@ void Player::onUpdate(const engine::timestep& timestep) {
                 mTransitionCameraTimer = 0.5f; // Timer to stop unwanted multiple key registrations
                 firstPerson = !firstPerson; // flip the boolean
             }
+        }
+
+
+        if (engine::input::key_pressed(engine::key_codes::KEY_E) && mDialogueTimer == 0.f) {
+            toInteractWithNpc = true;
         }
 
         // timer for jumping
@@ -168,9 +173,39 @@ void Player::onUpdate(const engine::timestep& timestep) {
             mMovementTimer = 1.f;
         }
 
+
+        // reduce stamina on mouse click
+        if (engine::input::mouse_button_pressed(0) && mStamina > 10.f) {
+            mStamina -= 10.f;
+            mStaminaRecoveryTimer = 1.f;
+        }
+
+        if (mStaminaRecoveryTimer <= 0.f && mStamina < 100.f) {
+            mStamina += mStaminaRecoverySpeed * timestep;
+        }
+
+        if (mStaminaRecoveryTimer > 0.f) {
+            mStaminaRecoveryTimer -= timestep;
+        }
+
         // Animate the mesh
         animationHandler.onUpdate(timestep);
         // mObject->animated_mesh()->on_update(timestep);
+    }
+}
+
+void Player::renderHud(engine::ref<engine::text_manager>& textManager) const {
+    if (hasStarted) {
+
+        // form the text
+        const auto healthText = "Health: " + std::to_string(mHealthPoints);
+        const auto staminaText = "Stamina: " + std::to_string(static_cast<int>(mStamina));
+
+        // Render text
+        const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
+        textManager->render_text(text_shader, healthText, 10.f, 25.f, 1.f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+        textManager->render_text(text_shader, staminaText, 10.f, 100.f, 1.f, glm::vec4(0.f, 1.f, 0.f, 1.f));
+        // textManager->render_text(text_shader, text, 10.f, (float)engine::application::window().height() - 25.f,1.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
     }
 }
 
@@ -212,16 +247,27 @@ void Player::updateCamera3rdPerson(engine::perspective_camera& camera, const eng
 
     glm::vec3 camPos = mObject->position() - glm::normalize(mObject->forward()) * B;
 
+    // limiting the cameras position when mouse is moved too high
+    if (camLookAtY > 0.7f)
+        camLookAtY = 0.7f;
+    else if (camLookAtY < -1.77f)
+        camLookAtY = -1.77f;
+
     camPos.y += A + camLookAtY;
+    // camPos.y +=  camLookAtY;
+    //limit at 2.7 high 0.77 min
+    // std::cout << "Y pos: " <<  camPos.y << "\n";
 
     glm::vec3 camLookAt = mObject->position() + glm::normalize(mObject->forward()) * C;
     camLookAt.y = -camLookAtY;
+    // limit at -0.21 min 1.73 max
+    // std::cout << "Y lok: " <<  camLookAt.y << "\n";
+
     // camera.set_view_matrix_custom(cam_pos, cam_look_at, mObject->position(), timeStep);
     camera.set_view_matrix(camPos, camLookAt);
 }
 
-
-void Player::update1stPersonCamera(engine::perspective_camera& camera, const engine::timestep& timestep) {
+void Player::update1stPersonCamera(engine::perspective_camera& camera, const engine::timestep& timestep) const {
     // auto cameraPosition = mObject->position();
     // cameraPosition.y += height;
     // cameraPosition.z -= 0;

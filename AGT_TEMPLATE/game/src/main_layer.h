@@ -2,6 +2,7 @@
 #include <engine.h>
 #include "player.h"
 #include "Enemy.h"
+#include "FriendlyNPC.h"
 
 class main_layer : public engine::layer
 {
@@ -15,6 +16,9 @@ public:
     void renderEnemies(const std::shared_ptr<engine::shader>& animatedMeshShader);
     void initialisePrimitives(const float& scale, const int& amount);
     void updatePrimitives(const engine::timestep& timestep);
+    void loadMusic();
+    void renderMusicHud();
+    void changeMusicTrack();
     void renderPrimitives(std::shared_ptr<engine::shader> shader);
     void menuCamera();
     void on_render() override;
@@ -42,6 +46,12 @@ private:
 	engine::ref<engine::material>		mMaterial{};
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};
+    //List of enemies
+	std::list<Enemy> mEnemies {};
+    //NPC Object
+	FriendlyNPC mFriendlyNpc {};
+
+
 
 
 	// Max/Min for primitive
@@ -52,16 +62,14 @@ private:
 	//Levels
 	std::list<engine::ref<engine::game_object>>	mLevels {};
 
-	//List of enemies
-	std::list<Enemy> mEnemies {};
-
-
-	engine::DirectionalLight            mDirectionalLight;
+		engine::DirectionalLight            mDirectionalLight;
 
 	std::vector<engine::ref<engine::game_object>>     mGameObjects{};
 
 	engine::ref<engine::bullet_manager> mPhysicsManager{};
 	engine::ref<engine::audio_manager>  mAudioManager{};
+	std::list<std::string> mMusicFileNames{};
+
 	float								mPrevSphereYVel = 0.f;
 	engine::ref<engine::text_manager>	mTextManager{};
 
