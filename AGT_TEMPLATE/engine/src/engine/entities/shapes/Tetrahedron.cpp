@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "PrimitiveShape.h"
+#include "Tetrahedron.h"
 #include <engine.h>		
 
-engine::PrimitiveShape::PrimitiveShape(std::vector<glm::vec3> vertices) : m_vertices(vertices) {
+engine::Tetrahedron::Tetrahedron(std::vector<glm::vec3> vertices) : m_vertices(vertices) {
 	std::vector<glm::vec3> normals;
 
     // front normal
@@ -55,9 +55,20 @@ engine::PrimitiveShape::PrimitiveShape(std::vector<glm::vec3> vertices) : m_vert
 }
 
 
-engine::PrimitiveShape::~PrimitiveShape() {}
+engine::Tetrahedron::~Tetrahedron() {}
 
-engine::ref<engine::PrimitiveShape> engine::PrimitiveShape::create(std::vector<glm::vec3> vertices)
+engine::ref<engine::Tetrahedron> engine::Tetrahedron::create(std::vector<glm::vec3> vertices)
 {
-	return std::make_shared<engine::PrimitiveShape>(vertices);
+	return std::make_shared<engine::Tetrahedron>(vertices);
+}
+
+engine::ref<engine::Tetrahedron> engine::Tetrahedron::createDefaultVertices(const float& scale) {
+    std::vector<glm::vec3> primitiveVerticies;
+        primitiveVerticies.push_back(glm::vec3(0.f, 1.f * scale, 0.f)); //0 //top vertex
+        primitiveVerticies.push_back(glm::vec3(0.f, 0.f, 1.f * scale)); //1
+        primitiveVerticies.push_back(glm::vec3(-1.f * scale, 0.f, -1.f * scale)); //2
+        primitiveVerticies.push_back(glm::vec3(1.f * scale, 0.f, -1.f * scale)); //3
+
+
+    return Tetrahedron::create(primitiveVerticies);
 }

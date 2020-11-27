@@ -180,7 +180,7 @@ main_layer::main_layer()
     mBall = engine::game_object::create(sphere_props);
 
     //initialise the primitive
-    initialisePrimitives(1.f, 3);
+    initialiseTetrahedorns(1.f, 3);
 
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
@@ -315,47 +315,38 @@ void main_layer::renderEnemies(const std::shared_ptr<engine::shader>& animatedMe
 
 
 // initialise the primitive shapes. pass through a scale and the amount of primitives to create.
-void main_layer::initialisePrimitives(const float& scale, const int& amount) {
-    std::vector<glm::vec3> primitiveVerticies;
-    std::vector<engine::ref<engine::texture_2d>> primTextures;
-    primTextures.push_back(engine::texture_2d::create("assets/textures/green_brick.png", false));
-    primTextures.push_back(engine::texture_2d::create("assets/textures/yellow_brick.png", false));
-    primTextures.push_back(engine::texture_2d::create("assets/textures/grey_brick.png", false));
+void main_layer::initialiseTetrahedorns(const float& scale, const int& amount) {
+    // std::vector<glm::vec3> tetVerticies;
+    std::vector<engine::ref<engine::texture_2d>> tetraTextures;
+    tetraTextures.push_back(engine::texture_2d::create("assets/textures/green_brick.png", false));
+    tetraTextures.push_back(engine::texture_2d::create("assets/textures/yellow_brick.png", false));
+    tetraTextures.push_back(engine::texture_2d::create("assets/textures/grey_brick.png", false));
 
 
     maxPrimSize *= scale;
     minPrimSize *= scale;
 
     for (int i = 0; i < amount; ++i) {
-        // auto relativeScale = scale * static_cast<float>(rand() % (i+1) + 1);
-        // relativeScale = scale + i;
-
-
-        primitiveVerticies.push_back(glm::vec3(0.f, 1.f * scale, 0.f)); //0 //top vertex
-        primitiveVerticies.push_back(glm::vec3(0.f, 0.f, 1.f * scale)); //1
-        primitiveVerticies.push_back(glm::vec3(-1.f * scale, 0.f, -1.f * scale)); //2
-        primitiveVerticies.push_back(glm::vec3(1.f * scale, 0.f, -1.f * scale)); //3
-        engine::ref<engine::PrimitiveShape> primitiveShape =
-            engine::PrimitiveShape::create(primitiveVerticies);
-        engine::game_object_properties primitiveProps;
+        const engine::ref<engine::Tetrahedron> tetrahedron = engine::Tetrahedron::createDefaultVertices(scale);
+        engine::game_object_properties tetraProps;
 
         float positionX = (rand() % 100) / 10.f;
         float positionY = (rand() % 100) / 10.f;
-        primitiveProps.position = {positionX, 0.5f, positionY};
-        primitiveProps.meshes = {primitiveShape->mesh()};
+        tetraProps.position = {positionX, 0.5f, positionY};
+        tetraProps.meshes = {tetrahedron->mesh()};
         if ((i + 1) % 3 == 0) {
-            primitiveProps.textures = {primTextures.at(2)};
+            tetraProps.textures = {tetraTextures.at(2)};
         }
         else if ((i + 1) % 2 == 0) {
-            primitiveProps.textures = {primTextures.at(1)};
+            tetraProps.textures = {tetraTextures.at(1)};
         }
         else {
-            primitiveProps.textures = {primTextures.at(0)};
+            tetraProps.textures = {tetraTextures.at(0)};
         }
 
 
-        auto primitive = engine::game_object::create(primitiveProps);
-        mPrimitives.push_back(primitive);
+        auto tetraObject     = engine::game_object::create(tetraProps);
+        mTetrahedrons.push_back(tetraObject);
     }
 
 
@@ -368,7 +359,7 @@ void main_layer::updatePrimitives(const engine::timestep& timestep) {
     const auto rotationSpeed = 1.5f;
     const auto scaleSpeed = 0.5f;
 
-    for (auto& primitive : mPrimitives) {
+    for (auto& primitive : mTetrahedrons) {
         primitive->set_rotation_amount(primitive->rotation_amount() + timestep * rotationSpeed);
 
 
@@ -439,7 +430,7 @@ void main_layer::changeMusicTrack() { }
 
 // render the primitives
 void main_layer::renderPrimitives(const std::shared_ptr<engine::shader> shader) {
-    for (auto& primitive : mPrimitives) {
+    for (auto& primitive : mTetrahedrons) {
         engine::renderer::submit(shader, primitive);
     }
 }

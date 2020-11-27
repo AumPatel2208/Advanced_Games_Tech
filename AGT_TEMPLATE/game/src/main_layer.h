@@ -16,7 +16,7 @@ public:
     void initialiseEnemies();
     void updateEnemies(const engine::timestep& timestep);
     void renderEnemies(const std::shared_ptr<engine::shader>& animatedMeshShader);
-    void initialisePrimitives(const float& scale, const int& amount);
+    void initialiseTetrahedorns(const float& scale, const int& amount);
     void updatePrimitives(const engine::timestep& timestep);
     void loadMusic();
     void renderMusicHud();
@@ -44,8 +44,7 @@ private:
 	engine::ref<engine::game_object>	mTree{};
 	engine::ref<engine::game_object>	mBall{};
 	engine::ref<engine::game_object>	mMannequin{};
-	engine::ref<engine::game_object>	mPrimitive{};
-	std::list<engine::ref<engine::game_object>>	mPrimitives{};
+	std::list<engine::ref<engine::game_object>>	mTetrahedrons{};
 	engine::ref<engine::material>		mMaterial{};
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};
