@@ -12,6 +12,7 @@ public:
     void initialise();
     void talk();
 
+    void onRender(const std::shared_ptr<engine::shader>& texturedLightingShader) const;
     void onUpdate(const engine::timestep& timestep, Player& player);
 
     void playDialogue() const;
@@ -29,7 +30,6 @@ public:
 private:
     engine::ref<engine::game_object> mObject;
     engine::ref<engine::audio_manager> mAudioManager {};
-	engine::ref<engine::skinned_mesh>	npcMesh;
 
     bool isYes = true;
     bool isNo = false;

@@ -1,6 +1,6 @@
 #include "FriendlyNPC.h"
 
-#include "player.h"
+// #include "player.h"
 
 FriendlyNPC::FriendlyNPC() {
     mAudioManager = engine::audio_manager::instance();
@@ -55,6 +55,16 @@ void FriendlyNPC::initialise() {
 
 }
 
+
+void FriendlyNPC::onRender(const std::shared_ptr<engine::shader>& texturedLightingShader) const {
+    glm::mat4 npcTransform(1.0f);
+    npcTransform = glm::translate(npcTransform, mObject->position());
+    npcTransform = glm::rotate(npcTransform, glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f));
+    npcTransform = glm::scale(npcTransform, glm::vec3(0.3f));
+
+    engine::renderer::submit(texturedLightingShader, npcTransform, mObject);
+
+}
 
 
 void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {

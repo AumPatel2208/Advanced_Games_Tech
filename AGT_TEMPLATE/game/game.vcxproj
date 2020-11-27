@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\AnimationHandler.h" />
+    <ClInclude Include="src\Boss.h" />
     <ClInclude Include="src\Enemy.h" />
     <ClInclude Include="src\FriendlyNPC.h" />
     <ClInclude Include="src\main_layer.h" />
@@ -139,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AnimationHandler.cpp" />
+    <ClCompile Include="src\Boss.cpp" />
     <ClCompile Include="src\Enemy.cpp" />
     <ClCompile Include="src\FriendlyNPC.cpp" />
     <ClCompile Include="src\main_layer.cpp" />

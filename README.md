@@ -5,21 +5,6 @@
 
 
 ## TO-DO
-- [x] Primitive Objects
-  - [x] Power ups that scale up and down move around the map
-  - [x] transform
-- [ ] Camera
-  - [ ] just need to limit to a radius/square/cube thing
-- [x] Mesh Based object
-  - [x] make multiple enemies with movement and different scales and animations
-  - [x] the change size when in close enough distance
-  - [x] make it so that it agro's and starts moving only when the player is certain distance away
-- [x] Commenting
-- [ ] Report
-  - [ ] mention having the menu as a small camera technique as well
-  - [ ] mention that I created the level in blender as well
-
-
 
 
 ## Checklist
@@ -42,13 +27,16 @@
 - [ ] Mesh-based object
   - [x] Level
     - [ ] add collision
+      - [ ] collision with wall using off roading and a fixed path
     - [ ] add texture
-    - [ ] add a door?
+  - [ ] add a door?
+    - [ ] door (opens and closes) - make it into a gate maybe, opened and closed with a switch
   - [ ] make multiple enemies with movement and different scales and animations
   - [ ] NPC dialogue
     - [x] record dialogue
     - [ ] Fix multiple calls of the dialogue
     - [ ] add yes/no gui
+  - [ ] maybe torches
 - [ ] HUD
   - [ ] Health
   - [ ] Ammo/Stamina
@@ -62,10 +50,9 @@
   - [ ] add fog on the outside
 - [ ] mesh based objects
   - [ ] Level
-    - [ ] collision with wall using off roading and a fixed path
     - [ ] 
-  - [ ] door (opens and closes) - make it into a gate maybe, opened and closed with a switch
-  - [ ] maybe torches
+  - [ ] 
+  - [ ] 
   - [ ] friendly NPC with dialogue
   - [ ] enemies
   - [ ] boss
@@ -99,6 +86,7 @@
 ## Documentation checklist
 - finite state machines for the enemies
 - maybe describe the animation handler or something better if i do come up with something
+- Had to get rid of death and getting hit animations from minitour enemy for size reasons
 
 ## Souls-Like Game
 

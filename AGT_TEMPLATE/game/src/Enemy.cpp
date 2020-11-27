@@ -7,8 +7,8 @@ Enemy::Enemy()  {
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Idle.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Walk.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Attack.FBX");
-    enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Death1.FBX");
-    enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Get_Hit.FBX");
+    // enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Death1.FBX");
+    // enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Get_Hit.FBX");
     enemyMesh->LoadAnimationFile("assets/models/animated/minotaur/Minotaur@Shout.FBX");
 }
 
@@ -28,9 +28,9 @@ void Enemy::initialise() {
     animationHandler.setIdleAnim(0);
     animationHandler.setAnimWalk(1);
     animationHandler.setAnimAttack(2);
-    animationHandler.setAnimDeath(3);
-    animationHandler.setAnimGetHit(4);
-    animationHandler.setAnimShout(5);
+    // animationHandler.setAnimDeath(3);
+    // animationHandler.setAnimGetHit(4);
+    animationHandler.setAnimShout(3);
 }
 
 void Enemy::setRandomPosition() const {

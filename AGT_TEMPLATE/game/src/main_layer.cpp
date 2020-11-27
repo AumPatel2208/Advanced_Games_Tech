@@ -127,6 +127,10 @@ main_layer::main_layer()
 
     mFriendlyNpc.initialise(); // initialise the npc
 
+    //Initialise the boss
+    mBoss.initialise();
+
+
     // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
     const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
         engine::texture_2d::create("assets/textures/sea_rock_terrain.jpg", false)
@@ -232,6 +236,7 @@ void main_layer::on_update(const engine::timestep& timestep) {
 
         updateEnemies(timestep);
         updatePrimitives(timestep);
+        mBoss.onUpdate(timestep, mPlayer);
     }
     else {
         // set the camera on the menu if the game hasn't started yet
@@ -257,6 +262,24 @@ void main_layer::on_update(const engine::timestep& timestep) {
             }
         }
 
+    }
+
+    if (engine::input::key_pressed(engine::key_codes::KEY_M)) {
+        showMusicHUD = !showMusicHUD;
+    }
+
+    if (showMusicHUD) {
+        if (engine::input::key_pressed(engine::key_codes::KEY_0)) {
+            mAudioManager->stop_all();
+        }
+        else if (engine::input::key_pressed(engine::key_codes::KEY_1)) {
+            mAudioManager->stop_all();
+            mAudioManager->play(mMusicFileNames.at(0));
+        }
+        else if (engine::input::key_pressed(engine::key_codes::KEY_2)) {
+            mAudioManager->stop_all();
+            mAudioManager->play(mMusicFileNames.at(1));
+        }
     }
 
     mFriendlyNpc.onUpdate(timestep, mPlayer);
@@ -396,9 +419,17 @@ void main_layer::renderMusicHud() {
         // Render text
         const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
         float offsetAdd = 0.f;
+        int i = 1;
+        mTextManager->render_text(text_shader, "0) Stop Music", 20.f,
+                                  (float)engine::application::window().height() / 2 - 25.f - offsetAdd, .5f,
+                                  glm::vec4(1.f, 0.5f, 0.f, 1.f));
+        offsetAdd += 30.f;
         for (auto& name : mMusicFileNames) {
-            mTextManager->render_text(text_shader, name, 10.f, (float)engine::application::window().height()/2- 25.f-offsetAdd, .5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-            offsetAdd += 20.f;
+            mTextManager->render_text(text_shader, std::to_string(i) + ") " + name, 20.f,
+                                      (float)engine::application::window().height() / 2 - 25.f - offsetAdd, .5f,
+                                      glm::vec4(1.f, 0.5f, 0.f, 1.f));
+            offsetAdd += 30.f;
+            i++;
         }
         // textManager->render_text(text_shader, text, 10.f, (float)engine::application::window().height() - 25.f,1.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
     }
@@ -441,11 +472,11 @@ void main_layer::on_render() {
     engine::render_command::clear();
 
 
-    const auto textured_lighting_shader = engine::renderer::shaders_library()->get("mesh_lighting");
-    engine::renderer::begin_scene(m3DCamera, textured_lighting_shader);
+    const auto texturedLightingShader = engine::renderer::shaders_library()->get("mesh_lighting");
+    engine::renderer::begin_scene(m3DCamera, texturedLightingShader);
 
     // Set up some of the scene's parameters in the shader
-    std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform(
+    std::dynamic_pointer_cast<engine::gl_shader>(texturedLightingShader)->set_uniform(
         "gEyeWorldPos", m3DCamera.position());
 
     // Position the skybox centred on the player and render it
@@ -454,33 +485,29 @@ void main_layer::on_render() {
     for (const auto& texture : mSkybox->textures()) {
         texture->bind();
     }
-    engine::renderer::submit(textured_lighting_shader, mSkybox, skyboxTransform);
+    engine::renderer::submit(texturedLightingShader, mSkybox, skyboxTransform);
 
-    engine::renderer::submit(textured_lighting_shader, mTerrain);
+    engine::renderer::submit(texturedLightingShader, mTerrain);
 
     // render the primitives into the scene
-    renderPrimitives(textured_lighting_shader);
+    renderPrimitives(texturedLightingShader);
 
 
     glm::mat4 treeTransform(1.0f);
     treeTransform = glm::translate(treeTransform, glm::vec3(4.f, 0.5, -5.0f));
     treeTransform = glm::rotate(treeTransform, mTree->rotation_amount(), mTree->rotation_axis());
     treeTransform = glm::scale(treeTransform, mTree->scale());
-    engine::renderer::submit(textured_lighting_shader, treeTransform, mTree);
+    engine::renderer::submit(texturedLightingShader, treeTransform, mTree);
 
     glm::mat4 cowTransform(1.0f);
     cowTransform = glm::translate(cowTransform, mCow->position());
     cowTransform = glm::rotate(cowTransform, mCow->rotation_amount(), mCow->rotation_axis());
     cowTransform = glm::scale(cowTransform, mCow->scale());
-    engine::renderer::submit(textured_lighting_shader, cowTransform, mCow);
+    engine::renderer::submit(texturedLightingShader, cowTransform, mCow);
 
-    glm::mat4 npcTransform(1.0f);
-    npcTransform = glm::translate(npcTransform, mFriendlyNpc.object()->position());
-    npcTransform = glm::rotate(npcTransform, glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f));
-    npcTransform = glm::scale(npcTransform, glm::vec3(0.3f));
-
-    engine::renderer::submit(textured_lighting_shader, npcTransform, mFriendlyNpc.object());
-
+    // RENDER CALLS TO OBJECTS
+    mFriendlyNpc.onRender(texturedLightingShader);
+    mBoss.onRender(texturedLightingShader);
 
     // render the maze level if the player has chosen too
     if (renderLevel1) {
@@ -489,7 +516,7 @@ void main_layer::on_render() {
         level1Transform = glm::rotate(level1Transform, glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f));
         level1Transform = glm::scale(level1Transform, glm::vec3(2.5f));
 
-        engine::renderer::submit(textured_lighting_shader, level1Transform, mLevels.front());
+        engine::renderer::submit(texturedLightingShader, level1Transform, mLevels.front());
         // render the level with the transformation matrix applied
     }
 
@@ -506,7 +533,7 @@ void main_layer::on_render() {
         glm::mat4 menuTransform(1.0f);
         menuTransform = glm::translate(menuTransform, glm::vec3(0, 10.f, 0));
 
-        engine::renderer::submit(textured_lighting_shader, mMenu->meshes().at(0),
+        engine::renderer::submit(texturedLightingShader, mMenu->meshes().at(0),
                                  menuTransform);
     }
 
@@ -539,7 +566,11 @@ void main_layer::on_render() {
 
     engine::renderer::end_scene();
 
+    // Render hud elements
     mPlayer.renderHud(mTextManager);
+    if (showMusicHUD) {
+        renderMusicHud();
+    }
 }
 
 // Display a wireframe view when TAB is pressed

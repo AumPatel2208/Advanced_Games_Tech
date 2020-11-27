@@ -1,5 +1,7 @@
 #pragma once
 #include <engine.h>
+
+#include "Boss.h"
 #include "player.h"
 #include "Enemy.h"
 #include "FriendlyNPC.h"
@@ -31,6 +33,7 @@ private:
 	bool hasStarted = false;
 	bool menuInHelp = false;
 	bool renderLevel1 = false;
+    bool showMusicHUD = false;
 
 
     std::string							menuText;
@@ -47,7 +50,8 @@ private:
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};
     //List of enemies
-	std::list<Enemy> mEnemies {};
+	std::list<Enemy>					mEnemies {};
+	Boss								mBoss{};
     //NPC Object
 	FriendlyNPC mFriendlyNpc {};
 
@@ -68,7 +72,7 @@ private:
 
 	engine::ref<engine::bullet_manager> mPhysicsManager{};
 	engine::ref<engine::audio_manager>  mAudioManager{};
-	std::list<std::string> mMusicFileNames{};
+	std::vector<std::string> mMusicFileNames{};
 
 	float								mPrevSphereYVel = 0.f;
 	engine::ref<engine::text_manager>	mTextManager{};
