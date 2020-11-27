@@ -180,7 +180,7 @@ main_layer::main_layer()
     mBall = engine::game_object::create(sphere_props);
 
     //initialise the primitive
-    initialiseTetrahedorns(1.f, 3);
+    initialiseTetrhedrons(1.f, 3);
 
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
@@ -315,7 +315,7 @@ void main_layer::renderEnemies(const std::shared_ptr<engine::shader>& animatedMe
 
 
 // initialise the primitive shapes. pass through a scale and the amount of primitives to create.
-void main_layer::initialiseTetrahedorns(const float& scale, const int& amount) {
+void main_layer::initialiseTetrhedrons(const float& scale, const int& amount) {
     // std::vector<glm::vec3> tetVerticies;
     std::vector<engine::ref<engine::texture_2d>> tetraTextures;
     tetraTextures.push_back(engine::texture_2d::create("assets/textures/green_brick.png", false));
