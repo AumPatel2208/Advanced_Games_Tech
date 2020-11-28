@@ -179,8 +179,20 @@ main_layer::main_layer()
     sphere_props.mass = 0.000001f;
     mBall = engine::game_object::create(sphere_props);
 
-    //initialise the primitive
+    //initialise the primitives
     initialiseTetrhedrons(1.f, 3);
+
+    // Octahedron
+    const engine::ref<engine::Octahedron> octahedron = engine::Octahedron::createDefaultVertices(3.f);
+    engine::game_object_properties octaProps;
+
+    float positionX = (rand() % 100) / 10.f;
+    float positionZ = (rand() % 100) / 10.f;
+    octaProps.position = { positionX, 10.f, positionZ };
+    octaProps.meshes = { octahedron->mesh() };
+    auto octObject = engine::game_object::create(octaProps);
+    mOctahedron = octObject;
+
 
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
@@ -222,11 +234,11 @@ void main_layer::on_update(const engine::timestep& timestep) {
         mPhysicsManager->dynamics_world_update(mGameObjects, double(timestep));
 
         //Free flowing camera uses the keys - UJHK. Uncomment line below, and comment out mPLayer.updateCamera
-        // m3DCamera.on_update(timestep);
+        m3DCamera.on_update(timestep);
 
         mPlayer.onUpdate(timestep); // Update the player object
 
-        mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
+        // mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
 
         // Put the player into the level that already exists
         if (engine::input::key_pressed(engine::key_codes::KEY_P)) {
@@ -482,6 +494,7 @@ void main_layer::on_render() {
 
     // render the primitives into the scene
     renderPrimitives(texturedLightingShader);
+    engine::renderer::submit(texturedLightingShader, mOctahedron);
 
 
     glm::mat4 treeTransform(1.0f);

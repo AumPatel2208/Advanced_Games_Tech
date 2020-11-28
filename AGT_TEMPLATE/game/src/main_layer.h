@@ -45,6 +45,8 @@ private:
 	engine::ref<engine::game_object>	mBall{};
 	engine::ref<engine::game_object>	mMannequin{};
 	std::list<engine::ref<engine::game_object>>	mTetrahedrons{};
+	std::list<engine::ref<engine::game_object>>	mOctahedrons{};
+	engine::ref<engine::game_object>	mOctahedron{};
 	engine::ref<engine::material>		mMaterial{};
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};

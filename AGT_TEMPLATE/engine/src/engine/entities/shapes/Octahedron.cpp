@@ -6,7 +6,18 @@
 engine::Octahedron::Octahedron(const std::vector<glm::vec3> vertices) :mVertices(vertices){
     std::vector<glm::vec3> normals;
 
-    
+    // top half
+    normals.push_back(glm::cross(vertices.at(0) - vertices.at(1), vertices.at(0) - vertices.at(2)));
+    normals.push_back(glm::cross(vertices.at(0) - vertices.at(2), vertices.at(0) - vertices.at(3)));
+    normals.push_back(glm::cross(vertices.at(0) - vertices.at(3), vertices.at(0) - vertices.at(4)));
+    normals.push_back(glm::cross(vertices.at(0) - vertices.at(4), vertices.at(0) - vertices.at(1)));
+
+    // bottom half
+    normals.push_back(glm::cross(vertices.at(5) - vertices.at(1), vertices.at(5) - vertices.at(2)));
+    normals.push_back(glm::cross(vertices.at(5) - vertices.at(2), vertices.at(5) - vertices.at(3)));
+    normals.push_back(glm::cross(vertices.at(5) - vertices.at(3), vertices.at(5) - vertices.at(4)));
+    normals.push_back(glm::cross(vertices.at(5) - vertices.at(4), vertices.at(5) - vertices.at(1)));
+
     std::vector < mesh::vertex > octaVertices
     {
         //position          Normal          tex Coord
@@ -16,39 +27,55 @@ engine::Octahedron::Octahedron(const std::vector<glm::vec3> vertices) :mVertices
         {vertices.at(1), normals.at(0),{0.f,0.f}},
         {vertices.at(2), normals.at(0),{0.f,0.f}},
 
-        {vertices.at(0), normals.at(0),{0.f,0.f}},
-        {vertices.at(2), normals.at(0),{0.f,0.f}},
-        {vertices.at(3), normals.at(0),{0.f,0.f}},
+        {vertices.at(0), normals.at(1),{0.f,0.f}},
+        {vertices.at(2), normals.at(1),{0.f,0.f}},
+        {vertices.at(3), normals.at(1),{0.f,0.f}},
 
-        {vertices.at(0), normals.at(0),{0.f,0.f}},
-        {vertices.at(3), normals.at(0),{0.f,0.f}},
-        {vertices.at(4), normals.at(0),{0.f,0.f}},
+        {vertices.at(0), normals.at(2),{0.f,0.f}},
+        {vertices.at(3), normals.at(2),{0.f,0.f}},
+        {vertices.at(4), normals.at(2),{0.f,0.f}},
+        
+        {vertices.at(0), normals.at(3),{0.f,0.f}},
+        {vertices.at(4), normals.at(3),{0.f,0.f}},
+        {vertices.at(1), normals.at(3),{0.f,0.f}},
+
+        {vertices.at(5), normals.at(4),{0.f,0.f}},
+        {vertices.at(1), normals.at(4),{0.f,0.f}},
+        {vertices.at(2), normals.at(4),{0.f,0.f}},
+
+        {vertices.at(5), normals.at(5),{0.f,0.f}},
+        {vertices.at(2), normals.at(5),{0.f,0.f}},
+        {vertices.at(3), normals.at(5),{0.f,0.f}},
+
+        {vertices.at(5), normals.at(6),{0.f,0.f}},
+        {vertices.at(3), normals.at(6),{0.f,0.f}},
+        {vertices.at(4), normals.at(6),{0.f,0.f}},
         
 
-        {vertices.at(0), normals.at(0),{0.f,0.f}},
-        {vertices.at(4), normals.at(0),{0.f,0.f}},
-        {vertices.at(1), normals.at(0),{0.f,0.f}},
-
-        {vertices.at(5), normals.at(0),{0.f,0.f}},
-        {vertices.at(1), normals.at(0),{0.f,0.f}},
-        {vertices.at(2), normals.at(0),{0.f,0.f}},
-
-        {vertices.at(5), normals.at(0),{0.f,0.f}},
-        {vertices.at(2), normals.at(0),{0.f,0.f}},
-        {vertices.at(3), normals.at(0),{0.f,0.f}},
-
-        {vertices.at(5), normals.at(0),{0.f,0.f}},
-        {vertices.at(3), normals.at(0),{0.f,0.f}},
-        {vertices.at(4), normals.at(0),{0.f,0.f}},
-        
-
-        {vertices.at(5), normals.at(0),{0.f,0.f}},
-        {vertices.at(4), normals.at(0),{0.f,0.f}},
-        {vertices.at(1), normals.at(0),{0.f,0.f}},
+        {vertices.at(5), normals.at(7),{0.f,0.f}},
+        {vertices.at(4), normals.at(7),{0.f,0.f}},
+        {vertices.at(1), normals.at(7),{0.f,0.f}},
 
     };
 
+    const std::vector<uint32_t> octaIndices
+    {
+        0, 1, 2, //front
+        3, 4, 5, //left
+        6, 7, 8, //Right
+        9, 10, 11, //Bottom
+        12, 13, 14,
+        15, 16, 17,
+        18, 19, 20,
+        21, 22, 23
+    };
+
+
+
+    mMesh = mesh::create(octaVertices, octaIndices);
 }
+
+engine::Octahedron::~Octahedron() {}
 
 std::shared_ptr<engine::Octahedron> engine::Octahedron::create(const std::vector<glm::vec3>& vertices) {
     return std::make_shared<engine::Octahedron>(vertices);
