@@ -1,0 +1,145 @@
+#include "pch.h"
+#include "BulletShape.h"
+
+
+engine::BulletShape::BulletShape(std::vector<glm::vec3> vertices) {
+    std::vector<glm::vec3> normals;
+
+    //normals
+    normals.push_back(glm::cross(vertices.at(0) - vertices.at(2), vertices.at(0) - vertices.at(4)));
+    normals.push_back(glm::cross(vertices.at(0) - vertices.at(1), vertices.at(0) - vertices.at(2)));
+    normals.push_back(glm::cross(vertices.at(0) - vertices.at(1), vertices.at(0) - vertices.at(3)));
+    normals.push_back(glm::cross(vertices.at(0) - vertices.at(3), vertices.at(0) - vertices.at(4)));
+    normals.push_back(glm::cross(vertices.at(2) - vertices.at(4), vertices.at(2) - vertices.at(8)));
+    normals.push_back(glm::cross(vertices.at(2) - vertices.at(6), vertices.at(2) - vertices.at(8)));
+    normals.push_back(glm::cross(vertices.at(2) - vertices.at(5), vertices.at(2) - vertices.at(6)));
+    normals.push_back(glm::cross(vertices.at(2) - vertices.at(5), vertices.at(2) - vertices.at(1)));
+    normals.push_back(glm::cross(vertices.at(1) - vertices.at(3), vertices.at(1) - vertices.at(7)));
+    normals.push_back(glm::cross(vertices.at(1) - vertices.at(5), vertices.at(1) - vertices.at(7)));
+    normals.push_back(glm::cross(vertices.at(4) - vertices.at(7), vertices.at(4) - vertices.at(8)));
+    normals.push_back(glm::cross(vertices.at(4) - vertices.at(3), vertices.at(4) - vertices.at(7)));
+    normals.push_back(glm::cross(vertices.at(7) - vertices.at(8), vertices.at(7) - vertices.at(6)));
+    normals.push_back(glm::cross(vertices.at(7) - vertices.at(5), vertices.at(7) - vertices.at(6)));
+
+    std::vector<engine::mesh::vertex> bulletShapeVertices
+    {
+        //position          Normal          tex Coord
+
+        // top front
+        {vertices.at(0), normals.at(0), {0.f, 0.f}},
+        {vertices.at(2), normals.at(0), {1.f, 0.f}},
+        {vertices.at(4), normals.at(0), {0.5f, 1.f}},
+
+        // top right
+        {vertices.at(0), normals.at(0), {0.f, 0.f}},
+        {vertices.at(1), normals.at(0), {1.f, 0.f}},
+        {vertices.at(2), normals.at(0), {0.5f, 1.f}},
+
+        // top back
+        {vertices.at(0), normals.at(0), {0.f, 0.f}},
+        {vertices.at(3), normals.at(0), {0.5f, 1.f}},
+        {vertices.at(1), normals.at(0), {1.f, 0.f}},
+
+        // top left
+        {vertices.at(0), normals.at(0), {0.f, 0.f}},
+        {vertices.at(4), normals.at(0), {0.5f, 1.f}},
+        {vertices.at(3), normals.at(0), {1.f, 0.f}},
+
+        // front 1
+        {vertices.at(2), normals.at(0), {0.f, 0.f}},
+        {vertices.at(8), normals.at(0), {1.f, 1.f}},
+        {vertices.at(4), normals.at(0), {1.f, 0.f}},
+        // front 2
+        {vertices.at(2), normals.at(0), {0.f, 0.f}},
+        {vertices.at(6), normals.at(0), {1.f, 0.f}},
+        {vertices.at(8), normals.at(0), {1.f, 1.f}},
+
+        // right 1
+        {vertices.at(2), normals.at(0), {0.f, 0.f}},
+        {vertices.at(5), normals.at(0), {1.f, 0.f}},
+        {vertices.at(6), normals.at(0), {1.f, 1.f}},
+        // right 2
+        {vertices.at(2), normals.at(0), {0.f, 0.f}},
+        {vertices.at(1), normals.at(0), {1.f, 1.f}},
+        {vertices.at(5), normals.at(0), {1.f, 0.f}},
+
+        // back 1
+        {vertices.at(1), normals.at(0), {0.f, 0.f}},
+        {vertices.at(3), normals.at(0), {1.f, 0.f}},
+        {vertices.at(7), normals.at(0), {1.f, 1.f}},
+        // back 2
+        {vertices.at(1), normals.at(0), {0.f, 0.f}},
+        {vertices.at(7), normals.at(0), {1.f, 1.f}},
+        {vertices.at(5), normals.at(0), {1.f, 0.f}},
+
+        // left 1
+        {vertices.at(4), normals.at(0), {0.f, 0.f}},
+        {vertices.at(8), normals.at(0), {1.f, 1.f}},
+        {vertices.at(7), normals.at(0), {1.f, 0.f}},
+        // left 2
+        {vertices.at(4), normals.at(0), {0.f, 0.f}},
+        {vertices.at(7), normals.at(0), {1.f, 1.f}},
+        {vertices.at(3), normals.at(0), {1.f, 0.f}},
+
+        // bottom 1
+        {vertices.at(7), normals.at(0), {0.f, 0.f}},
+        {vertices.at(8), normals.at(0), {1.f, 0.f}},
+        {vertices.at(6), normals.at(0), {1.f, 1.f}},
+        // bottom 2
+        {vertices.at(7), normals.at(0), {0.f, 0.f}},
+        {vertices.at(6), normals.at(0), {1.f, 1.f}},
+        {vertices.at(5), normals.at(0), {1.f, 0.f}},
+
+
+    };
+
+
+    const std::vector<uint32_t> bulletShapeIndices
+    {
+        0, 1, 2, //front
+        3, 4, 5, //left
+        6, 7, 8, //Right
+        9, 10, 11, //Bottom
+        12, 13, 14,
+        15, 16, 17,
+        18, 19, 20,
+        21, 22, 23,
+        24, 25, 26,
+        27, 28, 29,
+        30, 31, 32,
+        33, 34, 35,
+        36, 37, 38,
+        39, 40, 41
+    };
+
+
+    mMesh = mesh::create(bulletShapeVertices, bulletShapeIndices);
+
+}
+
+
+engine::BulletShape::~BulletShape() {}
+
+std::shared_ptr<engine::BulletShape> engine::BulletShape::create(const std::vector<glm::vec3>& vertices) {
+    return std::make_shared<engine::BulletShape>(vertices);
+}
+
+engine::ref<engine::BulletShape> engine::BulletShape::createDefaultVertices(const float& scale, const float& breadth) {
+    std::vector<glm::vec3> bulletVertices;
+
+    bulletVertices.emplace_back(0.f, breadth / 2, 2.f * scale); // tip
+    // right of base top
+    bulletVertices.emplace_back(1 * scale, 0.f, 1 * scale);
+    bulletVertices.emplace_back(1 * scale, breadth, 1 * scale);
+    //left of base top
+    bulletVertices.emplace_back(-1.f*scale, 0.f, 1.f*scale);
+    bulletVertices.emplace_back(-1.f * scale, breadth, 1.f * scale);
+    //right base
+    bulletVertices.emplace_back(1.f * scale, 0.f, -1.f * scale);
+    bulletVertices.emplace_back(1.f * scale, breadth, -1.f * scale);
+    //left base
+    bulletVertices.emplace_back(-1.f * scale, 0.f, -1.f * scale);
+    bulletVertices.emplace_back(-1.f * scale, breadth, -1.f * scale);
+
+    return create(bulletVertices);
+}

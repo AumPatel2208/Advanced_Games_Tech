@@ -32,6 +32,7 @@
 #include "engine/entities/shapes/sphere.h"
 #include "engine/entities/shapes/Tetrahedron.h"
 #include "engine/entities/shapes/Octahedron.h"
+#include "engine/entities/shapes/BulletShape.h"
 #include "engine/entities/terrain.h"
 #include "engine/entities/skybox.h"
 

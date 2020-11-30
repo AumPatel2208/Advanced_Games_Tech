@@ -16,7 +16,7 @@ public:
     void initialiseEnemies();
     void updateEnemies(const engine::timestep& timestep);
     void renderEnemies(const std::shared_ptr<engine::shader>& animatedMeshShader);
-    void initialiseTetrhedrons(const float& scale, const int& amount);
+    void initialiseTetrahedrons(const float& scale, const int& amount);
     void updatePrimitives(const engine::timestep& timestep);
     void loadMusic();
     void renderMusicHud();
@@ -47,6 +47,7 @@ private:
 	std::list<engine::ref<engine::game_object>>	mTetrahedrons{};
 	std::list<engine::ref<engine::game_object>>	mOctahedrons{};
 	engine::ref<engine::game_object>	mOctahedron{};
+	engine::ref<engine::game_object>	mBullet{};
 	engine::ref<engine::material>		mMaterial{};
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};

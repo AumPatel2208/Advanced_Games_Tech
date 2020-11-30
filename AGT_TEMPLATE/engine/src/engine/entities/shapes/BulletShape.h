@@ -4,22 +4,22 @@
 namespace engine {
     class mesh;
 
-    /// \brief Class creating a Octahedron object with a mesh of a specified size
-    class Octahedron {
+    /// \brief Class creating a Bullet object with a mesh of a specified size and breadth/thickness
+    class BulletShape {
     public:
         /// \brief Constructor
-        Octahedron(std::vector<glm::vec3> vertices);
+        BulletShape(std::vector<glm::vec3> vertices);
         // engine::ref<engine::Tetrahedron> initialise(float scale);
 
         /// \brief Destructor
-        ~Octahedron();
+        ~BulletShape();
 
         /// \brief Getter methods
         std::vector<glm::vec3> vertices() const { return mVertices; }
         ref<mesh> mesh() const { return mMesh; }
 
-        static ref<Octahedron> create(const std::vector<glm::vec3>& vertices);
-        static engine::ref<engine::Octahedron> createDefaultVertices(const float& scale);
+        static ref<BulletShape> create(const std::vector<glm::vec3>& vertices);
+        static engine::ref<engine::BulletShape> createDefaultVertices(const float& scale, const float& breadth);
 
     private:
         /// \brief Fields
@@ -29,4 +29,5 @@ namespace engine {
         ref<engine::mesh> mMesh;
     };
 }
+
 

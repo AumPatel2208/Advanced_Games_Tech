@@ -180,18 +180,38 @@ main_layer::main_layer()
     mBall = engine::game_object::create(sphere_props);
 
     //initialise the primitives
-    initialiseTetrhedrons(1.f, 3);
+    initialiseTetrahedrons(1.f, 3);
 
     // Octahedron
     const engine::ref<engine::Octahedron> octahedron = engine::Octahedron::createDefaultVertices(3.f);
+    const std::vector<engine::ref<engine::texture_2d>> octaTextures = {
+        engine::texture_2d::create("assets/textures/green_brick.png", false)
+        // Load Sea Rock Texture. sourced from https://3dtextures.me/
+    };
     engine::game_object_properties octaProps;
 
     float positionX = (rand() % 100) / 10.f;
     float positionZ = (rand() % 100) / 10.f;
-    octaProps.position = { positionX, 10.f, positionZ };
-    octaProps.meshes = { octahedron->mesh() };
+    octaProps.position = {positionX, 10.f, positionZ};
+    octaProps.meshes = {octahedron->mesh()};
+    octaProps.textures = octaTextures;
     auto octObject = engine::game_object::create(octaProps);
     mOctahedron = octObject;
+
+    //Bullet shape
+    const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(3.f, 1.f);
+    const std::vector<engine::ref<engine::texture_2d>> bulletTextures = {
+        engine::texture_2d::create("assets/textures/yellow_brick.png", false)
+        // Load Sea Rock Texture. sourced from https://3dtextures.me/
+    };
+    engine::game_object_properties bulletProps;
+    positionX = (rand() % 100) / 10.f;
+    positionZ = (rand() % 100) / 10.f;
+    bulletProps.position = { positionX, 13.f, positionZ };
+    bulletProps.meshes = { bulletShape->mesh() };
+    bulletProps.textures = bulletTextures;
+    auto bulletObject = engine::game_object::create(bulletProps);
+    mBullet= bulletObject;
 
 
 
@@ -327,7 +347,7 @@ void main_layer::renderEnemies(const std::shared_ptr<engine::shader>& animatedMe
 
 
 // initialise the primitive shapes. pass through a scale and the amount of primitives to create.
-void main_layer::initialiseTetrhedrons(const float& scale, const int& amount) {
+void main_layer::initialiseTetrahedrons(const float& scale, const int& amount) {
     // std::vector<glm::vec3> tetVerticies;
     std::vector<engine::ref<engine::texture_2d>> tetraTextures;
     tetraTextures.push_back(engine::texture_2d::create("assets/textures/green_brick.png", false));
@@ -357,7 +377,7 @@ void main_layer::initialiseTetrhedrons(const float& scale, const int& amount) {
         }
 
 
-        auto tetraObject     = engine::game_object::create(tetraProps);
+        auto tetraObject = engine::game_object::create(tetraProps);
         mTetrahedrons.push_back(tetraObject);
     }
 
@@ -495,7 +515,7 @@ void main_layer::on_render() {
     // render the primitives into the scene
     renderPrimitives(texturedLightingShader);
     engine::renderer::submit(texturedLightingShader, mOctahedron);
-
+    engine::renderer::submit(texturedLightingShader, mBullet);
 
     glm::mat4 treeTransform(1.0f);
     treeTransform = glm::translate(treeTransform, glm::vec3(4.f, 0.5, -5.0f));
