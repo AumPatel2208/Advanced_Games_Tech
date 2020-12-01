@@ -17,13 +17,14 @@ void Boss::initialise() {
     // npcProps.bounding_shape = npcMesh->size() / 2.f * npcProps.scale.x;
     // npcProps.textures = { engine::texture_2d::create("assets/models/animated/minotaur/Minotaur_diffuse.tga", false) };
     bossProps.type = 0;
+    bossProps.textures = {engine::texture_2d::create("assets/textures/metal_bullet_2.jpg", false)};
     mObject = engine::game_object::create(bossProps);
     // mObject->set_scale(glm::vec3(3.f));
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
     mObject->set_position(glm::vec3(0.f, 0.5f, 10.f));
 
     //Bullet shape
-    const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(0.5f, 0.25f, 0.1f);
+    const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(0.25f, 0.1f, 0.1f);
     const std::vector<engine::ref<engine::texture_2d>> bulletTextures = {
         engine::texture_2d::create("assets/textures/metal_bullet.jpg", false)
     };
@@ -33,6 +34,7 @@ void Boss::initialise() {
     bulletProps.textures = bulletTextures;
     auto bulletObject = engine::game_object::create(bulletProps);
     mBullet = bulletObject;
+    // mBullet->set_rotation_amount(glm::radians(90.f));
 }
 
 void Boss::onRender(const std::shared_ptr<engine::shader>& texturedLightingShader,
@@ -45,6 +47,7 @@ void Boss::onRender(const std::shared_ptr<engine::shader>& texturedLightingShade
     engine::renderer::submit(texturedLightingShader, mObject);
 }
 
+void Boss::moveBullet() { }
 
 void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardManager& billboardManager) {
     // turn towards the player
@@ -57,17 +60,34 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
 
 
     if (engine::input::key_pressed(engine::key_codes::KEY_F)) {
-        shoot(billboardManager);
+        if (bulletTimer <= 0) {
+            bulletTrajectory = glm::normalize(player.object()->position() - mObject->position());
+            shoot(billboardManager);
+        }
+    }
+
+    // Handling the timer for the bullet shooting
+    if (bulletTimer > 0.f) {
+        mBullet->set_position(mBullet->position() += bulletTrajectory * glm::vec3(timestep) * 2.f);
+        bulletTimer -= static_cast<float>(timestep);
+        if (bulletTimer <= 0.f) {
+            showBullet = false;
+            mBullet->set_position(glm::vec3(mObject->position().x, mObject->position().y + 1.f, mObject->position().z));
+
+            // do another explosion
+        }
     }
 }
 
 // Turn Boss towards the player
 void Boss::turn(float angle) const {
     mObject->set_rotation_amount(angle);
+    if (bulletTimer <= 0)
+        mBullet->set_rotation_amount(angle);
 }
 
-void Boss::shoot(BillboardManager& billboardManager)  {
+void Boss::shoot(BillboardManager& billboardManager) {
     billboardManager.activate(billboardManager.getSfx(BillboardManager::sfx_EXPLOSION));
-    mBullet->set_velocity(glm::vec3(0, 0, 1.f));
     showBullet = true;
+    bulletTimer = 2.5f;
 }

@@ -25,7 +25,7 @@ void BillboardManager::onUpdate(const engine::timestep& timestep) {
     }
 
     if (engine::input::key_pressed(engine::key_codes::KEY_F)) {
-        activate(mBillboards.at(sfx_EXPLOSION));
+        // activate(mBillboards.at(sfx_EXPLOSION));
     }
 
 }
