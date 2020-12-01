@@ -124,22 +124,22 @@ std::shared_ptr<engine::BulletShape> engine::BulletShape::create(const std::vect
     return std::make_shared<engine::BulletShape>(vertices);
 }
 
-engine::ref<engine::BulletShape> engine::BulletShape::createDefaultVertices(const float& scale, const float& breadth) {
+engine::ref<engine::BulletShape> engine::BulletShape::createDefaultVertices(const float& length, const float& width, const float& height) {
     std::vector<glm::vec3> bulletVertices;
 
-    bulletVertices.emplace_back(0.f, breadth / 2, 2.f * scale); // tip
+    bulletVertices.emplace_back(0.f, height / 2, 2.f * length); // tip
     // right of base top
-    bulletVertices.emplace_back(1 * scale, 0.f, 1 * scale);
-    bulletVertices.emplace_back(1 * scale, breadth, 1 * scale);
+    bulletVertices.emplace_back(1 * width, 0.f, 1 * length);
+    bulletVertices.emplace_back(1 * width, height, 1 * length);
     //left of base top
-    bulletVertices.emplace_back(-1.f*scale, 0.f, 1.f*scale);
-    bulletVertices.emplace_back(-1.f * scale, breadth, 1.f * scale);
+    bulletVertices.emplace_back(-1.f* width, 0.f, 1.f*length);
+    bulletVertices.emplace_back(-1.f * width, height, 1.f * length);
     //right base
-    bulletVertices.emplace_back(1.f * scale, 0.f, -1.f * scale);
-    bulletVertices.emplace_back(1.f * scale, breadth, -1.f * scale);
+    bulletVertices.emplace_back(1.f * width, 0.f, -1.f * length);
+    bulletVertices.emplace_back(1.f * width, height, -1.f * length);
     //left base
-    bulletVertices.emplace_back(-1.f * scale, 0.f, -1.f * scale);
-    bulletVertices.emplace_back(-1.f * scale, breadth, -1.f * scale);
+    bulletVertices.emplace_back(-1.f * width, 0.f, -1.f * length);
+    bulletVertices.emplace_back(-1.f * width, height, -1.f * length);
 
     return create(bulletVertices);
 }

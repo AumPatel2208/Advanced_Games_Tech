@@ -198,22 +198,7 @@ main_layer::main_layer()
     auto octObject = engine::game_object::create(octaProps);
     mOctahedron = octObject;
 
-    //Bullet shape
-    const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(3.f, 1.f);
-    const std::vector<engine::ref<engine::texture_2d>> bulletTextures = {
-        engine::texture_2d::create("assets/textures/yellow_brick.png", false)
-        // Load Sea Rock Texture. sourced from https://3dtextures.me/
-    };
-    engine::game_object_properties bulletProps;
-    positionX = (rand() % 100) / 10.f;
-    positionZ = (rand() % 100) / 10.f;
-    bulletProps.position = { positionX, 13.f, positionZ };
-    bulletProps.meshes = { bulletShape->mesh() };
-    bulletProps.textures = bulletTextures;
-    auto bulletObject = engine::game_object::create(bulletProps);
-    mBullet= bulletObject;
-
-
+ 
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
         glm::vec3((float)engine::application::window().width() / 500, 0.1f,
@@ -239,7 +224,8 @@ main_layer::main_layer()
     // create a text manager used to display text onto the screen
     mTextManager = engine::text_manager::create();
 
-
+	// m_billboard = billboard::create("assets/textures/Explosion.tga", 4, 5, 16);
+    
     // fixed animation for the player
     // have not implemented the animation manager for the player
     // mPlayer.object()->animated_mesh()->switch_animation(1);
@@ -254,11 +240,11 @@ void main_layer::on_update(const engine::timestep& timestep) {
         mPhysicsManager->dynamics_world_update(mGameObjects, double(timestep));
 
         //Free flowing camera uses the keys - UJHK. Uncomment line below, and comment out mPLayer.updateCamera
-        m3DCamera.on_update(timestep);
+        // m3DCamera.on_update(timestep);
 
         mPlayer.onUpdate(timestep); // Update the player object
 
-        // mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
+        mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
 
         // Put the player into the level that already exists
         if (engine::input::key_pressed(engine::key_codes::KEY_P)) {
@@ -266,9 +252,15 @@ void main_layer::on_update(const engine::timestep& timestep) {
             renderLevel1 = true;
         }
 
+        // if (engine::input::key_pressed(engine::key_codes::KEY_F)) {
+        //     m_billboard->activate(glm::vec3(0.f, 5.f, -10.f), 4.f, 4.f);
+        // }
+        // m_billboard->on_update(timestep);
+
+        mBillboardManager.onUpdate(timestep);
         updateEnemies(timestep);
         updatePrimitives(timestep);
-        mBoss.onUpdate(timestep, mPlayer);
+        mBoss.onUpdate(timestep, mPlayer,mBillboardManager);
     }
     else {
         // set the camera on the menu if the game hasn't started yet
@@ -515,7 +507,7 @@ void main_layer::on_render() {
     // render the primitives into the scene
     renderPrimitives(texturedLightingShader);
     engine::renderer::submit(texturedLightingShader, mOctahedron);
-    engine::renderer::submit(texturedLightingShader, mBullet);
+
 
     glm::mat4 treeTransform(1.0f);
     treeTransform = glm::translate(treeTransform, glm::vec3(4.f, 0.5, -5.0f));
@@ -531,7 +523,7 @@ void main_layer::on_render() {
 
     // RENDER CALLS TO OBJECTS
     mFriendlyNpc.onRender(texturedLightingShader);
-    mBoss.onRender(texturedLightingShader);
+    mBoss.onRender(texturedLightingShader, m3DCamera);
 
     // render the maze level if the player has chosen too
     if (renderLevel1) {
@@ -589,6 +581,13 @@ void main_layer::on_render() {
     renderEnemies(animatedMeshShader);
 
     engine::renderer::end_scene();
+
+    // render billboard
+    engine::renderer::begin_scene(m3DCamera, texturedLightingShader);
+    // m_billboard->on_render(m3DCamera, texturedLightingShader);
+    mBillboardManager.onRender(texturedLightingShader, m3DCamera);
+    engine::renderer::end_scene();
+
 
     // Render hud elements
     mPlayer.renderHud(mTextManager);

@@ -19,7 +19,7 @@ namespace engine {
         ref<mesh> mesh() const { return mMesh; }
 
         static ref<BulletShape> create(const std::vector<glm::vec3>& vertices);
-        static engine::ref<engine::BulletShape> createDefaultVertices(const float& scale, const float& breadth);
+        static engine::ref<engine::BulletShape> createDefaultVertices(const float& length, const float& width, const float& height);
 
     private:
         /// \brief Fields

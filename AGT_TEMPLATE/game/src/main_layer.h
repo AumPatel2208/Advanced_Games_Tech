@@ -1,6 +1,9 @@
 #pragma once
 #include <engine.h>
 
+
+#include "billboard.h"
+#include "BillboardManager.h"
 #include "Boss.h"
 #include "player.h"
 #include "Enemy.h"
@@ -47,7 +50,6 @@ private:
 	std::list<engine::ref<engine::game_object>>	mTetrahedrons{};
 	std::list<engine::ref<engine::game_object>>	mOctahedrons{};
 	engine::ref<engine::game_object>	mOctahedron{};
-	engine::ref<engine::game_object>	mBullet{};
 	engine::ref<engine::material>		mMaterial{};
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};
@@ -57,7 +59,9 @@ private:
     //NPC Object
 	FriendlyNPC mFriendlyNpc {};
 
-
+    // sfx
+	// engine::ref<billboard>				m_billboard{};
+	BillboardManager					mBillboardManager{};
 
 
 	// Max/Min for primitive
