@@ -53,7 +53,8 @@ void Player::initialise() {
     prevMousePosition = engine::input::mouse_position();
 
     //Bullet shape
-    const engine::ref<engine::BulletShape> swordShape = engine::BulletShape::createDefaultVertices(0.40f, 0.25f, 0.1f);
+    const engine::ref<engine::BulletShape> swordShape = engine::BulletShape::createDefaultVertices(
+        -0.30f, 0.125f, 0.05f);
     const std::vector<engine::ref<engine::texture_2d>> swordTextures = {
         // reference https://www.filterforge.com/filters/4486-diffuse.html
         engine::texture_2d::create("assets/textures/sword_texture.jpg", false)
@@ -120,12 +121,16 @@ void Player::onUpdate(const engine::timestep& timestep) {
 
         //turning
         currentMousePosition = engine::input::mouse_position();
+
         if (prevMousePosition.first > currentMousePosition.first) {
             turn(1.f * timestep); // Turn Left if the mouse moves left
+            // mSword->set_rotation_amount(mSword->rotation_amount() * timestep);
         }
         else if (prevMousePosition.first < currentMousePosition.first) {
             turn(-1.f * timestep); // Turn Right if mouse moves right
+            // mSword->set_rotation_amount(mSword->rotation_amount() * -timestep);
         }
+
 
         // Set the rotation to the new forward
         mObject->set_rotation_amount(atan2(mObject->forward().x, mObject->forward().z));
@@ -195,8 +200,12 @@ void Player::onUpdate(const engine::timestep& timestep) {
 
         // reduce stamina on mouse click
         if (engine::input::mouse_button_pressed(0) && mStamina > 10.f) {
-            mStamina -= 10.f;
-            mStaminaRecoveryTimer = 1.f;
+            if (!isSwordSwinging) {
+                mStamina -= 10.f;
+                mStaminaRecoveryTimer = 1.f;
+                isSwordSwinging = true;
+                mSwordSwingTimer = 0.5f;
+            }
         }
 
         if (mStaminaRecoveryTimer <= 0.f && mStamina < 100.f) {
@@ -215,12 +224,30 @@ void Player::onUpdate(const engine::timestep& timestep) {
         //turn it then offset it
         // const glm::vec3 v = player.object()->position() - mObject->position();
         // const float theta = atan2(v.x, v.z);
-        
-        mSword->set_position(glm::vec3(mObject->position().x, mObject->position().y + 1.f,
-                                       mObject->position().z - 1.f));
+
+        if (mSwordSwingTimer > 0) {
+            swingSword(timestep);
+            mSwordSwingTimer -= timestep;
+            if (mSwordSwingTimer <= 0) {
+                isSwordSwinging = false;
+                swordOffsetX = 0.2f;
+            }
+        }
+
+        // turn the sword
+        // // turn towards the player
+        // const glm::vec3 v = mSword->position() - mObject->position();
+        // const float theta = atan2(v.x, v.z);
+        // mSword->set_rotation_amount(theta);
+
+        mSword->set_position(glm::vec3(mObject->position().x + swordOffsetX, mObject->position().y + swordOffsetY,
+                                       mObject->position().z + swordOffsetZ));
     }
 }
 
+void Player::swingSword(const engine::timestep& timestep) {
+    swordOffsetX -= 1.f * timestep;
+}
 
 void Player::renderHud(engine::ref<engine::text_manager>& textManager) const {
     if (hasStarted) {
@@ -256,6 +283,7 @@ void Player::walk(const bool& forward, const engine::timestep& timestep) {
 
 void Player::turn(float angle) const {
     mObject->set_forward(glm::rotate(mObject->forward(), angle, glm::vec3(0.f, 1.f, 0.f)));
+    mObject->set_rotation_amount(angle);
     // mSword->set_rotation_amount(glm::radians(angle));
 }
 

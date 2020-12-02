@@ -62,6 +62,9 @@
   - [ ] it could just up the difficulty and reset you to the beginning of the level
     - [ ] can be attached to a stop watch showing how long the player has survived in the game.
     
+- [ ] Physics
+  - [ ] boss bullet have a bullet drop
+  - [ ] have power ups bounce around until collected by the player
 
 
 
@@ -81,12 +84,12 @@
       - REPEAT
 - After beating the guy. "Here have this." `end_1` {Gives item} "Many thanks for beating him, scary fella he is." `end_2`
 
-
-
 ## Documentation checklist
 - finite state machines for the enemies
 - maybe describe the animation handler or something better if i do come up with something
 - Had to get rid of death and getting hit animations from minitour enemy for size reasons
+
+
 
 ## Souls-Like Game
 
@@ -157,3 +160,50 @@ posx = right
 negz = back
 
 posz = front
+
+
+
+
+
+# Mark Scheme 
+
+Milestone 1 = (86/100) * 0.25 = 21.5%
+
+Milestone 2 = (??/100) * 0.85 = 
+
+minimum 48.5% (scaled) = 58 marks / 100 in milestone 2
+
+21.5% + (58/100)*0.85 = 70.8%
+
+
+
+
+
+## Part 1: Basic Game Modelling   `25%`
+
+1. `4% ` **intro screen with keyboard/mouse controls** 
+2. `12%` 3 Primitive Objects, change in skybox and terrain 
+3. `5%` Audio: 3 sounds synched with game events, new background audio
+4. `4%` HUD. Score Health Stamina etc
+
+## Part 2: Camera, Meshes, Lighting, FX   `25%`
+
+1. `6%` **camera motion technique**
+2. `7%` **3 mesh based objects**
+3. `6%` Lighting. minimum 2 lights in the scene.
+4. `6%` Special fx: 2 techniques (Billboards, cross fade)
+
+## Part 3: Physics, AI and Gameplay   `25%`
+
+1. `7%` use of game physics (3 techniques)
+2. `8%` Non-Player characters (4 NPCs) with some AI
+3. `10%` Gameplay Elements: power-ups, combos, timers
+
+## Part 4: Project Report and source code   `25%`
+
+1. `5%` Overview, asset/library listing references and licenses
+2. `10%` Features Implemented in Parts 1-3. Listing, implementation and results
+3. `5%` Discussion
+4. `5%` Source Code design, organization, and coding style
+5. `Plagarism check` referencing external source code 
+

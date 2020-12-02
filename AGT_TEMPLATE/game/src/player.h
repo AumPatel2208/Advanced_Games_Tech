@@ -13,6 +13,7 @@ public:
     void moveIntoLevel1() const;
     void onRenderStaticItems(const std::shared_ptr<engine::shader>& texturedLightingShader) const;
     void onUpdate(const engine::timestep& timestep);
+    void swingSword(const engine::timestep& timestep);
     void renderHud(engine::ref<engine::text_manager>& textManager) const;
     void idle(engine::timestep timestep);
     void walk(const bool& forward, const engine::timestep& timestep);
@@ -35,6 +36,8 @@ private:
     float mJumpTimer;
     float mMovementTimer;
     float mStaminaRecoveryTimer = 0.f;
+    float mSwordSwingTimer = 0.f; // timer for the sword swing
+    bool isSwordSwinging = false;
     bool hasStarted = false;
 
     // HUD values
@@ -44,9 +47,9 @@ private:
 
     engine::ref<engine::game_object> mObject;
     engine::ref<engine::game_object> mSword;
-    float swordOffsetX =  0.f;
-    float swordOffsetY =  1.f;
-    float swordOffsetZ = -1.f;
+    float swordOffsetX =  0.2f;
+    float swordOffsetY =  0.75f;
+    float swordOffsetZ = -0.4f;
 
     glm::vec3 cameraFront = glm::vec3(0, 0, 0);
     float height = 1.f;
