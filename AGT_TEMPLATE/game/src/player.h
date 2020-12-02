@@ -11,6 +11,7 @@ public:
     ~Player();
     void initialise();
     void moveIntoLevel1() const;
+    void onRenderStaticItems(const std::shared_ptr<engine::shader>& texturedLightingShader) const;
     void onUpdate(const engine::timestep& timestep);
     void renderHud(engine::ref<engine::text_manager>& textManager) const;
     void idle(engine::timestep timestep);
@@ -42,6 +43,11 @@ private:
     float mStaminaRecoverySpeed = 10.f;
 
     engine::ref<engine::game_object> mObject;
+    engine::ref<engine::game_object> mSword;
+    float swordOffsetX =  0.f;
+    float swordOffsetY =  1.f;
+    float swordOffsetZ = -1.f;
+
     glm::vec3 cameraFront = glm::vec3(0, 0, 0);
     float height = 1.f;
     glm::vec3 prevFront = glm::vec3(0, 0, 0);
@@ -60,6 +66,9 @@ private:
     const float cameraPosBehindLimit = 5.f;
     float ySensitivity3rdPerson = 2.f;
     float ySensitivity1stPerson = 5.f;
+
+
+    
 
     AnimationHandler animationHandler ={};
 

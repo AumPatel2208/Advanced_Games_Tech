@@ -524,6 +524,7 @@ void main_layer::on_render() {
     // RENDER CALLS TO OBJECTS
     mFriendlyNpc.onRender(texturedLightingShader);
     mBoss.onRender(texturedLightingShader, m3DCamera);
+    mPlayer.onRenderStaticItems(texturedLightingShader);
 
     // render the maze level if the player has chosen too
     if (renderLevel1) {

@@ -52,6 +52,21 @@ void Player::initialise() {
 
     prevMousePosition = engine::input::mouse_position();
 
+    //Bullet shape
+    const engine::ref<engine::BulletShape> swordShape = engine::BulletShape::createDefaultVertices(0.40f, 0.25f, 0.1f);
+    const std::vector<engine::ref<engine::texture_2d>> swordTextures = {
+        // reference https://www.filterforge.com/filters/4486-diffuse.html
+        engine::texture_2d::create("assets/textures/sword_texture.jpg", false)
+    };
+    engine::game_object_properties swordProps;
+    // swordProps.position = { mObject->position().x + swordOffsetX, mObject->position().y + swordOffsetY, mObject->position().z + swordOffsetZ };
+    swordProps.position = {mObject->position().x, mObject->position().y, mObject->position().z};
+    swordProps.meshes = {swordShape->mesh()};
+    swordProps.textures = swordTextures;
+    auto swordObject = engine::game_object::create(swordProps);
+    mSword = swordObject;
+
+
     // assign the current mouse position as previous as it will be empty otherwise
 }
 
@@ -59,6 +74,10 @@ void Player::initialise() {
 void Player::moveIntoLevel1() const {
     mObject->set_position(glm::vec3(0.16f, mObject->position().y, 1.72f));
     mObject->set_forward(glm::vec3(0.14f, 0, 1.f));
+}
+
+void Player::onRenderStaticItems(const std::shared_ptr<engine::shader>& texturedLightingShader) const {
+    engine::renderer::submit(texturedLightingShader, mSword);
 }
 
 // call every game loop
@@ -191,8 +210,17 @@ void Player::onUpdate(const engine::timestep& timestep) {
         // Animate the mesh
         animationHandler.onUpdate(timestep);
         // mObject->animated_mesh()->on_update(timestep);
+
+        // Move the sword
+        //turn it then offset it
+        // const glm::vec3 v = player.object()->position() - mObject->position();
+        // const float theta = atan2(v.x, v.z);
+        
+        mSword->set_position(glm::vec3(mObject->position().x, mObject->position().y + 1.f,
+                                       mObject->position().z - 1.f));
     }
 }
+
 
 void Player::renderHud(engine::ref<engine::text_manager>& textManager) const {
     if (hasStarted) {
@@ -228,6 +256,7 @@ void Player::walk(const bool& forward, const engine::timestep& timestep) {
 
 void Player::turn(float angle) const {
     mObject->set_forward(glm::rotate(mObject->forward(), angle, glm::vec3(0.f, 1.f, 0.f)));
+    // mSword->set_rotation_amount(glm::radians(angle));
 }
 
 void Player::jump() {
