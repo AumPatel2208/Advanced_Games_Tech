@@ -66,6 +66,31 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
         }
     }
 
+
+    switch (mState) {
+    case State::IDLE:
+
+        break;
+    case State::MOVE:
+        switch (mMoveState) {
+        case MoveState::STRAFE: break;
+        case MoveState::DASH: break;
+        default: ;
+        }
+        break;
+    case State::ATTACK:
+        switch (mAttackState) {
+        case AttackState::TRACKING_SHOT: break;
+        case AttackState::FAST_SHOT: break;
+        case AttackState::AIR_ATTACK: break;
+        default: ;
+        }
+        break;
+    case State::OPEN: break;
+    default: ;
+    }
+
+
     // Handling the timer for the bullet shooting
     if (bulletTimer > 0.f) {
         mBullet->set_position(mBullet->position() += bulletTrajectory * glm::vec3(timestep) * 2.f);

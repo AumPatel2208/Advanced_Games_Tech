@@ -8,6 +8,15 @@
 
 class Enemy {
 
+	enum class State
+	{
+		IDLE,
+	    WALK,
+		SHOUT,
+		ATTACK,
+		DIE
+	};
+
 public:
 	Enemy();
 	~Enemy();
@@ -27,11 +36,8 @@ public:
 	void attack();
 	void die();
 	void walk(engine::timestep timestep, const Player& player);
-	float calculateSpeed(bool isWalking);
-	void run();
-
+	float calculateSpeed(bool isWalking) const;
 	void shout();
-	void shoutAttack(const engine::timestep& timestep);
 
 	// Enemy Types based on integer
 	static const int TYPE_WALKER = 1;
@@ -46,10 +52,12 @@ private:
 	float angleFromPlayer = {};
 	float mSpeed{ 1.f };
 	float mShoutTimer = 0;
-	bool toAttack = false;
-	bool isInShoutRange = false; // amount of times been agroed
+	// bool toAttack = false;
+	// bool isInShoutRange = false; // amount of times been agroed
 	float maxSize = 0.f;
 	float agroRange = 5.f;
+	State mState = State::IDLE;
+
 	AnimationHandler animationHandler = {};
 
 

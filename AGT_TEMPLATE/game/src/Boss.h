@@ -4,6 +4,25 @@
 #include "BillboardManager.h"
 
 class Boss {
+
+    enum class State {
+        IDLE,
+        MOVE,
+        ATTACK,
+        OPEN
+    };
+
+    enum class AttackState {
+        TRACKING_SHOT,
+        FAST_SHOT,
+        AIR_ATTACK
+    };
+
+    enum class MoveState {
+        STRAFE,
+        DASH
+    };
+
 public:
     Boss();
     ~Boss();
@@ -27,6 +46,10 @@ private:
     engine::ref<engine::game_object> mBullet;
     glm::vec3 bulletTrajectory{};
     bool showBullet = false;
+
+    State mState = State::IDLE;
+    MoveState mMoveState = MoveState::STRAFE;
+    AttackState mAttackState = AttackState::TRACKING_SHOT;
 
     float bulletTimer = 0.f;
     
