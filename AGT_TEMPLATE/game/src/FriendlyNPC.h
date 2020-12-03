@@ -4,6 +4,7 @@
 #include "player.h"
 
 class FriendlyNPC {
+
 public:
     FriendlyNPC();
     ~FriendlyNPC();
@@ -13,6 +14,7 @@ public:
     void talk();
 
     void onRender(const std::shared_ptr<engine::shader>& texturedLightingShader) const;
+    void renderChoiceHUD(engine::ref<engine::text_manager>& textManager);
     void onUpdate(const engine::timestep& timestep, Player& player);
 
     void playDialogue() const;
@@ -31,11 +33,16 @@ private:
     engine::ref<engine::game_object> mObject;
     engine::ref<engine::audio_manager> mAudioManager {};
 
-    bool isYes = true;
+    bool isYes = false;
     bool isNo = false;
     bool isBossBeaten = false;
     bool toPLayDialogue = false;
-    
+    bool inChoice = false;
+    bool toRenderChoiceHUD = false;
+    // bool interactionCooldown = true;
+
+
+
     float mDialogueTimer = 0.f;
     std::string dialoguePath = "greeting";
     int         dialogueNumber = 1;

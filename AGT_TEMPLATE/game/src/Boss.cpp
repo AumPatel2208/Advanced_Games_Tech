@@ -21,7 +21,7 @@ void Boss::initialise() {
     mObject = engine::game_object::create(bossProps);
     // mObject->set_scale(glm::vec3(3.f));
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
-    mObject->set_position(glm::vec3(0.f, 0.5f, 10.f));
+    mObject->set_position(glm::vec3(0.f, 0.5f, 15.f));
 
     //Bullet shape
     const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(0.25f, 0.1f, 0.1f);

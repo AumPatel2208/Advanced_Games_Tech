@@ -583,6 +583,7 @@ void main_layer::on_render() {
 
     engine::renderer::end_scene();
 
+
     // render billboard
     engine::renderer::begin_scene(m3DCamera, texturedLightingShader);
     // m_billboard->on_render(m3DCamera, texturedLightingShader);
@@ -590,11 +591,15 @@ void main_layer::on_render() {
     engine::renderer::end_scene();
 
 
+    // Render 2d elements
+    
     // Render hud elements
     mPlayer.renderHud(mTextManager);
     if (showMusicHUD) {
         renderMusicHud();
     }
+
+    mFriendlyNpc.renderChoiceHUD(mTextManager);
 }
 
 // Display a wireframe view when TAB is pressed

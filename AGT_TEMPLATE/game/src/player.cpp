@@ -103,9 +103,11 @@ void Player::onUpdate(const engine::timestep& timestep) {
         }
 
 
-        if (engine::input::key_pressed(engine::key_codes::KEY_E) && mDialogueTimer == 0.f) {
-            toInteractWithNpc = true;
-        }
+        // if (engine::input::key_pressed(engine::key_codes::KEY_E) && mDialogueTimer == 0.f) {
+        //     toInteractWithNpc = true;
+        // }
+
+
 
         // timer for jumping
         if (mJumpTimer > 0.f) {

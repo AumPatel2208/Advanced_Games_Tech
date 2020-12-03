@@ -27,8 +27,8 @@ public:
     void setHasStarted(bool _hasStarted);
 
 
-    bool getToInteractWithNpc() const { return toInteractWithNpc; }
-    void setToInteractWithNpc(bool interactWithNpc) { this->toInteractWithNpc = interactWithNpc; }
+    // bool getToInteractWithNpc() const { return toInteractWithNpc; }
+    // void setToInteractWithNpc(bool interactWithNpc) { this->toInteractWithNpc = interactWithNpc; }
     void setDialogueTimer(const float& timer) { mDialogueTimer = timer; }
 
 private:
@@ -57,7 +57,7 @@ private:
     std::pair<float, float> prevMousePosition;
     std::pair<float, float> currentMousePosition;
 
-    bool toInteractWithNpc = false;
+    // bool toInteractWithNpc = false;
     float mDialogueTimer = 0.f;
 
     bool firstPerson = false; //
