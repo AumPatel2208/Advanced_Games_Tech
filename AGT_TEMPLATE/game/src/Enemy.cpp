@@ -20,9 +20,11 @@ void Enemy::initialise() {
     enemyProps.animated_mesh = enemyMesh;
     enemyProps.textures = {engine::texture_2d::create("assets/models/animated/minotaur/Minotaur_diffuse.tga", false)};
     enemyProps.type = 0;
+    enemyProps.bounding_shape = glm::vec3(.5f);
     mObject = engine::game_object::create(enemyProps);
     mObject->set_scale(glm::vec3(3.f));
-
+    // mObject->set_offset(enemyMesh->offset());
+    mObject->setName("enemy");
     // Set the positions of the animations based on the order they are loaded into the mesh
     animationHandler = AnimationHandler(mObject);
     animationHandler.setIdleAnim(0);
@@ -46,6 +48,12 @@ void Enemy::setRandomScale() {
     const float scale = (rand() % 30 + 10) / 10;
     mObject->set_scale(glm::vec3(scale));
     maxSize = 2.f * scale;
+}
+
+void Enemy::setFixedScale() {
+    const float scale = 1.f;
+    mObject->set_scale(glm::vec3(scale));
+    maxSize = 1.5f * scale;
 }
 
 void Enemy::setEnemyType() {
@@ -81,6 +89,14 @@ void Enemy::onUpdate(const engine::timestep& timestep, Player& player) {
     //check distance from player and stop walking and shout at the player (2.f currently)
     auto d = mObject->position() - player.object()->position();
     const int randomNo = rand() % 100;
+
+
+    if (glm::length(d) < 1.5f) {
+        if(player.getIsSwordSwinging()) {
+            die();
+        }
+    }
+
     switch (mState) {
 
     case State::IDLE:
@@ -96,6 +112,7 @@ void Enemy::onUpdate(const engine::timestep& timestep, Player& player) {
             // move the enemy
             mState = State::WALK;
         }
+        mObject->set_angular_velocity(glm::vec3(0.f));
         break;
 
     case State::WALK:
@@ -161,12 +178,16 @@ float Enemy::calculateSpeed(bool isWalking) const {
 
 // Turn Enemy towards the player
 void Enemy::turn(float angle) {
-    mObject->set_rotation_amount(angle);
+    // mObject->set_rotation_amount(angle);
+    
+    mObject->set_angular_velocity(glm::vec3(0.f, 2*angle, 0.f));
+
     angleFromPlayer = angle;
 }
 
 void Enemy::idle() {
     animationHandler.nextAnimation(animationHandler.animIdle());
+    mObject->set_velocity(glm::vec3(0.f));
 }
 
 // walk the enemy in relation to the player
@@ -178,7 +199,8 @@ void Enemy::walk(engine::timestep timestep, const Player& player) {
     const glm::vec3 directionVector = glm::normalize(player.object()->position() - mObject->position());
 
     // move the game object
-    mObject->set_position(mObject->position() += directionVector * glm::vec3(timestep) * calculateSpeed(true));
+    // mObject->set_position(mObject->position() += directionVector * glm::vec3(timestep) * calculateSpeed(true));
+    mObject->set_velocity(directionVector * 2.f*  calculateSpeed(true));
 }
 
 
@@ -189,7 +211,9 @@ void Enemy::attack() {
 
 // play the death animation and also will handle turning into a ragdoll
 void Enemy::die() {
-    animationHandler.nextAnimation(animationHandler.animDeath());
+    // animationHandler.nextAnimation(animationHandler.animDeath());
+    std::cout << "DEAD";
+    isDead = true;
 }
 
 // play the shout animation

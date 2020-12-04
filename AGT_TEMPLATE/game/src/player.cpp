@@ -204,13 +204,15 @@ void Player::onUpdate(const engine::timestep& timestep) {
         // reduce stamina on mouse click
         if (engine::input::mouse_button_pressed(0) && mStamina > 10.f) {
             if (!isSwordSwinging) {
-                mStamina -= 10.f;
-                mStaminaRecoveryTimer = 1.f;
+                // mStamina -= 10.f;
+                // mStaminaRecoveryTimer = 1.f;
+                decreaseStamina(10);
                 isSwordSwinging = true;
                 mSwordSwingTimer = 0.5f;
             }
         }
 
+     
         if (mStaminaRecoveryTimer <= 0.f && mStamina < 100.f) {
             mStamina += mStaminaRecoverySpeed * timestep;
         }
@@ -302,6 +304,11 @@ void Player::jump() {
 
 void Player::setHasStarted(const bool _hasStarted) {
     hasStarted = _hasStarted;
+}
+
+void Player::decreaseStamina(const float& amount) {
+    mStamina -= amount;
+    mStaminaRecoveryTimer = 1.f;
 }
 
 void Player::updateCamera3rdPerson(engine::perspective_camera& camera, const engine::timestep& timeStep) {

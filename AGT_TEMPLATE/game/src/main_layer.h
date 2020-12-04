@@ -8,6 +8,7 @@
 #include "player.h"
 #include "Enemy.h"
 #include "FriendlyNPC.h"
+#include "Throwable.h"
 
 class main_layer : public engine::layer
 {
@@ -28,6 +29,8 @@ public:
     void menuCamera();
     void on_render() override;
     void on_event(engine::event& event) override;
+
+	void onCollisions();
 
 private:
 	void checkBounce();
@@ -51,10 +54,13 @@ private:
 	std::list<engine::ref<engine::game_object>>	mOctahedrons{};
 	engine::ref<engine::game_object>	mOctahedron{};
 	engine::ref<engine::material>		mMaterial{};
+
+	Throwable mThrowable{};
+
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};
     //List of enemies
-	std::list<Enemy>					mEnemies {};
+	std::vector<Enemy>					mEnemies {};
 	Boss								mBoss{};
     //NPC Object
 	FriendlyNPC mFriendlyNpc {};

@@ -139,6 +139,7 @@
     <ClInclude Include="src\FriendlyNPC.h" />
     <ClInclude Include="src\main_layer.h" />
     <ClInclude Include="src\player.h" />
+    <ClInclude Include="src\Throwable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AnimationHandler.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="src\main_layer.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\Throwable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\engine\engine.vcxproj">

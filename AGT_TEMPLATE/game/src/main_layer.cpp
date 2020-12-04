@@ -134,6 +134,7 @@ main_layer::main_layer()
     //Initialise the boss
     mBoss.initialise();
 
+    mThrowable.initialise();
 
     // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
     const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
@@ -219,7 +220,10 @@ main_layer::main_layer()
     mGameObjects.push_back(mTerrain);
     mGameObjects.push_back(mBall);
     // mGameObjects.push_back(mPlayer.object());
-
+    mGameObjects.push_back(mThrowable.object());
+    for (auto & enemy : mEnemies) {
+        mGameObjects.push_back(enemy.object());
+    }
     //m_game_objects.push_back(m_cow);
     //m_game_objects.push_back(m_tree);
     //m_game_objects.push_back(m_pickup);
@@ -257,6 +261,8 @@ void main_layer::on_update(const engine::timestep& timestep) {
             mPlayer.moveIntoLevel1();
             renderLevel1 = true;
         }
+
+        mThrowable.onUpdate(timestep, mPlayer);
 
         // if (engine::input::key_pressed(engine::key_codes::KEY_F)) {
         //     m_billboard->activate(glm::vec3(0.f, 5.f, -10.f), 4.f, 4.f);
@@ -315,6 +321,7 @@ void main_layer::on_update(const engine::timestep& timestep) {
     mFriendlyNpc.onUpdate(timestep, mPlayer);
 
     checkBounce();
+    onCollisions();
 }
 
 // initialise enemies into the level
@@ -323,10 +330,15 @@ void main_layer::initialiseEnemies() {
     for (int i = 0; i < numberOfEnemies; ++i) {
         Enemy enemy = {};
         enemy.initialise(); // create the game object and initialise with the animations
-        enemy.setRandomPosition(); // set random positions
-        enemy.setRandomScale(); // set random scale of the enemy
+        // enemy.setRandomPosition(); // set random positions
+        // enemy.setRandomScale(); // set random scale of the enemy
+        enemy.setFixedScale(); // set fixed scale for enemy
         mEnemies.push_back(enemy);
     }
+    mEnemies.at(0).object()->set_position(glm::vec3(2.f, 0.5f, 4.f));
+    mEnemies.at(1).object()->set_position(glm::vec3(-2.f, 0.5f, 4.f));
+    mEnemies.at(2).object()->set_position(glm::vec3(1.f, 0.5f, -2.f));
+
 }
 
 // update the list of enemies mEnemies
@@ -537,6 +549,7 @@ void main_layer::on_render() {
     mFriendlyNpc.onRender(texturedLightingShader);
     mBoss.onRender(texturedLightingShader, m3DCamera);
     mPlayer.onRenderStaticItems(texturedLightingShader);
+    mThrowable.onRender(texturedLightingShader);
 
     // render the maze level if the player has chosen too
     if (renderLevel1) {
@@ -610,7 +623,7 @@ void main_layer::on_render() {
     if (showMusicHUD) {
         renderMusicHud();
     }
-
+    mThrowable.renderPickupHUD(mTextManager);
     mFriendlyNpc.renderChoiceHUD(mTextManager);
 }
 
@@ -623,6 +636,39 @@ void main_layer::on_event(engine::event& event) {
             engine::render_command::toggle_wireframe();
         }
     }
+}
+
+void main_layer::onCollisions() {
+
+    // collision between throwable and enemy
+    bool throwableEnemyCollision = false;
+    for (auto& collisionObject : mThrowable.object()->collision_objects()) {
+        if (collisionObject->getName() == "enemy")
+            throwableEnemyCollision= true;
+    }
+    if(mThrowable.object()->is_colliding() && throwableEnemyCollision ) {
+        throwableEnemyCollision = false;
+        int i = 0;
+        for (auto & enemy : mEnemies) {
+            for (auto& collisionObject : enemy.object()->collision_objects()) {
+                if (collisionObject->getName() == "throwable") {
+                    throwableEnemyCollision = true;
+                }
+            }
+            if(enemy.object()->is_colliding() && throwableEnemyCollision) {
+                enemy.die();
+            }
+            i++;
+        }
+    }
+    ////
+
+    // Collision Between throwable and boss
+
+
+    // collision with player and boss's bullet
+
+
 }
 
 // check whether the ball bounces and play the noise. // commented out as would like to implement it using a collision system

@@ -25,7 +25,8 @@ public:
 	void initialise();
 	void setRandomPosition() const;
 	void setRandomScale();
-	void setEnemyType();
+    void setFixedScale();
+    void setEnemyType();
 	void setEnemyType(int type);
 	void onUpdate(const engine::timestep& timestep, Player& player);
 	engine::ref<engine::game_object> object() const { return mObject; }
@@ -57,6 +58,8 @@ private:
 	float maxSize = 0.f;
 	float agroRange = 5.f;
 	State mState = State::IDLE;
+
+	bool isDead = false;
 
 	AnimationHandler animationHandler = {};
 

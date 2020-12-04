@@ -105,6 +105,8 @@ namespace engine
 		// bind the object's textures if there are any
 		void bind_textures();
 
+
+		// for collisions
 		bool is_colliding() const { return s_colliding; }
 		std::vector<engine::ref<engine::game_object>> collision_objects() const { return m_collision_objects; }
 

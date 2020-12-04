@@ -24,7 +24,7 @@ void Boss::initialise() {
     mObject->set_position(glm::vec3(0.f, 0.5f, 15.f));
 
     //Bullet shape
-    const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(0.25f, 0.1f, 0.1f);
+    const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(0.25f, 0.1f, 0.25f);
     const std::vector<engine::ref<engine::texture_2d>> bulletTextures = {
         engine::texture_2d::create("assets/textures/metal_bullet.jpg", false)
     };

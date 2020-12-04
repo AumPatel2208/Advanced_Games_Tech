@@ -79,8 +79,6 @@ namespace engine
 
 		void delete_shape(btRigidBody* rigid_body);
 
-		void myTickCallback(btDynamicsWorld* dynamicsWorld, btScalar timeStep, const std::vector<engine::ref<engine::game_object>>& game_objects);
-
 		/// \brief Fields
 		btBroadphaseInterface*	m_overlapping_pair_cache;
 		btCollisionDispatcher*	m_dispatcher;

@@ -26,7 +26,8 @@ public:
     void updateCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
     void jump();
     void setHasStarted(bool _hasStarted);
-
+    bool getIsSwordSwinging() const { return isSwordSwinging; }
+    void decreaseStamina(const float& amount);
 
     // bool getToInteractWithNpc() const { return toInteractWithNpc; }
     // void setToInteractWithNpc(bool interactWithNpc) { this->toInteractWithNpc = interactWithNpc; }
