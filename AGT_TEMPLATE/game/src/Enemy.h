@@ -27,7 +27,7 @@ public:
 	void setRandomScale();
 	void setEnemyType();
 	void setEnemyType(int type);
-	void onUpdate(const engine::timestep& timestep, const Player& player);
+	void onUpdate(const engine::timestep& timestep, Player& player);
 	engine::ref<engine::game_object> object() const { return mObject; }
 
 	void turn(float angle);

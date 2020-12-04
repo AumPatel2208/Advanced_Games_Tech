@@ -39,8 +39,8 @@ private:
     bool toPLayDialogue = false;
     bool inChoice = false;
     bool toRenderChoiceHUD = false;
-    // bool interactionCooldown = true;
-
+    bool isInRange = false;
+    
 
 
     float mDialogueTimer = 0.f;

@@ -85,4 +85,9 @@ private:
 
     engine::orthographic_camera       m2DCamera; 
     engine::perspective_camera        m3DCamera;
+
+
+	// Point lighting
+	engine::PointLight m_pointLight;
+	uint32_t num_point_lights = 1;
 };

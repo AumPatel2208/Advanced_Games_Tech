@@ -37,12 +37,12 @@ void FriendlyNPC::initialise() {
     mAudioManager->load_sound("assets/audio/npc_dialogue/greeting_2.mp3", engine::sound_type::event, "greeting_2");
     mAudioManager->load_sound("assets/audio/npc_dialogue/yes_1.mp3", engine::sound_type::event, "yes_1");
     mAudioManager->load_sound("assets/audio/npc_dialogue/yes_2.mp3", engine::sound_type::event, "yes_2");
-    mAudioManager->load_sound("assets/audio/npc_dialogue/yes_3.1.mp3", engine::sound_type::event, "yes_3");
+    mAudioManager->load_sound("assets/audio/npc_dialogue/yes_3.mp3", engine::sound_type::event, "yes_3");
     mAudioManager->load_sound("assets/audio/npc_dialogue/yes_4.mp3", engine::sound_type::event, "yes_4");
     mAudioManager->load_sound("assets/audio/npc_dialogue/no_1.mp3", engine::sound_type::event, "no_1");
     mAudioManager->load_sound("assets/audio/npc_dialogue/no_2.mp3", engine::sound_type::event, "no_2");
-    mAudioManager->load_sound("assets/audio/npc_dialogue/no_3.1.mp3", engine::sound_type::event, "no_3");
-    //                                                                                                         NO 4
+    mAudioManager->load_sound("assets/audio/npc_dialogue/no_3.mp3", engine::sound_type::event, "no_3");
+    mAudioManager->load_sound("assets/audio/npc_dialogue/no_4.mp3", engine::sound_type::event, "no_4");
     mAudioManager->load_sound("assets/audio/npc_dialogue/end_1.mp3", engine::sound_type::event, "end_1");
     mAudioManager->load_sound("assets/audio/npc_dialogue/end_2.mp3", engine::sound_type::event, "end_2");
 }
@@ -55,7 +55,6 @@ void FriendlyNPC::onRender(const std::shared_ptr<engine::shader>& texturedLighti
     npcTransform = glm::scale(npcTransform, glm::vec3(0.3f));
 
     engine::renderer::submit(texturedLightingShader, npcTransform, mObject);
-
 }
 
 void FriendlyNPC::renderChoiceHUD(engine::ref<engine::text_manager>& textManager) {
@@ -66,9 +65,11 @@ void FriendlyNPC::renderChoiceHUD(engine::ref<engine::text_manager>& textManager
 
         // Render text
         const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-        textManager->render_text(text_shader, yesText, 500.f, 100.f + 100.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
-        textManager->render_text(text_shader, noText, 500.f, 25.f + 100.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
-        // textManager->render_text(text_shader, text, 10.f, (float)engine::application::window().height() - 25.f,1.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+        textManager->render_text(text_shader, yesText, 1000.f, 100.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+        textManager->render_text(text_shader, noText, 1000.f, 25.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+    }else if(isInRange) {
+        const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
+        textManager->render_text(text_shader, "'E' to interact", 950.f, 175.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
     }
 }
 
@@ -76,14 +77,9 @@ void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {
     if (toPLayDialogue)
         playDialogue();
 
-
     // Handling the timer for the cooldown of the dialogue button
     if (mDialogueTimer > 0.f) {
         mDialogueTimer -= static_cast<float>(timestep);
-        // interactionCooldown = false;
-        // if(mDialogueTimer<=0) {
-        // interactionCooldown = true;
-        // }
     }
 
 
@@ -91,7 +87,7 @@ void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {
 
     // distance relative to player
     const auto distanceFromPLayer = mObject->position() - player.object()->position();
-    const auto isInRange = distanceFromPLayer.x < 2.f && distanceFromPLayer.z < 2.f && distanceFromPLayer.x > -2.f && distanceFromPLayer.z > -2.f;
+    isInRange = distanceFromPLayer.x < 1.5f && distanceFromPLayer.z < 1.5f && distanceFromPLayer.x > -1.5f && distanceFromPLayer.z > -1.5f;
     if (isInRange) {
         if (mDialogueTimer <= 0) {
             if (engine::input::key_pressed(engine::key_codes::KEY_E)) {

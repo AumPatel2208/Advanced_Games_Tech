@@ -62,6 +62,10 @@ main_layer::main_layer()
     mDirectionalLight.DiffuseIntensity = 0.6f;
     mDirectionalLight.Direction = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
 
+    // Point light
+    m_pointLight.Position = glm::vec3(0.f, 2.f, 0.f);
+
+
     // set color texture unit
     std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->bind();
     std::dynamic_pointer_cast<engine::gl_shader>(animatedMeshShader)->set_uniform("gColorMap", 0);
@@ -214,6 +218,7 @@ main_layer::main_layer()
 
     mGameObjects.push_back(mTerrain);
     mGameObjects.push_back(mBall);
+    // mGameObjects.push_back(mPlayer.object());
 
     //m_game_objects.push_back(m_cow);
     //m_game_objects.push_back(m_tree);
@@ -245,6 +250,7 @@ void main_layer::on_update(const engine::timestep& timestep) {
         mPlayer.onUpdate(timestep); // Update the player object
 
         mPlayer.updateCamera(m3DCamera, timestep); // update the camera in the player object
+        m_pointLight.Position = glm::vec3(mPlayer.object()->position().x, mPlayer.object()->position().y + 1.f, mPlayer.object()->position().z); // update the point light based on the players position.
 
         // Put the player into the level that already exists
         if (engine::input::key_pressed(engine::key_codes::KEY_P)) {
@@ -493,6 +499,12 @@ void main_layer::on_render() {
     // Set up some of the scene's parameters in the shader
     std::dynamic_pointer_cast<engine::gl_shader>(texturedLightingShader)->set_uniform(
         "gEyeWorldPos", m3DCamera.position());
+
+    // Point Light
+    std::dynamic_pointer_cast<engine::gl_shader>(texturedLightingShader) -> set_uniform("gNumPointLights", (int)num_point_lights);
+    m_pointLight.submit(texturedLightingShader, 0);
+    /////
+
 
     // Position the skybox centred on the player and render it
     glm::mat4 skyboxTransform(1.0f);

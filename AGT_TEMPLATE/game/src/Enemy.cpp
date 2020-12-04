@@ -68,7 +68,7 @@ void Enemy::setEnemyType(const int type) {
     enemyType = type;
 }
 
-void Enemy::onUpdate(const engine::timestep& timestep, const Player& player) {
+void Enemy::onUpdate(const engine::timestep& timestep, Player& player) {
 
     // turn towards the player
     const glm::vec3 v = player.object()->position() - mObject->position();
@@ -80,7 +80,7 @@ void Enemy::onUpdate(const engine::timestep& timestep, const Player& player) {
 
     //check distance from player and stop walking and shout at the player (2.f currently)
     auto d = mObject->position() - player.object()->position();
-
+    const int randomNo = rand() % 100;
     switch (mState) {
 
     case State::IDLE:
@@ -121,6 +121,14 @@ void Enemy::onUpdate(const engine::timestep& timestep, const Player& player) {
     case State::ATTACK:
         turn(theta);
         attack();
+        // add 5% chance of the player getting hit
+        if(randomNo<=5) {
+            player.getHit(5);
+        }
+
+        if (glm::length(d) >= 2.f) {
+            mState = State::WALK;
+        }
         break;
     case State::DIE: break;
     default: break;

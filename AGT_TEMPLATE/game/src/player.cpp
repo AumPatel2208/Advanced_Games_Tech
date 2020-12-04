@@ -35,6 +35,7 @@ void Player::initialise() {
     objectProperties.bounding_shape = mSkinnedMesh->size() / 2.f * objectProperties.scale.x;
 
     mObject = engine::game_object::create(objectProperties);
+    
 
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
     mObject->set_position(glm::vec3(0.f, 0.5f, 10.f));
@@ -281,6 +282,10 @@ void Player::walk(const bool& forward, const engine::timestep& timestep) {
     mObject->set_position(glm::vec3(mObject->position().x, height / 2, mObject->position().z));
     mObject->set_rotation_amount(atan2(mObject->forward().x, mObject->forward().z));
 
+}
+
+void Player::getHit(const int& damage) {
+    mHealthPoints -= damage;
 }
 
 void Player::turn(float angle) const {

@@ -6,6 +6,10 @@ BillboardManager::BillboardManager() {
     explosion.height = 2.f;
     explosion.width = 2.f;
     mBillboards.push_back(explosion);
+
+
+    sfx blood1{};
+    // blood1.billboard = billboard::create("assets/textures/blood_1.png", )
 }
 
 BillboardManager::~BillboardManager() {}

@@ -18,10 +18,11 @@ public:
     void idle(engine::timestep timestep);
     void walk(const bool& forward, const engine::timestep& timestep);
     engine::ref<engine::game_object> object() const { return mObject; }
+    void getHit(const int& damage);
     void turn(float angle) const;
     void updateCamera3rdPerson(engine::perspective_camera& camera, const engine::timestep& timeStep);
     void update1stPersonCamera(engine::perspective_camera& camera, const engine::timestep& timestep) const;
-    void menuUpdateCamera(engine::perspective_camera& camera, const engine::timestep& timestep, bool hasStarted);
+    // void menuUpdateCamera(engine::perspective_camera& camera, const engine::timestep& timestep, bool hasStarted);
     void updateCamera(engine::perspective_camera& camera, const engine::timestep& timestep);
     void jump();
     void setHasStarted(bool _hasStarted);
