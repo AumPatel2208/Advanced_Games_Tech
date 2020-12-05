@@ -179,8 +179,11 @@ float Enemy::calculateSpeed(bool isWalking) const {
 // Turn Enemy towards the player
 void Enemy::turn(float angle) {
     // mObject->set_rotation_amount(angle);
-    
-    mObject->set_angular_velocity(glm::vec3(0.f, 2*angle, 0.f));
+    if (angle != 0) {
+        mObject->set_angular_velocity(glm::vec3(0.f, 2 * angle, 0.f));
+    }else {
+        mObject->set_angular_velocity(glm::vec3(0.f));
+    }
 
     angleFromPlayer = angle;
 }

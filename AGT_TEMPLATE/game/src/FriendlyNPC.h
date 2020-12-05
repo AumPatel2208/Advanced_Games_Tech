@@ -28,6 +28,7 @@ public:
     engine::ref<engine::game_object> object() { return mObject; }
     // void setMObject(const engine::ref<engine::game_object>& mObject) { this->mObject = mObject; }
 
+    void setIsBossBeaten(bool isBossBeaten) { this->isBossBeaten = isBossBeaten; }
 
 private:
     engine::ref<engine::game_object> mObject;

@@ -74,6 +74,9 @@ void FriendlyNPC::renderChoiceHUD(engine::ref<engine::text_manager>& textManager
 }
 
 void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {
+
+    
+
     if (toPLayDialogue)
         playDialogue();
 

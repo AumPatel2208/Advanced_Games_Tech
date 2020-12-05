@@ -16,6 +16,9 @@ main_layer::main_layer()
     //engine::input::anchor_mouse(true);
     engine::application::window().hide_mouse_cursor();
 
+    // get random seed
+    srand(time(NULL));
+
     // Load File
     std::ifstream inFile;
     // inFile.open("C:\\Users\\Aum\\Documents\\Games Tech\\Coursework\\AGT_TEMPLATE\\game\\assets\\text\\menu.txt");
@@ -191,22 +194,22 @@ main_layer::main_layer()
     //initialise the primitives
     initialiseTetrahedrons(1.f, 3);
 
-    // Octahedron
-    const engine::ref<engine::Octahedron> octahedron = engine::Octahedron::createDefaultVertices(3.f);
-    const std::vector<engine::ref<engine::texture_2d>> octaTextures = {
-        engine::texture_2d::create("assets/textures/green_brick.png", false)
-        // Load Sea Rock Texture. sourced from https://3dtextures.me/
-    };
-    engine::game_object_properties octaProps;
-
-    float positionX = (rand() % 100) / 10.f;
-    float positionZ = (rand() % 100) / 10.f;
-    octaProps.position = {positionX, 10.f, positionZ};
-    octaProps.meshes = {octahedron->mesh()};
-    octaProps.textures = octaTextures;
-    auto octObject = engine::game_object::create(octaProps);
-    mOctahedron = octObject;
-
+    // // Octahedron
+    // const engine::ref<engine::Octahedron> octahedron = engine::Octahedron::createDefaultVertices(3.f);
+    // const std::vector<engine::ref<engine::texture_2d>> octaTextures = {
+    //     engine::texture_2d::create("assets/textures/green_brick.png", false)
+    //     // Load Sea Rock Texture. sourced from https://3dtextures.me/
+    // };
+    // engine::game_object_properties octaProps;
+    //
+    // float positionX = (rand() % 100) / 10.f;
+    // float positionZ = (rand() % 100) / 10.f;
+    // octaProps.position = {positionX, 10.f, positionZ};
+    // octaProps.meshes = {octahedron->mesh()};
+    // octaProps.textures = octaTextures;
+    // auto octObject = engine::game_object::create(octaProps);
+    // mOctahedron = octObject;
+    //
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
         glm::vec3((float)engine::application::window().width() / 500, 0.1f,
@@ -230,6 +233,7 @@ main_layer::main_layer()
     for (auto& enemy : mEnemies) {
         mGameObjects.push_back(enemy.object());
     }
+    // mGameObjects.push_back(mBoss.object());
     //m_game_objects.push_back(m_cow);
     //m_game_objects.push_back(m_tree);
     //m_game_objects.push_back(m_pickup);
@@ -256,6 +260,11 @@ void main_layer::on_update(const engine::timestep& timestep) {
 
         //Free flowing camera uses the keys - UJHK. Uncomment line below, and comment out mPLayer.updateCamera
         // m3DCamera.on_update(timestep);
+
+        if (mBoss.getIsDead()) {
+            mFriendlyNpc.setIsBossBeaten(true);
+            // mFriendlyNpc.progress();
+        }
 
         mPlayer.onUpdate(timestep); // Update the player object
 
@@ -592,7 +601,7 @@ void main_layer::on_render() {
 
     // render the primitives into the scene
     renderTetrahedrons(texturedLightingShader);
-    engine::renderer::submit(texturedLightingShader, mOctahedron);
+    // engine::renderer::submit(texturedLightingShader, mOctahedron);
 
 
     glm::mat4 treeTransform(1.0f);
@@ -696,6 +705,8 @@ void main_layer::on_render() {
     mFriendlyNpc.renderChoiceHUD(mTextManager);
 
 
+    if (hasStarted)
+        mBoss.onRenderHUD(mTextManager);
     mPlayer.render2d(texturedLightingShader, m2DCamera);
 
 }
@@ -735,7 +746,27 @@ void main_layer::onCollisions() {
                 i++;
             }
         }
+
+        // check boss and throwable collisions
+        const auto distance = glm::length(throwable.object()->position() - mBoss.object()->position());
+        if (distance <= 1.f) {
+            // if it is being thrown and not just static on the ground
+            if (throwable.getThrowTimer() > 0) {
+                mBoss.getHit(25);
+            }
+        }
     }
+
+    //check distance from player and check the collision between sword and throwable AND the boss enemy and afflict damage 
+    const auto d = mBoss.object()->position() - mPlayer.object()->position();
+
+
+    if (glm::length(d) < 1.5f) {
+        if (mPlayer.getIsSwordSwinging()) {
+            mBoss.getHit(10);
+        }
+    }
+
 
     // // Remove after throwable is all put in the list
     // bool throwableEnemyCollision = false;

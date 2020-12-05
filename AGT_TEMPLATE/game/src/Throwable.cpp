@@ -9,7 +9,8 @@ Throwable::Throwable() {
     // throwableTextures.push_back(engine::texture_2d::create("assets/textures/yellow_brick.png", false));
     // throwableTextures.push_back(engine::texture_2d::create("assets/textures/grey_brick.png", false));
 
-    mSize = static_cast<float>(rand() % 100 + 1) / 100.f;
+    // mSize = static_cast<float>(rand() % 100 + 1) / 100.f;
+    mSize = 0.35f;
     calculateSpeed();
 
    
@@ -118,7 +119,7 @@ void Throwable::throwObject(const glm::vec3& playerForward) {
     // use physics and direction to send the object flying (Enable gravity again)
     mObject->set_mass(0);
     mObject->set_velocity(glm::vec3(mThrowSpeed*4)*glm::normalize(playerForward));
-    throwTimer = 3.f;
+    throwTimer = 2.f;
 }
 
 void Throwable::pickUpObject(const glm::vec3& playerPosition) {
