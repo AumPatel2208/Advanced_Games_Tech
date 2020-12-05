@@ -134,7 +134,11 @@ main_layer::main_layer()
     //Initialise the boss
     mBoss.initialise();
 
-    mThrowable.initialise();
+    // mThrowable.initialise();
+
+    auto tempThrowable = Throwable{};
+    tempThrowable.initialise();
+    mThrowables.emplace_back(tempThrowable);
 
     // Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
     const std::vector<engine::ref<engine::texture_2d>> terrainTextures = {
@@ -203,7 +207,6 @@ main_layer::main_layer()
     auto octObject = engine::game_object::create(octaProps);
     mOctahedron = octObject;
 
- 
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
         glm::vec3((float)engine::application::window().width() / 500, 0.1f,
@@ -220,8 +223,11 @@ main_layer::main_layer()
     mGameObjects.push_back(mTerrain);
     mGameObjects.push_back(mBall);
     // mGameObjects.push_back(mPlayer.object());
-    mGameObjects.push_back(mThrowable.object());
-    for (auto & enemy : mEnemies) {
+    // mGameObjects.push_back(mThrowable.object());
+    for (auto& throwable : mThrowables) {
+        mGameObjects.push_back(throwable.object());
+    }
+    for (auto& enemy : mEnemies) {
         mGameObjects.push_back(enemy.object());
     }
     //m_game_objects.push_back(m_cow);
@@ -233,8 +239,8 @@ main_layer::main_layer()
     // create a text manager used to display text onto the screen
     mTextManager = engine::text_manager::create();
 
-	// m_billboard = billboard::create("assets/textures/Explosion.tga", 4, 5, 16);
-    
+    // m_billboard = billboard::create("assets/textures/Explosion.tga", 4, 5, 16);
+
     // fixed animation for the player
     // have not implemented the animation manager for the player
     // mPlayer.object()->animated_mesh()->switch_animation(1);
@@ -262,17 +268,26 @@ void main_layer::on_update(const engine::timestep& timestep) {
             renderLevel1 = true;
         }
 
-        mThrowable.onUpdate(timestep, mPlayer);
+        updateThrowables(timestep);
 
-        // if (engine::input::key_pressed(engine::key_codes::KEY_F)) {
-        //     m_billboard->activate(glm::vec3(0.f, 5.f, -10.f), 4.f, 4.f);
-        // }
-        // m_billboard->on_update(timestep);
+        if (interactionTimer > 0) {
+            interactionTimer -= timestep;
+        }
+
+        if (engine::input::key_pressed(engine::key_codes::KEY_Q) && interactionTimer <= 0) {
+            auto tempThrowable = Throwable{};
+            tempThrowable.initialise();
+            tempThrowable.object()->set_position(glm::vec3(mPlayer.object()->position().x, mPlayer.object()->position().y + 0.5f, mPlayer.object()->position().z - 2.f));
+            mThrowables.push_back(tempThrowable);
+            mPhysicsManager->add_physical_object(mThrowables.back().object(), mPhysicsManager->get_dynamics_world());
+            mGameObjects.push_back(mThrowables.back().object());
+            interactionTimer = 2.f;
+        }
 
         mBillboardManager.onUpdate(timestep);
         updateEnemies(timestep);
-        updatePrimitives(timestep);
-        mBoss.onUpdate(timestep, mPlayer,mBillboardManager);
+        updateTetrahedrons(timestep);
+        mBoss.onUpdate(timestep, mPlayer, mBillboardManager);
     }
     else {
         // set the camera on the menu if the game hasn't started yet
@@ -346,6 +361,23 @@ void main_layer::updateEnemies(const engine::timestep& timestep) {
     for (auto& enemy : mEnemies) {
         enemy.onUpdate(timestep, mPlayer); // update the enemy
     }
+
+    // Removing a dead enemy
+    std::vector<Enemy>::iterator toRemove = mEnemies.end();
+
+    // ReSharper disable once CppMsExtBindingRValueToLvalueReference
+    for (auto& i = mEnemies.begin(); i != mEnemies.end(); i++) {
+        // std::cout << *i << std::endl;
+        if (i->getIsDead()) {
+            // toRemove.push_back(i);
+            toRemove = i;
+        }
+    }
+    if (toRemove != mEnemies.end()) {
+        mEnemies.erase(toRemove);
+        mPlayer.increaseScore(10);
+    }
+
 }
 
 // render the list of enemies into the scene
@@ -358,7 +390,6 @@ void main_layer::renderEnemies(const std::shared_ptr<engine::shader>& animatedMe
 
 // initialise the primitive shapes. pass through a scale and the amount of primitives to create.
 void main_layer::initialiseTetrahedrons(const float& scale, const int& amount) {
-    // std::vector<glm::vec3> tetVerticies;
     std::vector<engine::ref<engine::texture_2d>> tetraTextures;
     tetraTextures.push_back(engine::texture_2d::create("assets/textures/green_brick.png", false));
     tetraTextures.push_back(engine::texture_2d::create("assets/textures/yellow_brick.png", false));
@@ -376,60 +407,91 @@ void main_layer::initialiseTetrahedrons(const float& scale, const int& amount) {
         float positionY = (rand() % 100) / 10.f;
         tetraProps.position = {positionX, 0.5f, positionY};
         tetraProps.meshes = {tetrahedron->mesh()};
+        std::string name;
         if ((i + 1) % 3 == 0) {
             tetraProps.textures = {tetraTextures.at(2)};
+            name = "health";
         }
         else if ((i + 1) % 2 == 0) {
             tetraProps.textures = {tetraTextures.at(1)};
+            name = "stamina";
         }
         else {
             tetraProps.textures = {tetraTextures.at(0)};
+            name = "stamina_recovery";
         }
 
 
         auto tetraObject = engine::game_object::create(tetraProps);
+        tetraObject->setName(name);
         mTetrahedrons.push_back(tetraObject);
     }
 
 
 }
 
-// update the primitives
-void main_layer::updatePrimitives(const engine::timestep& timestep) {
+// update the tetrahedrons
+void main_layer::updateTetrahedrons(const engine::timestep& timestep) {
 
 
     const auto rotationSpeed = 1.5f;
     const auto scaleSpeed = 0.5f;
 
-    for (auto& primitive : mTetrahedrons) {
-        primitive->set_rotation_amount(primitive->rotation_amount() + timestep * rotationSpeed);
+    for (auto& tetrahedron : mTetrahedrons) {
+        tetrahedron->set_rotation_amount(tetrahedron->rotation_amount() + timestep * rotationSpeed);
 
 
-        if (primitive->scale().x > maxPrimSize) {
+        if (tetrahedron->scale().x > maxPrimSize) {
             isPrimGrowing = false;
         }
-        else if (primitive->scale().x < minPrimSize) {
+        else if (tetrahedron->scale().x < minPrimSize) {
             isPrimGrowing = true;
         }
 
 
         if (isPrimGrowing) {
-            primitive->set_scale(primitive->scale() + timestep * scaleSpeed);
+            tetrahedron->set_scale(tetrahedron->scale() + timestep * scaleSpeed);
         }
         else {
-            primitive->set_scale(primitive->scale() - timestep * scaleSpeed);
+            tetrahedron->set_scale(tetrahedron->scale() - timestep * scaleSpeed);
         }
 
-        auto d = primitive->position() - mPlayer.object()->position();
-        if (glm::length(d) <= primitive->scale().x) {
+        // Tetrahedron collision with the player
+        auto d = tetrahedron->position() - mPlayer.object()->position();
+        if (glm::length(d) <= tetrahedron->scale().x) {
             float randX = (rand() % 100) / 10.f;
             float randZ = (rand() % 100) / 10.f;
 
             const auto randPosition = glm::vec3(randX, 0.5f, randZ);
-            primitive->set_position(randPosition);
+
+            if (tetrahedron->getName() == "health") {
+                mPlayer.healthPickup();
+            }
+            else if (tetrahedron->getName() == "stamina") {
+                mPlayer.staminaPickup();
+            }
+            else if (tetrahedron->getName() == "stamina_recovery") {
+                mPlayer.staminaRecoveryPickup();
+            }
+
+            mPlayer.increaseScore(5);
+
+            tetrahedron->set_position(randPosition);
         }
 
 
+    }
+}
+
+void main_layer::updateThrowables(const engine::timestep& timestep) {
+    for (auto& throwable : mThrowables) {
+        throwable.onUpdate(timestep, mPlayer);
+    }
+}
+
+void main_layer::renderThrowables(std::shared_ptr<engine::shader> shader) {
+    for (auto& throwable : mThrowables) {
+        throwable.onRender(shader);
     }
 }
 
@@ -471,7 +533,7 @@ void main_layer::renderMusicHud() {
 void main_layer::changeMusicTrack() { }
 
 // render the primitives
-void main_layer::renderPrimitives(const std::shared_ptr<engine::shader> shader) {
+void main_layer::renderTetrahedrons(const std::shared_ptr<engine::shader> shader) {
     for (auto& primitive : mTetrahedrons) {
         engine::renderer::submit(shader, primitive);
     }
@@ -513,7 +575,7 @@ void main_layer::on_render() {
         "gEyeWorldPos", m3DCamera.position());
 
     // Point Light
-    std::dynamic_pointer_cast<engine::gl_shader>(texturedLightingShader) -> set_uniform("gNumPointLights", (int)num_point_lights);
+    std::dynamic_pointer_cast<engine::gl_shader>(texturedLightingShader)->set_uniform("gNumPointLights", (int)num_point_lights);
     m_pointLight.submit(texturedLightingShader, 0);
     /////
 
@@ -529,7 +591,7 @@ void main_layer::on_render() {
     engine::renderer::submit(texturedLightingShader, mTerrain);
 
     // render the primitives into the scene
-    renderPrimitives(texturedLightingShader);
+    renderTetrahedrons(texturedLightingShader);
     engine::renderer::submit(texturedLightingShader, mOctahedron);
 
 
@@ -549,7 +611,8 @@ void main_layer::on_render() {
     mFriendlyNpc.onRender(texturedLightingShader);
     mBoss.onRender(texturedLightingShader, m3DCamera);
     mPlayer.onRenderStaticItems(texturedLightingShader);
-    mThrowable.onRender(texturedLightingShader);
+    // mThrowable.onRender(texturedLightingShader);
+    renderThrowables(texturedLightingShader);
 
     // render the maze level if the player has chosen too
     if (renderLevel1) {
@@ -617,14 +680,24 @@ void main_layer::on_render() {
 
 
     // Render 2d elements
-    
+
     // Render hud elements
     mPlayer.renderHud(mTextManager);
     if (showMusicHUD) {
         renderMusicHud();
     }
-    mThrowable.renderPickupHUD(mTextManager);
+
+    // mThrowable.renderPickupHUD(mTextManager);
+
+    for (auto& throwable : mThrowables) {
+        throwable.renderPickupHUD(mTextManager);
+    }
+
     mFriendlyNpc.renderChoiceHUD(mTextManager);
+
+
+    mPlayer.render2d(texturedLightingShader, m2DCamera);
+
 }
 
 // Display a wireframe view when TAB is pressed
@@ -641,26 +714,50 @@ void main_layer::on_event(engine::event& event) {
 void main_layer::onCollisions() {
 
     // collision between throwable and enemy
-    bool throwableEnemyCollision = false;
-    for (auto& collisionObject : mThrowable.object()->collision_objects()) {
-        if (collisionObject->getName() == "enemy")
-            throwableEnemyCollision= true;
-    }
-    if(mThrowable.object()->is_colliding() && throwableEnemyCollision ) {
-        throwableEnemyCollision = false;
-        int i = 0;
-        for (auto & enemy : mEnemies) {
-            for (auto& collisionObject : enemy.object()->collision_objects()) {
-                if (collisionObject->getName() == "throwable") {
-                    throwableEnemyCollision = true;
+    for (auto& throwable : mThrowables) {
+        bool throwableEnemyCollision = false;
+        for (auto& collisionObject : throwable.object()->collision_objects()) {
+            if (collisionObject->getName() == "enemy")
+                throwableEnemyCollision = true;
+        }
+        if (throwable.object()->is_colliding() && throwableEnemyCollision && throwable.getThrowTimer() > 0) {
+            throwableEnemyCollision = false;
+            int i = 0;
+            for (auto& enemy : mEnemies) {
+                for (auto& collisionObject : enemy.object()->collision_objects()) {
+                    if (collisionObject->getName() == "throwable") {
+                        throwableEnemyCollision = true;
+                    }
                 }
+                if (enemy.object()->is_colliding() && throwableEnemyCollision) {
+                    enemy.die();
+                }
+                i++;
             }
-            if(enemy.object()->is_colliding() && throwableEnemyCollision) {
-                enemy.die();
-            }
-            i++;
         }
     }
+
+    // // Remove after throwable is all put in the list
+    // bool throwableEnemyCollision = false;
+    // for (auto& collisionObject : mThrowable.object()->collision_objects()) {
+    //     if (collisionObject->getName() == "enemy")
+    //         throwableEnemyCollision = true;
+    // }
+    // if (mThrowable.object()->is_colliding() && throwableEnemyCollision && mThrowable.getThrowTimer()>0) {
+    //     throwableEnemyCollision = false;
+    //     int i = 0;
+    //     for (auto& enemy : mEnemies) {
+    //         for (auto& collisionObject : enemy.object()->collision_objects()) {
+    //             if (collisionObject->getName() == "throwable") {
+    //                 throwableEnemyCollision = true;
+    //             }
+    //         }
+    //         if (enemy.object()->is_colliding() && throwableEnemyCollision) {
+    //             enemy.die();
+    //         }
+    //         i++;
+    //     }
+    // }
     ////
 
     // Collision Between throwable and boss

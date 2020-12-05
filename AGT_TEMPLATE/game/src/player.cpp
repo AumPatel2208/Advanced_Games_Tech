@@ -35,7 +35,7 @@ void Player::initialise() {
     objectProperties.bounding_shape = mSkinnedMesh->size() / 2.f * objectProperties.scale.x;
 
     mObject = engine::game_object::create(objectProperties);
-    
+
 
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
     mObject->set_position(glm::vec3(0.f, 0.5f, 10.f));
@@ -68,6 +68,7 @@ void Player::initialise() {
     auto swordObject = engine::game_object::create(swordProps);
     mSword = swordObject;
 
+    m_cross_fade = cross_fade::create("assets/textures/Red.bmp", 2.0f, 1.6f, 0.9f);
 
     // assign the current mouse position as previous as it will be empty otherwise
 }
@@ -82,9 +83,18 @@ void Player::onRenderStaticItems(const std::shared_ptr<engine::shader>& textured
     engine::renderer::submit(texturedLightingShader, mSword);
 }
 
+void Player::render2d(const std::shared_ptr<engine::shader>& texturedLightingShader, engine::orthographic_camera camera) const {
+    engine::renderer::begin_scene(camera, texturedLightingShader);
+    m_cross_fade->on_render(texturedLightingShader);
+    engine::renderer::end_scene();
+}
+
 // call every game loop
 void Player::onUpdate(const engine::timestep& timestep) {
-    // idle(timestep);
+    m_cross_fade->on_update(timestep);
+    if (crossFadeTimer > 0)
+        crossFadeTimer -= timestep;
+
     if (hasStarted) {
         if (mTransitionCameraTimer > 0.f) {
             mTransitionCameraTimer -= static_cast<float>(timestep);
@@ -107,7 +117,6 @@ void Player::onUpdate(const engine::timestep& timestep) {
         // if (engine::input::key_pressed(engine::key_codes::KEY_E) && mDialogueTimer == 0.f) {
         //     toInteractWithNpc = true;
         // }
-
 
 
         // timer for jumping
@@ -180,39 +189,37 @@ void Player::onUpdate(const engine::timestep& timestep) {
             }
         }
 
-
-        // Move Forward if W is pressed
-        if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
-            // mObject->animated_mesh()->switch_animation(0);
-            walk(true, timestep);
-            mMovementTimer = 1.f;
-        }
-            // Move Back if S is pressed
-        else if (engine::input::key_pressed(engine::key_codes::KEY_S)) {
-            // mObject->animated_mesh()->switch_animation(0);
-            walk(false, timestep);
-            mMovementTimer = 1.f;
-        }
-
-        // Jump if Space is pressed
-        if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
-            jump();
-            mMovementTimer = 1.f;
-        }
-
-
-        // reduce stamina on mouse click
-        if (engine::input::mouse_button_pressed(0) && mStamina > 10.f) {
-            if (!isSwordSwinging) {
-                // mStamina -= 10.f;
-                // mStaminaRecoveryTimer = 1.f;
-                decreaseStamina(10);
-                isSwordSwinging = true;
-                mSwordSwingTimer = 0.5f;
+            // Move Forward if W is pressed
+            if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
+                // mObject->animated_mesh()->switch_animation(0);
+                walk(true, timestep);
+                mMovementTimer = 1.f;
             }
-        }
+            // Move Back if S is pressed
+            else if (engine::input::key_pressed(engine::key_codes::KEY_S)) {
+                // mObject->animated_mesh()->switch_animation(0);
+                walk(false, timestep);
+                mMovementTimer = 1.f;
+            }
 
-     
+            // Jump if Space is pressed
+            if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
+                jump();
+                mMovementTimer = 1.f;
+            }
+
+
+            // reduce stamina on mouse click
+            if (engine::input::mouse_button_pressed(0) && mStamina > 10.f) {
+                if (!isSwordSwinging) {
+                    // mStamina -= 10.f;
+                    // mStaminaRecoveryTimer = 1.f;
+                    decreaseStamina(10);
+                    isSwordSwinging = true;
+                    mSwordSwingTimer = 0.5f;
+                }
+            }
+
         if (mStaminaRecoveryTimer <= 0.f && mStamina < 100.f) {
             mStamina += mStaminaRecoverySpeed * timestep;
         }
@@ -239,6 +246,15 @@ void Player::onUpdate(const engine::timestep& timestep) {
             }
         }
 
+
+        if (pickupTimer > 0) {
+            pickupTimer -= timestep;
+            if (pickupTimer <= 0) {
+                mStaminaRecoverySpeed = mDefaultStaminaRecoverySpeed;
+            }
+        }
+
+
         // turn the sword
         // // turn towards the player
         // const glm::vec3 v = mSword->position() - mObject->position();
@@ -256,16 +272,27 @@ void Player::swingSword(const engine::timestep& timestep) {
 
 void Player::renderHud(engine::ref<engine::text_manager>& textManager) const {
     if (hasStarted) {
+        if (isAlive) {
+            // form the text
+            const auto healthText = "Health: " + std::to_string(mHealthPoints);
+            const auto staminaText = "Stamina: " + std::to_string(static_cast<int>(mStamina));
+            const auto scoreText = "Score: " + std::to_string(mScore);
 
-        // form the text
-        const auto healthText = "Health: " + std::to_string(mHealthPoints);
-        const auto staminaText = "Stamina: " + std::to_string(static_cast<int>(mStamina));
+            // Render text
+            const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
+            textManager->render_text(text_shader, healthText, 10.f, 25.f, 1.f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+            textManager->render_text(text_shader, staminaText, 10.f, 100.f, 1.f, glm::vec4(0.f, 1.f, 0.f, 1.f));
+            textManager->render_text(text_shader, scoreText, 10.f, (float)engine::application::window().height() - 50.f, 1.f, glm::vec4(1.f, 0.f, 0.5f, 1.f));
 
-        // Render text
-        const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-        textManager->render_text(text_shader, healthText, 10.f, 25.f, 1.f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-        textManager->render_text(text_shader, staminaText, 10.f, 100.f, 1.f, glm::vec4(0.f, 1.f, 0.f, 1.f));
-        // textManager->render_text(text_shader, text, 10.f, (float)engine::application::window().height() - 25.f,1.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+            if (pickupTimer > 0) {
+                textManager->render_text(text_shader, "* stamina up", 10.f, 175.f, 0.5f, glm::vec4(0.f, 1.f, 0.f, 1.f));
+            }
+        }else {
+            const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
+
+            textManager->render_text(text_shader, "GAME OVER", (float)engine::application::window().width()/2-100.f, (float)engine::application::window().height()/2-75.f, 2.f, glm::vec4(1.f, 0.f, 0.1f, 1.f));
+
+        }
     }
 }
 
@@ -288,6 +315,14 @@ void Player::walk(const bool& forward, const engine::timestep& timestep) {
 
 void Player::getHit(const int& damage) {
     mHealthPoints -= damage;
+    if (crossFadeTimer <= 0) {
+        m_cross_fade->activate();
+        crossFadeTimer = 0.5f;
+    }
+    if(mHealthPoints<=0) {
+        mHealthPoints = 0;
+        isAlive = false;
+    }
 }
 
 void Player::turn(float angle) const {
@@ -309,6 +344,23 @@ void Player::setHasStarted(const bool _hasStarted) {
 void Player::decreaseStamina(const float& amount) {
     mStamina -= amount;
     mStaminaRecoveryTimer = 1.f;
+}
+
+void Player::staminaPickup() {
+    mStamina += 50.f;
+}
+
+void Player::healthPickup() {
+    mHealthPoints += 50;
+}
+
+void Player::staminaRecoveryPickup() {
+    mStaminaRecoverySpeed = 30.f;
+    pickupTimer = 10.f;
+}
+
+void Player::increaseScore(const int amount) {
+    mScore += amount;
 }
 
 void Player::updateCamera3rdPerson(engine::perspective_camera& camera, const engine::timestep& timeStep) {

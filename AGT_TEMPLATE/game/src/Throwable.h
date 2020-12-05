@@ -28,13 +28,15 @@ public:
 
 	void calculateSpeed();
 
+	float getThrowTimer() const { return throwTimer; }
+
 private:
 	engine::ref<engine::game_object>	mObject;
 	float angleFromPlayer = {};
 	float mThrowSpeed{ 1.f };
 	float mSize = 1.f;
 	float pickupRange = 5.f;
-
+	float throwTimer = 0.f;
 	//timer
 	float interactTimer = 0.f;
 	

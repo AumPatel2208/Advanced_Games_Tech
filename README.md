@@ -3,8 +3,10 @@
 ## top priority
 - [ ] change the enemy models to lower poly to reduce file size, as will not have enough space later on
 
-
 ## TO-DO
+
+- [ ] test power ups
+  - [ ] add a stamina recovery power up notification
 
 
 ## Checklist
@@ -61,7 +63,7 @@
     - [ ] change HP/AP when bell is interacted with
   - [ ] it could just up the difficulty and reset you to the beginning of the level
     - [ ] can be attached to a stop watch showing how long the player has survived in the game.
-    
+  
 - [ ] Physics
   - [ ] boss bullet have a bullet drop
   - [ ] have power ups bounce around until collected by the player

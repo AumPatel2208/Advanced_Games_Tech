@@ -44,12 +44,12 @@ void Throwable::renderPickupHUD(engine::ref<engine::text_manager>& textManager) 
     if (toRenderPickup) {
         if (isActive) {
             const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-            textManager->render_text(text_shader, "(Click) Throw", 700.f, 100.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+            textManager->render_text(text_shader, "(Right Click) Throw", 600.f, 100.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
             textManager->render_text(text_shader, "Y/U size", 700.f, 175.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
         }
         else {
             const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-            textManager->render_text(text_shader, "(Click) Pickup", 700.f, 100.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+            textManager->render_text(text_shader, "(Right Click) Pickup", 600.f, 100.f, 1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
         }
     }
 }
@@ -68,14 +68,19 @@ void Throwable::onUpdate(const engine::timestep& timestep, Player& player) {
     if (isActive) {
         //turn Apply angular velocity
         pickUpObject(player.object()->position());
+        player.decreaseStamina(0.1f);
     }
 
     if(interactTimer>0) {
         interactTimer -= timestep;
     }
 
+    if(throwTimer>0) {
+        throwTimer-= timestep;
+    }
+
     if (interactTimer <= 0) {
-        if (engine::input::mouse_button_pressed(0)) {
+        if (engine::input::mouse_button_pressed(1)) {
             if (isActive) {
                 throwObject(player.object()->forward());
                 isActive = false;
@@ -113,6 +118,7 @@ void Throwable::throwObject(const glm::vec3& playerForward) {
     // use physics and direction to send the object flying (Enable gravity again)
     mObject->set_mass(0);
     mObject->set_velocity(glm::vec3(mThrowSpeed*4)*glm::normalize(playerForward));
+    throwTimer = 3.f;
 }
 
 void Throwable::pickUpObject(const glm::vec3& playerPosition) {

@@ -21,11 +21,16 @@ public:
     void updateEnemies(const engine::timestep& timestep);
     void renderEnemies(const std::shared_ptr<engine::shader>& animatedMeshShader);
     void initialiseTetrahedrons(const float& scale, const int& amount);
-    void updatePrimitives(const engine::timestep& timestep);
+    void updateTetrahedrons(const engine::timestep& timestep);
+
+
+	void updateThrowables(const engine::timestep& timestep);
+	void renderThrowables(std::shared_ptr<engine::shader> shader);
+
     void loadMusic();
     void renderMusicHud();
     void changeMusicTrack();
-    void renderPrimitives(std::shared_ptr<engine::shader> shader);
+    void renderTetrahedrons(std::shared_ptr<engine::shader> shader);
     void menuCamera();
     void on_render() override;
     void on_event(engine::event& event) override;
@@ -41,6 +46,8 @@ private:
 	bool renderLevel1 = false;
     bool showMusicHUD = false;
 
+	float interactionTimer = 0.f;
+
 
     std::string							menuText;
 
@@ -55,7 +62,8 @@ private:
 	engine::ref<engine::game_object>	mOctahedron{};
 	engine::ref<engine::material>		mMaterial{};
 
-	Throwable mThrowable{};
+	// Throwable mThrowable{};
+	std::vector<Throwable> mThrowables{};
 
 	Player								mPlayer{};
 	engine::ref<engine::game_object>	mMenu{};

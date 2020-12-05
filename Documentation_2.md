@@ -50,13 +50,13 @@ The keyboard and mouse controls are shown in the help menu.
 
 I have created **2** primitive objects: Octahedron, Bullet Shape.
 
-The Octahedron has 8 sides(8 triangles) and 6 vertices; when creating an instance of the shape, you only have to pass in the scale of the octahedron, and it will create the shape accordingly.
+The **Octahedron** has 8 sides(8 triangles) and 6 vertices; when creating an instance of the shape, you only have to pass in the scale of the octahedron, and it will create the shape accordingly.
 
-<ADD USES AND TRANSFORMATIONS>
+The player can pick up the octahedron and throw it at any enemy to kill them, this object interacts with bullet physics. The player can choose to scale the octahedron up or down which will change scale appropriately but also effect the velocity respectively.
 
-The Bullet Shape has 14 triangles and 9 vertices; when creating an instance of the shape, you pass in the height, the width, and the length of the shape, creating that shape accordingly.
+The **Bullet Shape** has 14 triangles and 9 vertices; when creating an instance of the shape, you pass in the height, the width, and the length of the shape, creating that shape accordingly. I have used this shape as both the bullet for the boss enemy and the sword for the player, this works as I can change the thickness and it greatly changes the appearance.
 
-<ADD USES AND TRANSFORMATIONS>
+When the player swings the sword, it is transformed to the left on a timer, and then goes back into its resting position. The sword does not rotate around the player but it has collisions around the player, so even if the enemy is behind the player, the sword will kill them.
 
 <ADD ANOTHER PRIMITIVE AND CHANGE FIRST LINE>
 
@@ -72,11 +72,11 @@ I have added 2 music tracks into the game (I wrote the music selection menu code
 
 I have implemented a few HUD elements into the game.
 
-**Health**: The health shows up as text as a number value from 0-100, and is changed as the player gets damaged.
+**Health**: The health shows up as text as a number value from 0-100, and is changed as the player gets damaged. (It can go above 100 when power ups are picked up)
 
-**Stamina**: this number goes down as the player takes actions to attack. The recharge is set on a timer. this is also a value from 0-100.
+**Stamina**: this number goes down as the player takes actions to attack. The recharge is set on a timer. this is also a value from 0-100. (It can go above 100 when power ups are picked up)
 
-**'E to Interact'**: this shows up when there is something the player can interact with within the scene. Example the FriendlyNPC can be interacted with and this will show up when in range. This is changed to `1. yes, 2. no` when the player has to answer to the NPC.
+**'E to Interact'**: this shows up when there is something the player can interact with within the scene. Example the `FriendlyNPC` can be interacted with and this will show up when in range. This is changed to `1. yes, 2. no` when the player has to answer to the NPC.
 
 ### Part 2
 
@@ -136,6 +136,8 @@ I have used the billboard special effect,
 
 > Add a telekinises/half life style pickup and throw mechanic to damage enemies
 
+There is physics applied to the octahedron and the minotaur enemies. The player can right click when close enough to the octahedron, and then press right click to pick up the object, then the player can press `Y` and `U` to decrease and increase the size of the octahedron respectively. The velocity at which the octahedron is thrown is dependent on the size of the shape (the bigger it is, it has a bigger bounding box for collisions but a slower speed and therefore shorter range).
+
 
 
 #### NPC and AI
@@ -148,19 +150,35 @@ I have used the billboard special effect,
 
 
 
+The minotaur enemies have 4 main states they can be in: IDLE, WALK, SHOUT, ATTACK. 
+
+
+
+> Show Finite state machine of the minotaur enemy
+
+
+
 > add some sort of flocking algorithm for multiple enemies maybe
 
 
 
 #### Gameplay elements
 
-> Health pickup
+The tetrahedrons are power ups, the type of power up they are can be seen by the texture on the tetrahedron:
 
-> fast stamina recovery
+Health Pickup: increases health by 50 points.
 
-> score multiplier
+Stamina Pickup: Increases stamina by 50 points.
 
+Stamina Recovery: increases the stamina recovery speed for a few seconds after picking it up. There is an indicator on top of the stamina to tell you that the stamina recovery speed is active.
 
+The players score is increased when he kills an enemy, or picks up any power ups.
+
+The player can kill an enemy by throwing an octahedron at it or by swinging their sword when they are close by the enemy.
+
+There is a quest you can finish with the friendly NPC after the player kills the boss.
+
+I have not implemented a proper game over screen, so the player can still move around and play around after the game is over, I think this is alright for now as it allows to play around with everything in the game while testing.
 
 ## Reflection
 

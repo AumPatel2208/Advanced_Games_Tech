@@ -2,6 +2,7 @@
 #include <engine.h>
 
 #include "AnimationHandler.h"
+#include "cross_fade.h"
 #include "glm/gtx/rotate_vector.hpp"
 
 class Player {
@@ -12,6 +13,7 @@ public:
     void initialise();
     void moveIntoLevel1() const;
     void onRenderStaticItems(const std::shared_ptr<engine::shader>& texturedLightingShader) const;
+    void render2d(const std::shared_ptr<engine::shader>& texturedLightingShader, engine::orthographic_camera camera) const;
     void onUpdate(const engine::timestep& timestep);
     void swingSword(const engine::timestep& timestep);
     void renderHud(engine::ref<engine::text_manager>& textManager) const;
@@ -32,20 +34,32 @@ public:
     // bool getToInteractWithNpc() const { return toInteractWithNpc; }
     // void setToInteractWithNpc(bool interactWithNpc) { this->toInteractWithNpc = interactWithNpc; }
     void setDialogueTimer(const float& timer) { mDialogueTimer = timer; }
+    void staminaPickup();
+    void healthPickup();
+    void staminaRecoveryPickup();
+
+    // void resetPlayer();
+
+    void increaseScore(const int amount);
 
 private:
     float mSpeed{ 0.f };
     float mJumpTimer;
     float mMovementTimer;
     float mStaminaRecoveryTimer = 0.f;
+    float pickupTimer = 0.f;
+    float crossFadeTimer = 0.f;
     float mSwordSwingTimer = 0.f; // timer for the sword swing
     bool isSwordSwinging = false;
     bool hasStarted = false;
+    bool isAlive = true;
 
     // HUD values
     int mHealthPoints = 100;// health points
+    int mScore = 0;
     float mStamina = 100.f; // stamina points
     float mStaminaRecoverySpeed = 10.f;
+    float mDefaultStaminaRecoverySpeed = 10.f;
 
     engine::ref<engine::game_object> mObject;
     engine::ref<engine::game_object> mSword;
@@ -72,8 +86,7 @@ private:
     float ySensitivity3rdPerson = 2.f;
     float ySensitivity1stPerson = 5.f;
 
-
-    
+    engine::ref<cross_fade>							m_cross_fade{};
 
     AnimationHandler animationHandler ={};
 

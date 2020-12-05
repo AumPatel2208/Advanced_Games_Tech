@@ -40,6 +40,8 @@ public:
 	float calculateSpeed(bool isWalking) const;
 	void shout();
 
+	bool& getIsDead() { return isDead; }
+
 	// Enemy Types based on integer
 	static const int TYPE_WALKER = 1;
 	static const int TYPE_SHOUTER = 2;
