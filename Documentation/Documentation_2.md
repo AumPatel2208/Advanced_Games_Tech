@@ -190,12 +190,6 @@ The minotaur enemies have 4 main states they can be in: IDLE, WALK, SHOUT, ATTAC
 
 
 
-##### Minotaur Enemy
-
-Below is a finite state machine of the Minotaur enemy. It is quite simplistic. Inside of the shout there is a check to see whether the enemy has already scaled up, if not it will scale itself up.
-
-![](C:\Users\Aum\Documents\Games Tech\Coursework\Documentation\FSM_Enemy.jpg)
-
 
 
 #### Gameplay elements
