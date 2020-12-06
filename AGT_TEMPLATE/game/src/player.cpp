@@ -9,6 +9,7 @@ Player::Player() {
     mMovementTimer = 0.f;
     mStaminaRecoveryTimer = 0.f;
     mSpeed = 1.f;
+    mAudioManager = engine::audio_manager::instance();
 }
 
 
@@ -24,7 +25,7 @@ void Player::initialise() {
     mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
     mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/jump.dae");
     mSkinnedMesh->LoadAnimationFile("assets/models/animated/mannequin/standard_run.dae");
-    mSkinnedMesh->switch_root_movement(false);
+    // mSkinnedMesh->switch_root_movement(false);
 
     engine::game_object_properties objectProperties;
     objectProperties.animated_mesh = mSkinnedMesh;
@@ -47,8 +48,8 @@ void Player::initialise() {
     animationHandler.setIdleAnim(1);
     animationHandler.setAnimJump(2);
     animationHandler.setAnimRun(3);
-    std::cout << "Anim Walk" << animationHandler.animWalk() << "\n";
-    std::cout << "Anim Idle" << animationHandler.animIdle() << "\n";
+    // std::cout << "Anim Walk" << animationHandler.animWalk() << "\n";
+    // std::cout << "Anim Idle" << animationHandler.animIdle() << "\n";
     animationHandler.nextAnimation(animationHandler.animIdle());
 
     prevMousePosition = engine::input::mouse_position();
@@ -69,6 +70,13 @@ void Player::initialise() {
     mSword = swordObject;
 
     m_cross_fade = cross_fade::create("assets/textures/Red.bmp", 2.0f, 1.6f, 0.9f);
+
+    //Audio
+    mAudioManager->init();
+    // Load the dialogue
+    mAudioManager->load_sound("assets/audio/grunt.mp3", engine::sound_type::event, "grunt");
+    mAudioManager->load_sound("assets/audio/game_over.mp3", engine::sound_type::event, "game_over");
+
 
     // assign the current mouse position as previous as it will be empty otherwise
 }
@@ -118,6 +126,9 @@ void Player::onUpdate(const engine::timestep& timestep) {
         //     toInteractWithNpc = true;
         // }
 
+        if(playGameOverTune==1) {
+            mAudioManager->play("game_over");
+        }
 
         // timer for jumping
         if (mJumpTimer > 0.f) {
@@ -284,6 +295,9 @@ void Player::renderHud(engine::ref<engine::text_manager>& textManager) const {
             textManager->render_text(text_shader, staminaText, 10.f, 100.f, 1.f, glm::vec4(0.f, 1.f, 0.f, 1.f));
             textManager->render_text(text_shader, scoreText, 10.f, (float)engine::application::window().height() - 50.f, 1.f, glm::vec4(1.f, 0.f, 0.5f, 1.f));
 
+            if(hasApple)
+                textManager->render_text(text_shader, "1 APPLE", 100.f, 175.f, 0.5f, glm::vec4(1.f, 0.f, 0.f, 1.f));
+
             if (pickupTimer > 0) {
                 textManager->render_text(text_shader, "* stamina up", 10.f, 175.f, 0.5f, glm::vec4(0.f, 1.f, 0.f, 1.f));
             }
@@ -302,7 +316,9 @@ void Player::idle(const engine::timestep timestep) {
 
 void Player::walk(const bool& forward, const engine::timestep& timestep) {
 
+    /*Comment the line below and uncomment the animRun one to see the other animation work, but the walk seems broken*/
     animationHandler.nextAnimation(animationHandler.animWalk());
+    // animationHandler.nextAnimation(animationHandler.animRun());
 
     if (forward)
         mObject->set_position(mObject->position() += mObject->forward() * mSpeed * static_cast<float>(timestep));
@@ -318,10 +334,16 @@ void Player::getHit(const int& damage) {
     if (crossFadeTimer <= 0) {
         m_cross_fade->activate();
         crossFadeTimer = 0.5f;
+        mAudioManager->play("grunt");
     }
     if(mHealthPoints<=0) {
         mHealthPoints = 0;
         isAlive = false;
+        
+        playGameOverTune += 1;
+        if(playGameOverTune>1) {
+            playGameOverTune = 2; // to prevent an overflow of a kind
+        }
     }
 }
 

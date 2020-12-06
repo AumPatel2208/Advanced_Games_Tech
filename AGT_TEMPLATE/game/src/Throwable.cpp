@@ -31,6 +31,7 @@ void Throwable::initialise() {
     octaProps.bounding_shape = glm::vec3(mSize);
     octaProps.restitution = 0.f;
     octaProps.mass = 1.f;
+    octaProps.textures = { engine::texture_2d::create("assets/textures/bullet.png", false) };
     mObject = engine::game_object::create(octaProps);
     mObject->setName("throwable");
 

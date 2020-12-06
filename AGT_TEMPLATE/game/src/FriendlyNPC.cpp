@@ -75,7 +75,9 @@ void FriendlyNPC::renderChoiceHUD(engine::ref<engine::text_manager>& textManager
 
 void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {
 
-    
+    if(dialoguePath == "end" &&dialogueNumber == 2) {
+        player.recieveApple();
+    }
 
     if (toPLayDialogue)
         playDialogue();
@@ -122,37 +124,11 @@ void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {
         toRenderChoiceHUD = false;
     }
 
+    
+
     if (!(dialogueNumber == 2 && dialoguePath == "greeting"))
         toRenderChoiceHUD = false;
 
-
-    //
-    // // Handling the timer for the cooldown of the dialogue button
-    // if (mDialogueTimer > 0.f) {
-    //     mDialogueTimer -= static_cast<float>(timestep);
-    //     const float scale = 1.f + timestep; // scalar factor when the enemy grows
-    //     player.setToInteractWithNpc(false);
-    // }
-    //
-    //
-    //
-    // // mObject->animated_mesh()->on_update(timestep);
-    //
-    // // distance relative to player
-    // const auto distanceFromPLayer = mObject->position() - player.object()->position();
-    // if (distanceFromPLayer.x < 2.f) {
-    //     if (player.getToInteractWithNpc() && mDialogueTimer <= 0) {
-    //         playDialogue();
-    //         progress();
-    //         mDialogueTimer = 3.f;
-    //         player.setToInteractWithNpc(false);
-    //     }
-    //     if(dialogueNumber==2 && dialoguePath=="greeting") {
-    //         toRenderChoiceHUD = true;
-    //     }
-    // }else {
-    //     toRenderChoiceHUD = false;
-    // }
 }
 
 void FriendlyNPC::playDialogue() const {
@@ -190,6 +166,7 @@ void FriendlyNPC::progress() {
 
     }
     else if (dialoguePath == "end" && isBossBeaten) {
+        
         if (dialogueNumber == 1) {
             dialogueNumber += 1;
         }

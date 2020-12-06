@@ -40,6 +40,8 @@ public:
 
     // void resetPlayer();
 
+    void recieveApple() { hasApple = true; }
+
     void increaseScore(const int amount);
 
 private:
@@ -53,6 +55,9 @@ private:
     bool isSwordSwinging = false;
     bool hasStarted = false;
     bool isAlive = true;
+    bool hasApple = false;
+
+    int playGameOverTune = 0; // used to only play it once
 
     // HUD values
     int mHealthPoints = 100;// health points
@@ -87,6 +92,7 @@ private:
     float ySensitivity1stPerson = 5.f;
 
     engine::ref<cross_fade>							m_cross_fade{};
+    engine::ref<engine::audio_manager> mAudioManager{};
 
     AnimationHandler animationHandler ={};
 

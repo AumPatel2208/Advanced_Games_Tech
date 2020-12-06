@@ -33,7 +33,7 @@ main_layer::main_layer()
     while (inFile >> x) {
         menuText = menuText + x;
     }
-    std::cout << menuText;
+    // std::cout << menuText;
     inFile.close();
 
 
@@ -324,11 +324,25 @@ void main_layer::on_update(const engine::timestep& timestep) {
 
     }
 
-    if (engine::input::key_pressed(engine::key_codes::KEY_M)) {
+    if (engine::input::key_pressed(engine::key_codes::KEY_M) && musicMenuTimer <= 0) {
         showMusicHUD = !showMusicHUD;
+        musicMenuTimer = 0.5f;
     }
 
-    if (showMusicHUD) {
+    if(musicMenuTimer>0) {
+        musicMenuTimer -= (float)timestep;
+    }
+
+    if(mBoss.isActive()) {
+        playBossMusic += 1;
+        if(playBossMusic ==1) {
+            mAudioManager->play(mMusicFileNames.at(0));
+        }else {
+            playBossMusic = 2;
+        }
+    }
+
+    if (showMusicHUD ) {
         if (engine::input::key_pressed(engine::key_codes::KEY_0)) {
             mAudioManager->stop_all();
         }
@@ -400,9 +414,12 @@ void main_layer::renderEnemies(const std::shared_ptr<engine::shader>& animatedMe
 // initialise the primitive shapes. pass through a scale and the amount of primitives to create.
 void main_layer::initialiseTetrahedrons(const float& scale, const int& amount) {
     std::vector<engine::ref<engine::texture_2d>> tetraTextures;
-    tetraTextures.push_back(engine::texture_2d::create("assets/textures/green_brick.png", false));
-    tetraTextures.push_back(engine::texture_2d::create("assets/textures/yellow_brick.png", false));
-    tetraTextures.push_back(engine::texture_2d::create("assets/textures/grey_brick.png", false));
+    // https://freestocktextures.com/texture/aerial-view-of-forest,1135.html
+    tetraTextures.push_back(engine::texture_2d::create("assets/textures/green_trees.png", false));
+    // https://freestocktextures.com/texture/green-bark-nature,188.html
+    tetraTextures.push_back(engine::texture_2d::create("assets/textures/green_bark.png", false));
+    // https://freestocktextures.com/texture/3d-abstract-construction,1146.html
+    tetraTextures.push_back(engine::texture_2d::create("assets/textures/red_abstract.png", false));
 
 
     maxPrimSize *= scale;
@@ -508,7 +525,7 @@ void main_layer::loadMusic() {
     const std::string path = "assets/audio/music/";
 
     for (const auto& file : std::filesystem::directory_iterator(path)) {
-        std::cout << file.path() << std::endl;
+        // std::cout << file.path() << std::endl;
         std::string name = file.path().string();
         name.erase(0, 19);
 

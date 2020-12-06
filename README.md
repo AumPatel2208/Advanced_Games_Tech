@@ -5,8 +5,8 @@
 
 ## TO-DO
 
-- [ ] test power ups
-  - [ ] add a stamina recovery power up notification
+- [x] test power ups
+  - [x] add a stamina recovery power up notification
 
 
 ## Checklist
@@ -14,7 +14,7 @@
 - [x] intro screen
   - [ ]? top down camera view pan into the gameplay view
   - [ ]? interactible buttons?
-- [ ] Primitive based objects [1/3]
+- [ ] Primitive based objects [2/3]
   - [ ] with multiple transformations
   - [ ] could have a power up move around the map/scale up and down, stay there for a bit and move around more afterwards
   - [ ] Power Up Effect
@@ -34,14 +34,14 @@
   - [ ] add a door?
     - [ ] door (opens and closes) - make it into a gate maybe, opened and closed with a switch
   - [ ] make multiple enemies with movement and different scales and animations
-  - [ ] NPC dialogue
+  - [x] NPC dialogue
     - [x] record dialogue
-    - [ ] Fix multiple calls of the dialogue
-    - [ ] add yes/no gui
+    - [x] Fix multiple calls of the dialogue
+    - [x] add yes/no gui
   - [ ] maybe torches
-- [ ] HUD
-  - [ ] Health
-  - [ ] Ammo/Stamina
+- [x] HUD
+  - [x] Health
+  - [x] Ammo/Stamina
 - [ ] Report
 - [ ] Source Code Design, organization and coding style
 - [ ] Light

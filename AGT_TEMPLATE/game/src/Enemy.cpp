@@ -215,7 +215,7 @@ void Enemy::attack() {
 // play the death animation and also will handle turning into a ragdoll
 void Enemy::die() {
     // animationHandler.nextAnimation(animationHandler.animDeath());
-    std::cout << "DEAD";
+    // std::cout << "DEAD";
     isDead = true;
 }
 

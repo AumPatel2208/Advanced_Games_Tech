@@ -47,6 +47,7 @@ private:
     bool showMusicHUD = false;
 
 	float interactionTimer = 0.f;
+	float musicMenuTimer = 0.f;
 
 
     std::string							menuText;
@@ -104,4 +105,6 @@ private:
 	// Point lighting
 	engine::PointLight m_pointLight;
 	uint32_t num_point_lights = 1;
+
+	int playBossMusic = 0;
 };

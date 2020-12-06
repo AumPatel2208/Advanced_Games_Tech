@@ -19,7 +19,8 @@ void Boss::initialise() {
     // npcProps.bounding_shape = npcMesh->size() / 2.f * npcProps.scale.x;
     // npcProps.textures = { engine::texture_2d::create("assets/models/animated/minotaur/Minotaur_diffuse.tga", false) };
     bossProps.type = 0;
-    bossProps.textures = {engine::texture_2d::create("assets/textures/metal_bullet_2.jpg", false)};
+    // https://opengameart.org/node/21067
+    bossProps.textures = {engine::texture_2d::create("assets/textures/antimony.png", false)};
     mObject = engine::game_object::create(bossProps);
     // mObject->set_scale(glm::vec3(3.f));
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
@@ -33,7 +34,8 @@ void Boss::initialise() {
     //Bullet shape
     const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(0.25f, 0.1f, 0.25f);
     const std::vector<engine::ref<engine::texture_2d>> bulletTextures = {
-        engine::texture_2d::create("assets/textures/metal_bullet.jpg", false)
+        // https://opengameart.org/content/details-for-damaged-and-dirty-textures
+        engine::texture_2d::create("assets/textures/bullet.png", false)
     };
     engine::game_object_properties bulletProps;
     bulletProps.position = {mObject->position().x, mObject->position().y + 1.f, mObject->position().z};
@@ -140,7 +142,7 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
             }
             break;
         case State::ATTACK: // attack state
-            std::cout << "Attack: ";
+            // std::cout << "Attack: ";
             mState = State::OPEN;
             // if (randomNo < 20) {
             //     //air attack
@@ -164,7 +166,7 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
 
             switch (mAttackState) {
             case AttackState::TRACKING_SHOT:
-                std::cout << "Tracking Shot \n";
+                // std::cout << "Tracking Shot \n";
 
                 mBullet->set_scale(glm::vec3(3.f));
                 bulletSpeed = 2.f;
@@ -178,7 +180,7 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
                 mState = State::ACTING;
                 break;
             case AttackState::FAST_SHOT:
-                std::cout << "Fast Shot \n";
+                // std::cout << "Fast Shot \n";
 
                 mBullet->set_scale(glm::vec3(1.f));
                 bulletSpeed = 4.f;
@@ -194,7 +196,7 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
                 break;
             case AttackState::AIR_ATTACK:
                 // not implemented, not enough time
-                std::cout << "Air Attack \n";
+                // std::cout << "Air Attack \n";
                 break;
             default:
                 break;

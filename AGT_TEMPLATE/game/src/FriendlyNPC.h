@@ -16,7 +16,7 @@ public:
     void onRender(const std::shared_ptr<engine::shader>& texturedLightingShader) const;
     void renderChoiceHUD(engine::ref<engine::text_manager>& textManager);
     void onUpdate(const engine::timestep& timestep, Player& player);
-
+    
     void playDialogue() const;
 
 
@@ -42,7 +42,7 @@ private:
     bool toRenderChoiceHUD = false;
     bool isInRange = false;
     
-
+    
 
     float mDialogueTimer = 0.f;
     std::string dialoguePath = "greeting";

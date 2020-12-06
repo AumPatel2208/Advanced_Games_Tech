@@ -46,9 +46,12 @@ public:
 
     static int randomNumber();
 
+
+
     //getters/setters
     engine::ref<engine::game_object> object() { return mObject; }
     bool getIsDead() const { return isDead; }
+    bool isActive() const { return mState != State::IDLE; }
 
 
 private:
