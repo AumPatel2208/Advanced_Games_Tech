@@ -5,7 +5,7 @@
 engine::BulletShape::BulletShape(std::vector<glm::vec3> vertices) {
     std::vector<glm::vec3> normals;
 
-    //normals
+    //normals for the different sides
     normals.push_back(glm::cross(vertices.at(0) - vertices.at(2), vertices.at(0) - vertices.at(4)));
     normals.push_back(glm::cross(vertices.at(0) - vertices.at(1), vertices.at(0) - vertices.at(2)));
     normals.push_back(glm::cross(vertices.at(0) - vertices.at(1), vertices.at(0) - vertices.at(3)));
@@ -21,6 +21,7 @@ engine::BulletShape::BulletShape(std::vector<glm::vec3> vertices) {
     normals.push_back(glm::cross(vertices.at(7) - vertices.at(8), vertices.at(7) - vertices.at(6)));
     normals.push_back(glm::cross(vertices.at(7) - vertices.at(5), vertices.at(7) - vertices.at(6)));
 
+    // create the triangles for the shape
     std::vector<engine::mesh::vertex> bulletShapeVertices
     {
         //position          Normal          tex Coord
@@ -96,10 +97,10 @@ engine::BulletShape::BulletShape(std::vector<glm::vec3> vertices) {
 
     const std::vector<uint32_t> bulletShapeIndices
     {
-        0, 1, 2, //front
-        3, 4, 5, //left
-        6, 7, 8, //Right
-        9, 10, 11, //Bottom
+        0, 1, 2, 
+        3, 4, 5, 
+        6, 7, 8, 
+        9, 10, 11,
         12, 13, 14,
         15, 16, 17,
         18, 19, 20,
@@ -124,6 +125,7 @@ std::shared_ptr<engine::BulletShape> engine::BulletShape::create(const std::vect
     return std::make_shared<engine::BulletShape>(vertices);
 }
 
+// used to create a shape by providing length, width and height through using a default set of vertices
 engine::ref<engine::BulletShape> engine::BulletShape::createDefaultVertices(const float& length, const float& width, const float& height) {
     std::vector<glm::vec3> bulletVertices;
 

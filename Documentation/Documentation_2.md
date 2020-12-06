@@ -4,7 +4,7 @@
 
 ## Description
 
-This is a 3rd/1st person game inspired from games like dark souls (or more akin to kings field); games like these have a focus on a combat system that focuses on stamina management. I have taken that concept and some what applied it to  my game where the character has a sword that they can swing around damaging enemies in range, swinging depletes the stamina of the player. When the stamina reaches 0, the player cannot swing their sword. The player can also pick up certain objects (Octahedrons) by right-clicking them, resizing them to change the velocity they are thrown at, and then right click again to throw them; the player can spawn these at will by pressing Q, these can be thrown at enemies to damage them. There are power ups in the shape of tetrahedrons, they have certain power-ups based on their type. Picking up power ups and killing enemies give you points.
+This is a 3rd/1st person game inspired from games like Dark Souls (or more akin to Kings Field); games like these have a focus on a combat system that is based on stamina management. I have taken that concept and some what applied it to  my game where the character has a sword that they can swing around damaging enemies in range, swinging depletes the stamina of the player. When the stamina reaches 0, the player cannot swing their sword. The player can also pick up certain objects (Octahedrons) by right-clicking them, resizing them to change the velocity they are thrown at, and then right click again to throw them; the player can spawn these at will by pressing Q, these can be thrown at enemies to damage them. There are power ups in the shape of tetrahedrons, they have certain power-ups based on their type. Picking up power ups and killing enemies give you points.
 
 ### Controls
 
@@ -22,51 +22,7 @@ This is a 3rd/1st person game inspired from games like dark souls (or more akin 
 >
 > `T` - Switch between 1st and 3rd person camera views.
 
-## Asset Listing/References
 
-#### Audio
-
-NPC Dialogue : self made, recorded with friends.
-
-Game Over: https://freesound.org/people/EVRetro/sounds/533034/
-
-Grunt: https://freesound.org/people/bennychico11/sounds/80438/
-
-Music: from https://freemusicarchive.org/music/Lobo_Loco
-
-Artist: **Lobo Loco**
-
-Songs: 
-- 1969 Moonwalk: https://freemusicarchive.org/music/Lobo_Loco/Mr_Tachyon/1969_Moonwalk_ID_1261
-- Silentfilm Part A: https://freemusicarchive.org/music/Lobo_Loco/around/silentfilm-part-a-id-1294mp3
-
-License Creative Commons: https://creativecommons.org/licenses/by-nc-nd/4.0/
-
-#### Models
-
-From Turbo Squid (TurboSquid 3D model License https://blog.turbosquid.com/turbosquid-3d-model-license/):
-
-Argon: https://www.turbosquid.com/3d-models/3d-humanoid-robot-character-1479200
-
-Rigged and Animated Minotaur: https://www.turbosquid.com/3d-models/character-minotaur-3ds/1044341
-
-Mannequin Figure: https://www.turbosquid.com/3d-models/free-mannequin-male-3d-model/1005602
-
-#### Textures  
-
-Sky Box : Artist: http://www.humus.name , License: http://creativecommons.org/licenses/by/3.0/
-
-Sea Rock Terrain: https://3dtextures.me/2020/08/24/sea-rock-001/
-
-Green trees: https://freestocktextures.com/texture/aerial-view-of-forest,1135.html
-
-Green bark: https://freestocktextures.com/texture/green-bark-nature,188.html
-
-Red Abstract:  https://freestocktextures.com/texture/3d-abstract-construction,1146.html
-
-Antimony: https://opengameart.org/node/21067
-
-Bullet: https://opengameart.org/content/details-for-damaged-and-dirty-textures
 
 ## Implementation
 
@@ -89,8 +45,6 @@ The player can pick up the octahedron and throw it at any enemy to kill them, th
 The **Bullet Shape** has 14 triangles and 9 vertices; when creating an instance of the shape, you pass in the height, the width, and the length of the shape, creating that shape accordingly. I have used this shape as both the bullet for the boss enemy and the sword for the player, this works as I can change the thickness and it greatly changes the appearance.
 
 When the player swings the sword, it is transformed to the left on a timer, and then goes back into its resting position. The sword does not rotate around the player but it has collisions around the player, so even if the enemy is behind the player, the sword will kill them.
-
-<ADD ANOTHER PRIMITIVE AND CHANGE FIRST LINE>
 
 I have changed both skybox and terrain textures. I have not had the opportunity to work on making the terrain texture repeat rather than stretch.
 
@@ -168,27 +122,46 @@ There is physics applied to the octahedron and the minotaur enemies. The player 
 
 #### NPC and AI
 
-There is a branching decision tree within the Friendly NPC which is used to implement a quest line with one branching option with different dialogue.
+##### Friendly NPC
+
+There is a branching decision tree within the Friendly NPC which is used to implement a quest line with one branching option with different dialogue. Interacting with it will provide different dialogue until the dialogue is exhausted. There is a branching path at the beginning of the interaction, where the NPC asks you "are you a hunter?" and you can answer yes or no to it, providing some different dialogue on the way to the end of the quest; where the NPC will give the player a reward item (an apple, currently it has no gameplay benefits, but who doesn't love an apple).
+
+<img src="C:\Users\Aum\Documents\Games Tech\Coursework\Documentation\Tree_FriendlyNPC.jpg" alt="Tree_FriendlyNPC" style="zoom:80%;" />
 
 
 
 
-
-> draw branching decision tree for the simple friendlyNPC dialogue
-
+<div style="page-break-after: always"></div>
 
 
-> Show the finite state machine for the boss enemy
+##### Boss Enemy
+
+The Boss enemy uses multiple types of states to manage the AI. There is the base state with the states: IDLE, MOVE, ATTACK, OPEN, ACTIVE, DIE; GET HIT does not need its separate state as it is simple reduction of heath points in collision, however if I was to further expand on this game, I would make it so that the player could stagger the enemy, in that case I would a get hit state to calculate when to stagger the enemy. Inside the MOVE State there are 2 more states, STRAFE (side to side movement) and DASH (backwards and forwards movement). There are similarly 2 states within the ATTACK State, these being FAST SHOT (faster/smaller bullet that does not track the player) and TRACKING SHOT (bigger/slower bullet that tracks the player). At any point in the states, if the player deals damage to the boss, the health points will be deducted appropriately based on weapon used.
+
+**Description of the states:**
+
+- **IDLE**: The boss enemy does not do anything until the player gets into range, activating the aggroed state (it will always move first to get started).
+- **MOVE**: Choose the movement the boss will do, with a 50:50 chance between STRAFE and DASH. After doing the action, go into the ACTIVE state.
+  - **STRAFE**: Move left or right (with a 50:50 chance between the direction).
+  - **DASH**: Move forwards or backwards (with a 50:50 chance between the direction).
+- **ATTACK**: Choose the attack state to go into, 60:40 chance between the FAST shot and TRACKING shot respectively. After doing the action, go into the ACTIVE state.
+  - **FAST SHOT**: Set the bullet's velocity to a fast amount, set the size and collision range of the bullet to a smaller value and set tracking to false, then shoot the bullet.
+  - **TRACKING SHOT**: Set the bullet's velocity to a slow amount amount, set the size and collision range of the bullet to a bigger value and set tracking true, then shoot the bullet
+- **ACTIVE**: Perform the action that had been activated in the previous state, there should be a set of timers in here to perform the action over an appropriate amount of time and then move to the OPEN State.
+- **OPEN**: this is a cool off period where the boss does nothing for 2 seconds, allowing an opportunity for the player to deal damage to it. It will then choose whether to change state to MOVE or ATTACK with a 55:45 chance respectively.
+- **DIE**: Every update loop, the health points of the boss will be checked, if these health points reach 0 or below, it will activate this state and deactivate the boss. This will also change the variable `isBossDefeated` in the player's class to true, so that he can finish the quest with the Friendly NPC.
+
+![FSM_Boss](C:\Users\Aum\Documents\Games Tech\Coursework\Documentation\FSM_Boss.jpg)
 
 
 
-The minotaur enemies have 4 main states they can be in: IDLE, WALK, SHOUT, ATTACK. 
+<div style="page-break-after: always"></div>
 
+##### Minotaur Enemy
 
+The minotaur enemies have 4 main states they can be in: IDLE, WALK, SHOUT, ATTACK. Below is a finite state machine of the Minotaur enemy. It is quite simplistic. Inside of the **SHOUT** there is a check to see whether the enemy has already scaled up, if not it will scale itself up. When the enemy reaches the **DIE** state, it will notify the parent (list of enemies) that this enemy has been defeated and can be destroyed from the game. The other states are fairly self explanatory, **HIT** will deal damage to player character, **WALK** will chase the player if he is within range.
 
-> Show Finite state machine of the minotaur enemy
-
-
+<img src="C:\Users\Aum\Documents\Games Tech\Coursework\Documentation\FSM_Enemy.jpg" alt="FSM_Enemy" style="zoom:80%;" />
 
 
 
@@ -218,8 +191,67 @@ There are many timers used in the background for multiple reasons, a few notable
 
 ## Reflection
 
-
+I have learnt a lot about many different systems within games, and how using simple techniques such as timers, you can provide a lot of game play value to the player. I read a bit of `Artificial Intelligence for Games by Ian Millington and John Funge` to get some interesting insight on how to implement different types AI for games and how they differ from academic AI that we are learning about in other modules at University. I find it interesting that using simple techniques such as finite state machines you can create quite compelling enemies by adding depth to the states and adding a number of states.
 
 I had different ideas of the boss enemy flying in the air, and hovering there, for this I would've set the upwards velocity to something greater than 9.8 and then it would come rest at 9.8 to hover. I was not able to implement physics into the boss enemy as it was breaking multiple things such as the rotation problem with the minotaur, and the weird movement that can be seen in the minotaur.
 
+I am glad I could implement the bullet physics system, even if I did not get it to work with many object, the ability to pick up and throw certain object and change the size to alter the velocity to throw them at is very interesting game play wise as it provides some freedom on how the player goes about defeating enemies, keeping variety. Expanding on this idea with having many interactable objects with physics would be a very nice addition; also having some sort of limitation of how many objects they can create at will (as of now the player can create as many Octahedrons as they want (within the systems technical limitations)) would provide a nice game play loop of picking up and storing different objects in their inventory to use/throw, this can have interesting choice on the players behalf of being able to throw every item, including health packs or keys to areas and such. 
+
 I also had the idea of having the bullet fired by the enemy affected by physics so that when the player throws the octahedron at the bullet it could deviate its trajectory hence avoiding the player, I was not able to implement this due to time constraints.
+
+I had some issues on implementing the physics system deep into the progress of the game, as it messed up how the enemies rotate to face the player and such, where I did not have enough time to dedicate to ironing the flaws out. If I had implemented the physics from the start I do not think this would've been much of an issue as everything would be built on top of it. I attempted to implement physics to the player and the boss enemy however it had many issues so I removed them, implementing collisions based on distance from each other.
+
+Given more time, I would've liked to create a maze like level with torches for lighting and collisions against the walls with all objects. Enemies would be placed such that it would provide a fair challenge to the player but also teach the game play mechanics before being introduced to the boss.
+
+For collisions between game objects, I added a variable called `name` into the `game_object` class that made it so I was able to reference game objects by what they are to check collisions. Inspect game object class to see this.
+
+I added a Billboard manager that I did not get time to fully utilize, this would provide me with easy scalability if I were to add more animated billboards into the game.
+
+## Asset Listing/References
+
+#### Audio
+
+NPC Dialogue : self produced, recorded with friends. Used Audacity to record and edit the audio.  I wrote a little silly script and we jumped on an audio call to record the dialogue and play around with different voices.
+
+Game Over: https://freesound.org/people/EVRetro/sounds/533034/
+
+Grunt: https://freesound.org/people/bennychico11/sounds/80438/
+
+Music: from https://freemusicarchive.org/music/Lobo_Loco
+
+Artist: **Lobo Loco**
+
+Songs: 
+
+- 1969 Moonwalk: https://freemusicarchive.org/music/Lobo_Loco/Mr_Tachyon/1969_Moonwalk_ID_1261
+- Silentfilm Part A: https://freemusicarchive.org/music/Lobo_Loco/around/silentfilm-part-a-id-1294mp3
+
+License Creative Commons: https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+#### Models
+
+Level_1: Created this model in Blender, by taking a Plane and manipulating it in different ways, I then used the sculpting tools in Blender to make it look more unique than a boxy room adding different angles to the model.
+
+From Turbo Squid (TurboSquid 3D model License https://blog.turbosquid.com/turbosquid-3d-model-license/):
+
+Argon: https://www.turbosquid.com/3d-models/3d-humanoid-robot-character-1479200
+
+Rigged and Animated Minotaur: https://www.turbosquid.com/3d-models/character-minotaur-3ds/1044341
+
+Mannequin Figure: https://www.turbosquid.com/3d-models/free-mannequin-male-3d-model/1005602
+
+#### Textures  
+
+Sky Box : Artist: http://www.humus.name , License: http://creativecommons.org/licenses/by/3.0/
+
+Sea Rock Terrain: https://3dtextures.me/2020/08/24/sea-rock-001/
+
+Green trees: https://freestocktextures.com/texture/aerial-view-of-forest,1135.html
+
+Green bark: https://freestocktextures.com/texture/green-bark-nature,188.html
+
+Red Abstract:  https://freestocktextures.com/texture/3d-abstract-construction,1146.html
+
+Antimony: https://opengameart.org/node/21067
+
+Bullet: https://opengameart.org/content/details-for-damaged-and-dirty-textures

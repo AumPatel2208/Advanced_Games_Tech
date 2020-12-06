@@ -171,11 +171,10 @@ posz = front
 
 Milestone 1 = (86/100) * 0.25 = 21.5%
 
-Milestone 2 = (??/100) * 0.85 = 
+Milestone 2 = (??/100) * 0.75 = 
 
-minimum 48.5% (scaled) = 58 marks / 100 in milestone 2
-
-21.5% + (58/100)*0.85 = 70.8%
+- 0.215+ (0.66)*0.75 = 0.71 = 71%
+- minimum required 66/100 marks in milestone 2
 
 
 

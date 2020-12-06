@@ -4,25 +4,16 @@
 
 // Constructor
 Throwable::Throwable() {
-    // std::vector<engine::ref<engine::texture_2d>> throwableTextures;
-    // throwableTextures.push_back(engine::texture_2d::create("assets/textures/green_brick.png", false));
-    // throwableTextures.push_back(engine::texture_2d::create("assets/textures/yellow_brick.png", false));
-    // throwableTextures.push_back(engine::texture_2d::create("assets/textures/grey_brick.png", false));
-
-    // mSize = static_cast<float>(rand() % 100 + 1) / 100.f;
-    mSize = 0.35f;
-    calculateSpeed();
-
-   
-
+    mSize = 0.35f; // set a fixed size when first initialised
+    calculateSpeed(); // calculate the speed based on the size
 }
-
 
 Throwable::~Throwable() {}
 
 
 void Throwable::initialise() {
     // float radius = 0.5f
+    // initailise the throwbale object based on the octahedron shape
     engine::ref<engine::Octahedron> octahedronShape = engine::Octahedron::createDefaultVertices(mSize);
     engine::game_object_properties octaProps;
     octaProps.position = { 0.f, 5.f, 0.f };
@@ -33,15 +24,16 @@ void Throwable::initialise() {
     octaProps.mass = 1.f;
     octaProps.textures = { engine::texture_2d::create("assets/textures/bullet.png", false) };
     mObject = engine::game_object::create(octaProps);
-    mObject->setName("throwable");
+    mObject->setName("throwable"); // set the name to a throwable
 
 }
 
-
+// render the object
 void Throwable::onRender(const std::shared_ptr<engine::shader>& texturedLightingShader) const {
     engine::renderer::submit(texturedLightingShader, mObject);
 }
 
+// render the up to interact with the player.
 void Throwable::renderPickupHUD(engine::ref<engine::text_manager>& textManager) {
     if (toRenderPickup) {
         if (isActive) {
@@ -58,6 +50,7 @@ void Throwable::renderPickupHUD(engine::ref<engine::text_manager>& textManager) 
 
 void Throwable::onUpdate(const engine::timestep& timestep, Player& player) {
 
+    // calculate distance from the player
     auto d = mObject->position() - player.object()->position();
     auto distanceFromPlayer = glm::length(d);
     if (isInRange(distanceFromPlayer)) {
@@ -68,15 +61,18 @@ void Throwable::onUpdate(const engine::timestep& timestep, Player& player) {
 
     //Turn the object with the player
     if (isActive) {
-        //turn Apply angular velocity
+        // turn Apply angular velocity
+        // move the object with the player
         pickUpObject(player.object()->position());
         player.decreaseStamina(0.1f);
     }
 
+    // timer to provide a space between interacting with the objects with button inputs (required to avoid the issue of multiple click in a short time frame)
     if(interactTimer>0) {
         interactTimer -= timestep;
     }
 
+    // timer used to tell that the object is still in the air being thrown.
     if(throwTimer>0) {
         throwTimer-= timestep;
     }
@@ -95,6 +91,7 @@ void Throwable::onUpdate(const engine::timestep& timestep, Player& player) {
             interactTimer = 0.5f;
         }
         else if (engine::input::key_pressed(engine::key_codes::KEY_U)) {
+            // scale the object up
             if (isActive) {
                 mSize += 0.1f;
                 mObject->set_scale(glm::vec3(mSize));
@@ -104,6 +101,7 @@ void Throwable::onUpdate(const engine::timestep& timestep, Player& player) {
             }
         }
         else if (engine::input::key_pressed(engine::key_codes::KEY_Y)) {
+            // scale the object down 
             if (isActive) {
                 mSize -= 0.1f;
                 mObject->set_scale(glm::vec3(mSize));
@@ -129,9 +127,11 @@ void Throwable::pickUpObject(const glm::vec3& playerPosition) {
 }
 
 bool Throwable::isInRange(const float distanceFromPlayer) {
+    // will return true if the player is in range of the object to pick it up
     return (distanceFromPlayer <= 1.f);
 }
 
 void Throwable::calculateSpeed() {
+    // calculate the velocity at which the object will be thrown
     mThrowSpeed = 1 / mSize;
 }

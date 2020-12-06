@@ -130,9 +130,10 @@ void Enemy::onUpdate(const engine::timestep& timestep, Player& player) {
         walk(timestep, player);
         break;
 
-    case State::SHOUT:
+    case State::SHOUT: // shout and turn
         turn(theta);
         shout();
+        // state will be changed to attack after the animation for shouting has finished
         break;
 
     case State::ATTACK:
@@ -140,14 +141,15 @@ void Enemy::onUpdate(const engine::timestep& timestep, Player& player) {
         attack();
         // add 5% chance of the player getting hit
         if(randomNo<=5) {
-            player.getHit(5);
+            player.getHit(5); // do 5hp damage to the player
         }
 
+        // walk if the player is too far away to hit
         if (glm::length(d) >= 2.f) {
             mState = State::WALK;
         }
         break;
-    case State::DIE: break;
+    case State::DIE: break; // unimplemented as no space to add the death animation
     default: break;
     }
 
@@ -160,7 +162,7 @@ void Enemy::onUpdate(const engine::timestep& timestep, Player& player) {
             mObject->set_scale(mObject->scale() *= (1.f + timestep));
         if (mShoutTimer <= 0.f) {
             // toAttack = true;
-            mState = State::ATTACK;
+            mState = State::ATTACK; // set the state to attack after shouting has finished
         }
     }
 
@@ -179,7 +181,7 @@ float Enemy::calculateSpeed(bool isWalking) const {
 // Turn Enemy towards the player
 void Enemy::turn(float angle) {
     // mObject->set_rotation_amount(angle);
-    if (angle != 0) {
+    if (angle != 0.f) {
         mObject->set_angular_velocity(glm::vec3(0.f, 2 * angle, 0.f));
     }else {
         mObject->set_angular_velocity(glm::vec3(0.f));
@@ -188,6 +190,7 @@ void Enemy::turn(float angle) {
     angleFromPlayer = angle;
 }
 
+// play the idle animation and set the velocity to 0
 void Enemy::idle() {
     animationHandler.nextAnimation(animationHandler.animIdle());
     mObject->set_velocity(glm::vec3(0.f));
@@ -202,7 +205,7 @@ void Enemy::walk(engine::timestep timestep, const Player& player) {
     const glm::vec3 directionVector = glm::normalize(player.object()->position() - mObject->position());
 
     // move the game object
-    // mObject->set_position(mObject->position() += directionVector * glm::vec3(timestep) * calculateSpeed(true));
+    // mObject->set_position(mObject->position() += directionVector * glm::vec3(timestep) * calculateSpeed(true)); // old method of moving
     mObject->set_velocity(directionVector * 2.f*  calculateSpeed(true));
 }
 
@@ -214,12 +217,12 @@ void Enemy::attack() {
 
 // play the death animation and also will handle turning into a ragdoll
 void Enemy::die() {
-    // animationHandler.nextAnimation(animationHandler.animDeath());
-    // std::cout << "DEAD";
+    // animationHandler.nextAnimation(animationHandler.animDeath()); // animation for death has been removed
     isDead = true;
 }
 
 // play the shout animation
 void Enemy::shout() {
+    // play the shout animation
     animationHandler.nextAnimation(animationHandler.animShout());
 }

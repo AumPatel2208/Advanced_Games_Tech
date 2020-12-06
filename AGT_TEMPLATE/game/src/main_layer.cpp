@@ -1,6 +1,5 @@
 #include "main_layer.h"
 #include "platform/opengl/gl_shader.h"
-
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/type_ptr.hpp>
 #include "engine/events/key_event.h"
@@ -139,6 +138,7 @@ main_layer::main_layer()
 
     // mThrowable.initialise();
 
+    // initialise one throwable
     auto tempThrowable = Throwable{};
     tempThrowable.initialise();
     mThrowables.emplace_back(tempThrowable);
@@ -191,25 +191,8 @@ main_layer::main_layer()
     sphere_props.mass = 0.000001f;
     mBall = engine::game_object::create(sphere_props);
 
-    //initialise the primitives
+    //initialise the Tetrahedrons
     initialiseTetrahedrons(1.f, 3);
-
-    // // Octahedron
-    // const engine::ref<engine::Octahedron> octahedron = engine::Octahedron::createDefaultVertices(3.f);
-    // const std::vector<engine::ref<engine::texture_2d>> octaTextures = {
-    //     engine::texture_2d::create("assets/textures/green_brick.png", false)
-    //     // Load Sea Rock Texture. sourced from https://3dtextures.me/
-    // };
-    // engine::game_object_properties octaProps;
-    //
-    // float positionX = (rand() % 100) / 10.f;
-    // float positionZ = (rand() % 100) / 10.f;
-    // octaProps.position = {positionX, 10.f, positionZ};
-    // octaProps.meshes = {octahedron->mesh()};
-    // octaProps.textures = octaTextures;
-    // auto octObject = engine::game_object::create(octaProps);
-    // mOctahedron = octObject;
-    //
 
     const engine::ref<engine::cuboid> menuShape = engine::cuboid::create(
         glm::vec3((float)engine::application::window().width() / 500, 0.1f,
@@ -223,6 +206,7 @@ main_layer::main_layer()
     mMenu = engine::game_object::create(menuProps);
 
 
+    // add objects to the game objects list to apply to the physics manager
     mGameObjects.push_back(mTerrain);
     mGameObjects.push_back(mBall);
     // mGameObjects.push_back(mPlayer.object());
@@ -243,11 +227,6 @@ main_layer::main_layer()
     // create a text manager used to display text onto the screen
     mTextManager = engine::text_manager::create();
 
-    // m_billboard = billboard::create("assets/textures/Explosion.tga", 4, 5, 16);
-
-    // fixed animation for the player
-    // have not implemented the animation manager for the player
-    // mPlayer.object()->animated_mesh()->switch_animation(1);
 }
 
 main_layer::~main_layer() {}
@@ -509,18 +488,21 @@ void main_layer::updateTetrahedrons(const engine::timestep& timestep) {
     }
 }
 
+// update the throwables
 void main_layer::updateThrowables(const engine::timestep& timestep) {
     for (auto& throwable : mThrowables) {
         throwable.onUpdate(timestep, mPlayer);
     }
 }
 
+// render the list of throwables
 void main_layer::renderThrowables(std::shared_ptr<engine::shader> shader) {
     for (auto& throwable : mThrowables) {
         throwable.onRender(shader);
     }
 }
 
+// load the music tracks from the music folder
 void main_layer::loadMusic() {
     const std::string path = "assets/audio/music/";
 
@@ -552,7 +534,6 @@ void main_layer::renderMusicHud() {
             offsetAdd += 30.f;
             i++;
         }
-        // textManager->render_text(text_shader, text, 10.f, (float)engine::application::window().height() - 25.f,1.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
     }
 }
 
@@ -694,13 +675,11 @@ void main_layer::on_render() {
 
     // Render the enemies into the scene using the same animated mesh shader as the player's object
     renderEnemies(animatedMeshShader);
-
     engine::renderer::end_scene();
 
 
     // render billboard
     engine::renderer::begin_scene(m3DCamera, texturedLightingShader);
-    // m_billboard->on_render(m3DCamera, texturedLightingShader);
     mBillboardManager.onRender(texturedLightingShader, m3DCamera);
     engine::renderer::end_scene();
 
@@ -783,36 +762,6 @@ void main_layer::onCollisions() {
             mBoss.getHit(10);
         }
     }
-
-
-    // // Remove after throwable is all put in the list
-    // bool throwableEnemyCollision = false;
-    // for (auto& collisionObject : mThrowable.object()->collision_objects()) {
-    //     if (collisionObject->getName() == "enemy")
-    //         throwableEnemyCollision = true;
-    // }
-    // if (mThrowable.object()->is_colliding() && throwableEnemyCollision && mThrowable.getThrowTimer()>0) {
-    //     throwableEnemyCollision = false;
-    //     int i = 0;
-    //     for (auto& enemy : mEnemies) {
-    //         for (auto& collisionObject : enemy.object()->collision_objects()) {
-    //             if (collisionObject->getName() == "throwable") {
-    //                 throwableEnemyCollision = true;
-    //             }
-    //         }
-    //         if (enemy.object()->is_colliding() && throwableEnemyCollision) {
-    //             enemy.die();
-    //         }
-    //         i++;
-    //     }
-    // }
-    ////
-
-    // Collision Between throwable and boss
-
-
-    // collision with player and boss's bullet
-
 
 }
 

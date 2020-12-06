@@ -3,28 +3,19 @@
 // #include "player.h"
 
 FriendlyNPC::FriendlyNPC() {
+    // initialise the audio manager
     mAudioManager = engine::audio_manager::instance();
-
-    // npcMesh = engine::skinned_mesh::create("assets/models/animated/mannequin/free3Dmodel.dae");
-    // npcMesh->LoadAnimationFile("assets/models/animated/mannequin/walking.dae");
-    // npcMesh->switch_root_movement(false);
-
-    // npcMesh->set_default_animation(0);
 }
 
 FriendlyNPC::~FriendlyNPC() {}
 
 void FriendlyNPC::initialise() {
+    // create the game object
     engine::ref<engine::model> npcModel = engine::model::create("assets/models/static/npc.dae");
     engine::game_object_properties npcProps;
-    // npcProps.animated_mesh =  npcMesh ;
     npcProps.meshes = npcModel->meshes();
-    // npcProps.scale = glm::vec3(100);
     npcProps.scale = glm::vec3(1.f / glm::max(npcModel->size().x, glm::max(npcModel->size().y, npcModel->size().z)));
-    // npcProps.scale = glm::vec3(1.5);
     npcProps.position = glm::vec3(3.0f, 0.5f, -5.0f);
-    // npcProps.bounding_shape = npcMesh->size() / 2.f * npcProps.scale.x;
-    // npcProps.textures = { engine::texture_2d::create("assets/models/animated/minotaur/Minotaur_diffuse.tga", false) };
     npcProps.type = 0;
     mObject = engine::game_object::create(npcProps);
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
@@ -47,7 +38,7 @@ void FriendlyNPC::initialise() {
     mAudioManager->load_sound("assets/audio/npc_dialogue/end_2.mp3", engine::sound_type::event, "end_2");
 }
 
-
+// Render the NPC
 void FriendlyNPC::onRender(const std::shared_ptr<engine::shader>& texturedLightingShader) const {
     glm::mat4 npcTransform(1.0f);
     npcTransform = glm::translate(npcTransform, mObject->position());
@@ -57,6 +48,7 @@ void FriendlyNPC::onRender(const std::shared_ptr<engine::shader>& texturedLighti
     engine::renderer::submit(texturedLightingShader, npcTransform, mObject);
 }
 
+// render the Choice HUD
 void FriendlyNPC::renderChoiceHUD(engine::ref<engine::text_manager>& textManager) {
     if (toRenderChoiceHUD) {
         // form the text
@@ -73,6 +65,7 @@ void FriendlyNPC::renderChoiceHUD(engine::ref<engine::text_manager>& textManager
     }
 }
 
+// update the object
 void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {
 
     if(dialoguePath == "end" &&dialogueNumber == 2) {
@@ -88,13 +81,12 @@ void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {
     }
 
 
-    // mObject->animated_mesh()->on_update(timestep);
-
     // distance relative to player
     const auto distanceFromPLayer = mObject->position() - player.object()->position();
     isInRange = distanceFromPLayer.x < 1.5f && distanceFromPLayer.z < 1.5f && distanceFromPLayer.x > -1.5f && distanceFromPLayer.z > -1.5f;
     if (isInRange) {
         if (mDialogueTimer <= 0) {
+            // play the audio if the E key is pressed
             if (engine::input::key_pressed(engine::key_codes::KEY_E)) {
                 playDialogue();
                 progress();
@@ -124,18 +116,18 @@ void FriendlyNPC::onUpdate(const engine::timestep& timestep, Player& player) {
         toRenderChoiceHUD = false;
     }
 
-    
-
     if (!(dialogueNumber == 2 && dialoguePath == "greeting"))
         toRenderChoiceHUD = false;
 
 }
 
+// play the appropriate dialogue
 void FriendlyNPC::playDialogue() const {
     const std::string dialogue = dialoguePath + "_" + std::to_string(dialogueNumber);
     mAudioManager->play(dialogue);
 }
 
+// progress to the next dialogue (or not if requirements are not met)
 void FriendlyNPC::progress() {
 
     if (dialoguePath == "greeting") {

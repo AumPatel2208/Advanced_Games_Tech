@@ -4,34 +4,28 @@ Boss::Boss() {}
 Boss::~Boss() {}
 
 void Boss::initialise() {
+
+    // create the boss game object
+    //
     // model from https://www.turbosquid.com/3d-models/3d-humanoid-robot-character-1479200
     engine::ref<engine::model> bossModel = engine::model::create("assets/models/static/Argon.obj");
     engine::game_object_properties bossProps;
-    // npcProps.animated_mesh =  npcMesh ;
     bossProps.meshes = bossModel->meshes();
-    // npcProps.scale = glm::vec3(100);
     bossProps.scale = glm::vec3(
         2.5f / glm::max(bossModel->size().x, glm::max(bossModel->size().y, bossModel->size().z)));
     bossProps.bounding_shape = glm::vec3(
         2.5f / glm::max(bossModel->size().x, glm::max(bossModel->size().y, bossModel->size().z)));
-    // npcProps.scale = glm::vec3(1.5);
     bossProps.position = glm::vec3(3.0f, 0.5f, -5.0f);
-    // npcProps.bounding_shape = npcMesh->size() / 2.f * npcProps.scale.x;
-    // npcProps.textures = { engine::texture_2d::create("assets/models/animated/minotaur/Minotaur_diffuse.tga", false) };
     bossProps.type = 0;
     // https://opengameart.org/node/21067
     bossProps.textures = {engine::texture_2d::create("assets/textures/antimony.png", false)};
     mObject = engine::game_object::create(bossProps);
-    // mObject->set_scale(glm::vec3(3.f));
+    // set the forward and position for the boss
     mObject->set_forward(glm::vec3(0.f, 0.f, -1.f));
     mObject->set_position(glm::vec3(0.f, 0.5f, -10.f));
-    // mObject->set_position(glm::vec3(0.f, 0.5f, 10.f));
-    // mObject->set_offset(bossModel->offset());
-    // mObject->set_position(glm::vec3(mObject->position().x, mObject->position().y + 2.f, mObject->position().z));
-    // mObject->set_mass(0);
-    // mObject->set_velocity(glm::vec3(0.f, 9.8f, 5.f));
 
-    //Bullet shape
+
+    // create the bullet shape
     const engine::ref<engine::BulletShape> bulletShape = engine::BulletShape::createDefaultVertices(0.25f, 0.1f, 0.25f);
     const std::vector<engine::ref<engine::texture_2d>> bulletTextures = {
         // https://opengameart.org/content/details-for-damaged-and-dirty-textures
@@ -43,21 +37,25 @@ void Boss::initialise() {
     bulletProps.textures = bulletTextures;
     auto bulletObject = engine::game_object::create(bulletProps);
     mBullet = bulletObject;
-    // mBullet->set_rotation_amount(glm::radians(90.f));
 }
 
+// render the boss and bullet
 void Boss::onRender(const std::shared_ptr<engine::shader>& texturedLightingShader,
                     const engine::perspective_camera& camera) const {
 
+    // only render the bullet if show bullet is true
     if (showBullet) {
         engine::renderer::submit(texturedLightingShader, mBullet);
     }
 
+    // only render the boss if it is not dead
     if (!isDead)
         engine::renderer::submit(texturedLightingShader, mObject);
 }
 
+// render the 2d elements of the boss (the boss health)
 void Boss::onRenderHUD(engine::ref<engine::text_manager>& textManager) {
+    // render the health of the boss if it is not in an idle state
     if (mState != State::IDLE) {
         const auto healthText = "BOSS: " + std::to_string(mHealthPoints);
         const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
@@ -65,44 +63,33 @@ void Boss::onRenderHUD(engine::ref<engine::text_manager>& textManager) {
     }
 }
 
-void Boss::moveBullet() { }
 
 void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardManager& billboardManager) {
     if (!isDead) {
         // turn towards the player
         const glm::vec3 v = player.object()->position() - mObject->position();
         const float theta = atan2(v.x, v.z);
-        // activate turning
         turn(theta);
 
-
+        // update the position of the explosion billboard to the position of the boss
         billboardManager.getSfx(BillboardManager::sfx_EXPLOSION).position = glm::vec3(
             mObject->position().x, mObject->position().y + 0.5f, mObject->position().z + 0.1f);
 
-
-        // if (engine::input::key_pressed(engine::key_codes::KEY_F)) {
-        //     if (bulletTimer <= 0) {
-        //         bulletTrajectory = glm::normalize(player.object()->position() - mObject->position());
-        //         shoot(billboardManager);
-        //     }
-        // }
-
-        // int randomNo = rand() % 100 + 1;
-
+        // calculate the distance of the boss to the player, used in the many switch statements
         const auto distanceFromPlayer = glm::length(mObject->position() - player.object()->position());
 
-        // auto randomNo = randomNumber();
 
-
+        // Switch Case for the base state of the boss
         switch (mState) {
         case State::IDLE: // idle non-aggro state
+            // if the distance is less than 3.f, the boss will activate and start by moving.
             if (distanceFromPlayer < 3.f) {
                 mState = State::MOVE;
             }
             break;
         case State::MOVE: // move state
 
-            // pick the movement
+            // pick the movement 50:50 chance
             if (randomNumber() < 50) {
                 mMoveState = MoveState::STRAFE;
             }
@@ -110,11 +97,12 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
                 mMoveState = MoveState::DASH;
             }
 
+            // Switch case for the move state
             switch (mMoveState) {
             case MoveState::STRAFE:
                 // activate strafing
                 strafeTimer = 0.5f;
-                // std::cout << "Strafing: " << randomNo << "\n";
+                // 50:50 chance on whether to strafe right or left
                 if (randomNumber() < 50) {
                     direction = false;
                 }
@@ -127,8 +115,8 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
             case MoveState::DASH:
                 // activate dashing
                 dashTimer = 0.5f;
-                // std::cout << "Dash: " << randomNo << "\n";
 
+                // 50:50 chance on whether to dash forwards or backwards
                 if (randomNumber() < 50) {
                     direction = false;
                 }
@@ -142,8 +130,8 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
             }
             break;
         case State::ATTACK: // attack state
-            // std::cout << "Attack: ";
             mState = State::OPEN;
+            // CODE COMMENTED OUT FOR THE POTENTIAL AIR ATTACK STATE
             // if (randomNo < 20) {
             //     //air attack
             //     mAttackState = AttackState::AIR_ATTACK;
@@ -157,6 +145,8 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
             //     mAttackState = AttackState::TRACKING_SHOT;
             // }
             //
+
+            // Pick the attack to perform, 60:40 chance of fast shot to tracking shot
             if (randomNumber() < 60) {
                 mAttackState = AttackState::FAST_SHOT;
             }
@@ -166,31 +156,35 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
 
             switch (mAttackState) {
             case AttackState::TRACKING_SHOT:
-                // std::cout << "Tracking Shot \n";
 
+                // set the scale, speed and tracking of the bullet
                 mBullet->set_scale(glm::vec3(3.f));
                 bulletSpeed = 2.f;
                 isTracking = true;
                 bulletCollisionRadius = 2.5f;
 
+                // shoot the bullet
                 if (bulletTimer <= 0) {
                     bulletTrajectory = glm::normalize(player.object()->position() - mObject->position());
                     shoot(billboardManager);
                 }
+                // change the state to the acting state
                 mState = State::ACTING;
                 break;
             case AttackState::FAST_SHOT:
-                // std::cout << "Fast Shot \n";
 
+                // set the scale, speed and tracking of the bullet
                 mBullet->set_scale(glm::vec3(1.f));
                 bulletSpeed = 4.f;
                 isTracking = false;
                 bulletCollisionRadius = 1.5f;
 
+                // shoot the bullet
                 if (bulletTimer <= 0) {
                     bulletTrajectory = glm::normalize(player.object()->position() - mObject->position());
                     shoot(billboardManager);
                 }
+                // change the state to the acting state
                 mState = State::ACTING;
 
                 break;
@@ -203,10 +197,13 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
             }
 
             break;
-        case State::OPEN:
+        case State::OPEN: // Open/Vulnerable state
+            // tick down the timer
             if (openTimer > 0) {
                 openTimer -= static_cast<float>(timestep);
             }
+
+            // if the timer has finished choose the state to go into next
             if (openTimer <= 0) {
                 // pick state here using random numbers 45% chance for attack and 55% chance for move
                 // picking here as just coming out of the open state
@@ -220,7 +217,11 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
 
             break;
 
-        case State::ACTING:
+        case State::ACTING: // a state to complete the actions that need to be performed
+
+            // after each action the boss is put into the open state where it will be vulnerable for a bit and then choose the next action
+
+            // if the action was to strafe, tick down the strafe timer and call the strafe method
             if (strafeTimer > 0) {
                 strafe(timestep);
                 strafeTimer -= timestep;
@@ -230,6 +231,7 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
                 }
             }
 
+            // if the action was to strafe, tick down the strafe timer and call the strafe method
             if (dashTimer > 0) {
                 dash(timestep);
                 dashTimer -= static_cast<float>(timestep);
@@ -253,7 +255,7 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
                     openTimer = 3.f;
                     mState = State::OPEN;
 
-                    // do another explosion
+                    // planned to do another billboard explosion
                 }
             }
 
@@ -265,25 +267,29 @@ void Boss::onUpdate(const engine::timestep& timestep, Player& player, BillboardM
 
 
         // handling timer for getting hit
+        // on a timer as the collision for the sword can be colliding for a bit and it will destroy boss to quickly
         if (getHitTimer > 0.f) {
             getHitTimer -= static_cast<float>(timestep);
         }
 
-        if(bulletHitTimer>0) {
+        // a timer to manage the collision with the player, will only hit the player every half a second so that the player's
+        // health will not be depleted instantly if he stays in the collision.
+        if (bulletHitTimer > 0) {
             bulletHitTimer -= timestep;
         }
 
     }
     else {
-        // if dead
+        // if dead hide the bullet
         showBullet = false;
 
     }
 }
 
+// check the collision with the player and the bullet
 void Boss::checkPlayerBulletCollision(Player& player) {
     const auto distance = glm::length(mBullet->position() - player.object()->position());
-    if(distance<=bulletCollisionRadius) {
+    if (distance <= bulletCollisionRadius) {
         if (bulletHitTimer <= 0) {
             player.getHit(10 * bulletCollisionRadius); // damage is based on the size of the bullet
             bulletHitTimer = 1.f;
@@ -291,7 +297,7 @@ void Boss::checkPlayerBulletCollision(Player& player) {
     }
 }
 
-
+// dash forwards or backwards
 void Boss::dash(const engine::timestep& timestep) {
     auto offset = 2.3f * static_cast<float>(timestep);
     if (direction)
@@ -300,6 +306,7 @@ void Boss::dash(const engine::timestep& timestep) {
 }
 
 
+// strafe left or right
 void Boss::strafe(const engine::timestep& timestep) {
     auto offset = 1.5f * static_cast<float>(timestep);
     if (direction)
@@ -307,7 +314,7 @@ void Boss::strafe(const engine::timestep& timestep) {
     mObject->set_position(glm::vec3(mObject->position().x + offset, mObject->position().y, mObject->position().z));
 }
 
-
+// deduct damage from the health points if hit
 void Boss::getHit(const int& damage) {
     if (getHitTimer <= 0.f) {
         mHealthPoints -= damage;
@@ -319,7 +326,7 @@ void Boss::getHit(const int& damage) {
     }
 }
 
-// Turn Boss towards the player
+// Turn Boss and the bullet towards the player
 void Boss::turn(float angle) const {
     if (mState != State::IDLE) {
         mObject->set_rotation_amount(angle);
@@ -328,17 +335,19 @@ void Boss::turn(float angle) const {
     }
 }
 
+// shoot a bullet and do an explosion
 void Boss::shoot(BillboardManager& billboardManager) {
     billboardManager.activate(billboardManager.getSfx(BillboardManager::sfx_EXPLOSION));
     showBullet = true;
     bulletTimer = 2.5f;
 }
 
+// set the is dead variable to true. can be used to create a unique billboard effect on death
 void Boss::die() {
-    // do something
     isDead = true;
 }
 
+// generate a random number, used in choosing what states to switch to and what directions to pick
 int Boss::randomNumber() {
     return rand() % 100 + 1;
 }
