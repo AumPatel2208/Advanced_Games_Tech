@@ -2,7 +2,7 @@
 
 > Knights Embers by Aum Patel at City University of London
 
-Note the engine code was provided by the University.
+Note the engine code was provided by the University however some alterations have been made to it.
 
 # Documentation
 
