@@ -267,7 +267,7 @@ Bullet: https://opengameart.org/content/details-for-damaged-and-dirty-textures
 
 ## Part 1: Basic Game Modelling   `25%`
 
-1. `4% ` **intro screen with keyboard/mouse controls** 
+1. `4%` **intro screen with keyboard/mouse controls** 
 2. `12%` 3 Primitive Objects, change in skybox and terrain 
 3. `5%` Audio: 3 sounds synched with game events, new background audio
 4. `4%` HUD. Score Health Stamina etc
